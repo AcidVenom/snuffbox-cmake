@@ -1,0 +1,104 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
+SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
+
+CMAKE_POLICY (SET CMP0020 OLD)
+
+#Project name
+PROJECT (snuffbox)
+
+#Version information
+SET (SNUFF_VERSION_MAJOR 0)
+SET (SNUFF_VERSION_MINOR 0)
+
+OPTION (SNUFF_BUILD_OPENGL "Build Snuffbox for OpenGL (MacOSX, Linux)" OFF)
+OPTION (SNUFF_BUILD_CONSOLE "Build Snuffbox with the Qt5 console" ON)
+
+#Macro definitions
+ADD_DEFINITIONS (-DSNUFF_VERSION_MAJOR=${SNUFF_VERSION_MAJOR})
+ADD_DEFINITIONS (-DSNUFF_VERSION_MINOR=${SNUFF_VERSION_MINOR})
+
+#Find OpenGL directories if building for OpenGL
+IF (SNUFF_BUILD_OPENGL)
+	FIND_PACKAGE(OpenGL)
+	IF (OPENGL_FOUND)
+		MESSAGE(STATUS "Succesfully found OpenGL")
+		INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+	ELSE()
+		MESSAGE(FATAL_ERROR "Could not find OpenGL on this system")
+	ENDIF()
+ENDIF (SNUFF_BUILD_OPENGL)
+
+IF (WIN32 AND (NOT SNUFF_BUILD_OPENGL))
+	FIND_PACKAGE(DirectX REQUIRED)
+	
+	IF (DirectX_D3D11_FOUND)
+		MESSAGE(STATUS "Succesfully found DirectX 11")
+		INCLUDE_DIRECTORIES(${DirectX_D3D11_INCLUDE_DIR})
+		INCLUDE_DIRECTORIES(${DirectX_OLD_INCLUDE_DIR})
+		LINK_DIRECTORIES(${DirectX_D3D11_LIBRARIES})
+	ELSE()
+		MESSAGE(FATAL_ERROR "Could not find DirectX 11 on this system")
+	ENDIF (DirectX_D3D11_FOUND)
+ELSEIF (NOT WIN32)
+	MESSAGE (FATAL_ERROR "You cannot build Snuffbox with DirectX on Linux or Mac, please set 'SNUFF_BUILD_OPENGL' to ON")
+ENDIF (WIN32 AND (NOT SNUFF_BUILD_OPENGL))
+
+#Find Qt5 directories if building with a console
+IF (SNUFF_BUILD_CONSOLE)
+	FIND_PACKAGE (Qt5Widgets REQUIRED)
+	
+	IF (Qt5Widgets_FOUND)
+		MESSAGE (STATUS "Succesfully found Qt5Widgets")
+		INCLUDE_DIRECTORIES (${Qt5Widgets_INCLUDE_DIRS})
+	ELSE()
+		MESSAGE (FATAL_ERROR "Could not find Qt 5.1.1 or newer on this system")
+	ENDIF()
+	ADD_DEFINITIONS (-DSNUFF_BUILD_CONSOLE)
+ENDIF (SNUFF_BUILD_CONSOLE)
+
+SET (V8_LIBRARY_DIR CACHE PATH "The path to where the Google V8 libraries are found")
+SET (V8_INCLUDE_DIR CACHE PATH "The path to where the Google V8 include headers are found")
+
+FIND_PACKAGE(V8 REQUIRED)
+IF (V8_FOUND)
+	INCLUDE_DIRECTORIES (${V8_INCLUDE})
+	LINK_DIRECTORIES (${V8_LIBRARY_DIR})
+ELSE ()
+	MESSAGE (FATAL_ERROR "Could not find Google V8 on this system")
+ENDIF (V8_FOUND)
+
+SET (FBX_LIBRARY_DIR CACHE PATH "The path to where the Autodesk FBX SDK libraries are found")
+SET (FBX_INCLUDE_DIR CACHE PATH "The path to where the Autodesk FBX SDK include headers are found")
+
+FIND_PACKAGE(FBX REQUIRED)
+IF (FBX_FOUND)
+	INCLUDE_DIRECTORIES (${FBX_INCLUDE})
+	LINK_DIRECTORIES (${FBX_LIBRARY_DIR})
+ELSE ()
+	MESSAGE (FATAL_ERROR "Could not find the Autodesk FBX SDK on this system")
+ENDIF (FBX_FOUND)
+
+SET (FMOD_LIBRARY_DIR CACHE PATH "The path to where the FMOD libraries are found")
+SET (FMOD_INCLUDE_DIR CACHE PATH "The path to where the FMOD include headers are found")
+
+FIND_PACKAGE(FMOD REQUIRED)
+IF (FMOD_FOUND)
+	INCLUDE_DIRECTORIES (${FMOD_INCLUDE})
+	LINK_DIRECTORIES (${FMOD_LIBRARY_DIR})
+ELSE ()
+	MESSAGE (FATAL_ERROR "Could not find FMOD on this system")
+ENDIF (FMOD_FOUND)
+
+SET (FREETYPE_LIBRARY_DIR CACHE PATH "The path to where the FreeType libraries are found")
+SET (FREETYPE_INCLUDE_DIR CACHE PATH "The path to where the FreeType include headers are found")
+
+FIND_PACKAGE(FreeType REQUIRED)
+IF (FREETYPE_FOUND)
+	INCLUDE_DIRECTORIES (${FREETYPE_INCLUDE})
+	LINK_DIRECTORIES (${FREETYPE_LIBRARY_DIR})
+ELSE ()
+	MESSAGE (FATAL_ERROR "Could not find FreeType on this system")
+ENDIF (FREETYPE_FOUND)
+
+#Sub-directories
+ADD_SUBDIRECTORY (src)
