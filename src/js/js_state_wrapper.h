@@ -1,6 +1,7 @@
 #pragma once
 
 #include <v8.h>
+#include <string>
 
 namespace v8
 {
@@ -42,11 +43,31 @@ namespace snuffbox
 		*/
 		v8::Handle<v8::Context> CreateContext(v8::Handle<v8::ObjectTemplate> global);
 
+		/**
+		* @brief Compiles JavaScript source code from a file and executes it
+		* @param[in] path (std::string) The source code file to compile and run
+		*/
+		void CompileAndRun(std::string path);
+
+		/**
+		* @brief Retrieves the last error from the JavaScript stack
+		* @param[in] try_catch (v8::TryCatch*) The try catch object of V8 that contains the error
+		* @param[in] failed (bool*) Did the error retrieval fail?
+		* @return std::string The error message
+		*/
+		std::string GetException(v8::TryCatch* try_catch, bool* failed);
+
 		/// Destroys the state wrapper and disposes V8
 		void Destroy();
 
 		/// Default destructor
 		~JSStateWrapper();
+
+		/**
+		* @brief Retrieves the isolate running on this thread
+		* @return v8::Isolate* The pointer to the current isolate
+		*/
+		v8::Isolate* isolate();
 
 	private:
 		v8::Isolate*	isolate_; //!< Used to create the isolated JavaScript state for this instance of the engine

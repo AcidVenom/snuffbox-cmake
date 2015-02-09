@@ -31,9 +31,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Verify()
 	{
-		SNUFF_ASSERT_NOTNULL(window_);
-		SNUFF_ASSERT_NOTNULL(keyboard_);
-		SNUFF_ASSERT_NOTNULL(mouse_);
+		SNUFF_ASSERT_NOTNULL(window_, "Game::Verify::Window");
+		SNUFF_ASSERT_NOTNULL(keyboard_, "Game::Verify::Keyboard");
+		SNUFF_ASSERT_NOTNULL(mouse_, "Game::Verify::Mouse");
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -92,21 +92,21 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::set_window(Window* window)
 	{
-		SNUFF_ASSERT_NOTNULL(window);
+		SNUFF_ASSERT_NOTNULL(window, "Game::set_window");
 		window_ = window;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void Game::set_keyboard(Keyboard* keyboard)
 	{
-		SNUFF_ASSERT_NOTNULL(keyboard);
+		SNUFF_ASSERT_NOTNULL(keyboard, "Game::set_keyboard");
 		keyboard_ = keyboard;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void Game::set_mouse(Mouse* mouse)
 	{
-		SNUFF_ASSERT_NOTNULL(mouse);
+		SNUFF_ASSERT_NOTNULL(mouse, "Game::set_mouse");
 		mouse_ = mouse;
 	}
 

@@ -45,7 +45,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	AllocatedMemory::~AllocatedMemory()
 	{
-		SNUFF_XASSERT(allocations_ == 0 && allocated_memory_ == 0, "Detected a memory leak on the heap!");
+		SNUFF_XASSERT(allocations_ == 0 && allocated_memory_ == 0, "Detected a memory leak on the heap!", "AllocatedMemory::~AllocatedMemory");
 		SNUFF_LOG_SUCCESS("No memory leaks detected");
 		SNUFF_LOG_INFO("Shutdown succesful");
 	}

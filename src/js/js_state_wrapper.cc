@@ -1,9 +1,12 @@
+#include <algorithm>
 #include <libplatform\libplatform.h>
 
 #include "../js/js_state_wrapper.h"
 
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
+
+#include "../platform/platform_text_file.h"
 
 
 using namespace v8;
@@ -32,60 +35,136 @@ namespace snuffbox
 		platform_ = platform::CreateDefaultPlatform();
 		V8::InitializePlatform(platform_);
 
-		Isolate* isolate = Isolate::New();
-		isolate->Enter();
+		isolate_ = Isolate::New();
+		isolate_->Enter();
 
-		Isolate::Scope isolate_scope(isolate);
+		Isolate::Scope isolate_scope(isolate_);
 
-		HandleScope scope(isolate);
+		HandleScope scope(isolate_);
 
 		Handle<ObjectTemplate> global = CreateGlobal();
-		global_.Reset(isolate, global);
+		global_.Reset(isolate_, global);
 
 		Handle<Context> context = CreateContext(global);
-		context_.Reset(isolate, context);
+		context_.Reset(isolate_, context);
 
-		Context::Scope context_scope(context);
-
-		Local<Script> script = Script::Compile(String::NewFromUtf8(isolate, "var x = 0;"), String::NewFromUtf8(isolate, "test.js"));
-		Local<Value> result = script->Run();
-
-		SNUFF_LOG_INFO(*String::Utf8Value(result));		
+		CompileAndRun("main.js");
 	}
 
 	//-------------------------------------------------------------------------------------------
 	Handle<ObjectTemplate> JSStateWrapper::CreateGlobal()
 	{
-		Isolate* isolate = Isolate::GetCurrent();
-		return ObjectTemplate::New(isolate);
+		return ObjectTemplate::New(isolate_);
 	}
 
 	//-------------------------------------------------------------------------------------------
 	Handle<Context> JSStateWrapper::CreateContext(Handle<ObjectTemplate> global)
 	{
-		Isolate* isolate = Isolate::GetCurrent();
-		return Context::New(isolate, NULL, global);
+		return Context::New(isolate_, NULL, global);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::CompileAndRun(std::string path)
+	{
+		HandleScope handle_scope(isolate_);
+
+		Local<Context> context = Local<Context>::New(isolate_, context_);
+		Context::Scope context_scope(context);
+
+		TextFile file;
+
+		bool success = file.Open(path);
+
+		SNUFF_XASSERT(success == true, "The file '" + path + "' could not be opened!", "JSStateWrapper::CompileAndRun");
+
+		TryCatch try_catch;
+
+		Local<Script> script = Script::Compile(String::NewFromUtf8(isolate_, file.Read().c_str()), String::NewFromUtf8(isolate_, path.c_str()));
+		Local<Value> result = script->Run();
+
+		if (result.IsEmpty() == true)
+		{
+			bool error = false;
+			std::string exception(GetException(&try_catch, &error));
+
+			SNUFF_XASSERT(error == false, "There was an error, but failed retrieving the error after compilation of " + path + "!", "JSStateWrapper::CompileAndRun::Error");
+
+			SNUFF_LOG_ERROR(exception);
+			return;
+		}
+		else
+		{
+
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	std::string JSStateWrapper::GetException(TryCatch* try_catch, bool* failed)
+	{
+		HandleScope handle_scope(isolate_);
+		String::Utf8Value exception(try_catch->Exception());
+		Handle<Message> message = try_catch->Message();
+
+		std::string error = "";
+
+		if (!message.IsEmpty()){
+			String::Utf8Value sourceline(message->GetSourceLine());
+			error += "\n\n";
+
+			std::string srcline = *sourceline;
+
+			auto it = std::remove_if(std::begin(srcline), std::end(srcline), [](char c){ return (c == '\t'); });
+			srcline.erase(it, std::end(srcline));
+
+			error += srcline;
+			error += "\n";
+
+			int start = message->GetStartColumn();
+			for (int i = 0; i < start; i++) {
+				error += " ";
+			}
+			int end = message->GetEndColumn();
+			for (int i = start; i < end; i++) {
+				error += "^";
+			}
+			String::Utf8Value stack_trace(try_catch->StackTrace());
+
+			error += "\n\t";
+			error += *stack_trace;
+			error += "\n";
+
+			if (stack_trace.length() > 0) {
+				*failed = true;
+				return error;
+			}
+		}
+
+		return std::string("");
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void JSStateWrapper::Destroy()
 	{
-		Isolate* isolate = Isolate::GetCurrent();
-		
 		SNUFF_LOG_DEBUG("Collecting all garbage..");
-		isolate->LowMemoryNotification();
+		isolate_->LowMemoryNotification();
 		SNUFF_LOG_DEBUG(".. Collected garbage");
 
 		global_.Reset();
 		context_.Reset();
 
-		isolate->Exit();
-		isolate->Dispose();
+		isolate_->Exit();
+		isolate_->Dispose();
 
 		V8::Dispose();
 
 		delete platform_;
 		platform_ = nullptr;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	v8::Isolate* JSStateWrapper::isolate()
+	{
+		return isolate_;
 	}
 
 	//-------------------------------------------------------------------------------------------

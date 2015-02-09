@@ -138,7 +138,7 @@ namespace snuffbox
 		wndClass.cbWndExtra = sizeof(void*);
 		wndClass.cbClsExtra = sizeof(WNDCLASS);
 
-		SNUFF_XASSERT(RegisterClassA(&wndClass), "Unable to register window class!");
+		SNUFF_XASSERT(RegisterClassA(&wndClass), "Unable to register window class!", "Win32Window::Initialise");
 
 		RECT clientSize;
 		clientSize.left = clientSize.top = 0;
@@ -158,7 +158,7 @@ namespace snuffbox
 			style, x_, y_, actualWidth, actualHeight, GetDesktopWindow(), NULL,
 			wndClass.hInstance, this);
 		
-		SNUFF_XASSERT(handle_, "Unable to create window!");
+		SNUFF_XASSERT(handle_, "Unable to create window!", "Win32Window::Initialise");
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -343,7 +343,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	Win32Window::~Win32Window()
 	{
-		SNUFF_ASSERT_NOTNULL(handle_);
+		SNUFF_ASSERT_NOTNULL(handle_, "Win32Window::~Win32Window");
 		DestroyWindow(handle_);
 		UnregisterClassA(SNUFF_WINDOW_CLASS, instance_);
 		SNUFF_LOG_INFO("Destroyed the window with name '" + name_ + "'");

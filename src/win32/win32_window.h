@@ -33,13 +33,13 @@ namespace snuffbox
 		/// Initialises the window
 		void Initialise();
 
-		/// Shows the window of minimised or closed
+		/// @see snuffbox::IWindowBase
 		void Show();
 
-		/// Processes the messages of this window and sends the information to the input handlers
+		/// @see snuffbox::IWindowBase
 		void ProcessMessages();
 
-		/// Sends a quit message to the game instance, preparing for shutdown
+		/// @see snuffbox::IWindowBase
 		void SendQuitMessage();
 
 		/// When the window retrieves focus execute this function

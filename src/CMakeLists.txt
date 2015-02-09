@@ -3,6 +3,8 @@ SET (Win32Sources
 	win32/win32_window.h
 	win32/win32_file_watch.cc
 	win32/win32_file_watch.h
+	win32/win32_text_file.h
+	win32/win32_text_file.cc
 )
 
 SET (OSXSources 
@@ -10,6 +12,8 @@ SET (OSXSources
 	osx/osx_window.h
 	osx/osx_file_watch.cc
 	osx/osx_file_watch.h
+	osx/osx_text_file.h
+	osx/osx_text_file.cc
 )
 
 SET (LinuxSources 
@@ -17,12 +21,17 @@ SET (LinuxSources
 	linux/linux_window.h
 	linux/linux_file_watch.cc
 	linux/linux_file_watch.h
+	linux/linux_text_file.h
+	linux/linux_text_file.cc
 )
 
 SET (PlatformSources
 	platform/platform_window_base.h
 	platform/platform_window.h
 	platform/platform_file_watch.h
+	platform/platform_text_file_base.h
+	platform/platform_text_file.h
+	platform/platform_text_file.cc
 )
 
 SET (ApplicationSources
@@ -60,6 +69,7 @@ SET (InputSources
 
 SET (JavaScriptSources
 	js/js_object.h
+	js/js_callback.h
 	js/js_object_register.h
 	js/js_state_wrapper.h
 	js/js_state_wrapper.cc

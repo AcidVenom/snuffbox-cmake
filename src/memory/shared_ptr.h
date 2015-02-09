@@ -27,7 +27,7 @@ namespace snuffbox
 		*/
 		RefCount(T* ptr) : ref_count_(1)
 		{
-			SNUFF_ASSERT_NOTNULL(ptr);
+			SNUFF_ASSERT_NOTNULL(ptr, "RefCount::RefCount(T*)");
 			ptr_ = ptr;
 		}
 
@@ -40,7 +40,7 @@ namespace snuffbox
 		/// Destroys the associated pointer
 		inline void Destroy()
 		{
-			SNUFF_ASSERT_NOTNULL(ptr_);
+			SNUFF_ASSERT_NOTNULL(ptr_, "SharedPtr::Destroy");
 			AllocatedMemory::Instance().Destruct(ptr_);
 		}
 
@@ -179,7 +179,7 @@ namespace snuffbox
 	template<typename T>
 	SharedPtr<T>::SharedPtr(T* ptr)
 	{
-		SNUFF_ASSERT_NOTNULL(ptr);
+		SNUFF_ASSERT_NOTNULL(ptr, "SharedPtr::SharedPtr(T*)");
 		ptr_ = ptr;
 		ref_ = new RefCount<T>(ptr);
 	}
@@ -212,7 +212,7 @@ namespace snuffbox
 	template<typename T>
 	T* SharedPtr<T>::operator->(void)
 	{
-		SNUFF_ASSERT_NOTNULL(ptr_);
+		SNUFF_ASSERT_NOTNULL(ptr_, "SharedPtr::operator->");
 		return ptr_;
 	}
 
@@ -220,7 +220,7 @@ namespace snuffbox
 	template<typename T>
 	T& SharedPtr<T>::operator*(void)
 	{
-		SNUFF_ASSERT_NOTNULL(ptr_);
+		SNUFF_ASSERT_NOTNULL(ptr_, "SharedPtr::operator*");
 		return *ptr_;
 	}
 
@@ -235,7 +235,7 @@ namespace snuffbox
 	template<typename T>
 	bool SharedPtr<T>::operator==(const T* other) const
 	{
-		SNUFF_ASSERT_NOTNULL(other);
+		SNUFF_ASSERT_NOTNULL(other, "SharedPtr::operator==");
 		return other == get();
 	}
 
@@ -257,7 +257,7 @@ namespace snuffbox
 	template<typename T>
 	bool SharedPtr<T>::operator!=(const T* other) const
 	{
-		SNUFF_ASSERT_NOTNULL(other);
+		SNUFF_ASSERT_NOTNULL(other, "SharedPtr::operator!=");
 		return other != get();
 	}
 
@@ -308,7 +308,7 @@ namespace snuffbox
 	template<typename T>
 	T* SharedPtr<T>::get()
 	{
-		SNUFF_ASSERT_NOTNULL(ptr_);
+		SNUFF_ASSERT_NOTNULL(ptr_, "SharedPtr::get");
 		return ptr_;
 	}
 
