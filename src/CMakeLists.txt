@@ -20,6 +20,7 @@ SET (LinuxSources
 )
 
 SET (PlatformSources
+	platform/platform_window_base.h
 	platform/platform_window.h
 	platform/platform_file_watch.h
 )
@@ -28,6 +29,8 @@ SET (ApplicationSources
 	application/main.cc
 	application/game.h
 	application/game.cc
+	application/logging.cc
+	application/logging.h
 )
 
 SET (D3DSources
@@ -40,16 +43,35 @@ SET (OGLSources
 	ogl/ogl_render_device.cc
 )
 
+SET (MemorySources
+	memory/allocated_memory.h
+	memory/allocated_memory.cc
+	memory/shared_ptr.h
+)
+
+SET (InputSources
+	input/key.h
+	input/key.cc
+	input/keyboard.h
+	input/keyboard.cc
+	input/mouse.h
+	input/mouse.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
 SOURCE_GROUP("d3d11" 			FILES ${D3DSources})
 SOURCE_GROUP("ogl" 				FILES ${OGLSources})
+SOURCE_GROUP("memory" 		FILES ${MemorySources})
+SOURCE_GROUP("input" 			FILES ${InputSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
 	${PlatformSources}
 	${ApplicationSources}
+	${MemorySources}
+	${InputSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

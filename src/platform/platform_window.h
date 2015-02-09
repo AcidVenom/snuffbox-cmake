@@ -16,7 +16,14 @@ namespace snuffbox
 	class Window : public PlatformWindow
 	{
 	public:
-		Window();
-		virtual ~Window();
+		Window(int x, int y, int w, int h, std::string name) :
+			PlatformWindow(x, y, w, h, name)
+		{
+
+		};
+		virtual ~Window()
+		{
+
+		};
 	};
 }
