@@ -20,7 +20,7 @@ namespace snuffbox
 		static AllocatedMemory& Instance();
 
 		/**
-		* @brief Constructs a shared pointer through given arguments
+		* @brief Constructs a pointer through given arguments
 		* @param[in] args (Args&&..) The forwarded arguments to construct the pointer with
 		* @return T* A pointer to the newly created object
 		*/

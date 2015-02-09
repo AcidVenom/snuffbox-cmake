@@ -37,7 +37,7 @@ namespace snuffbox
 			Value(ValueTypes type);
 
 			/// Default destructor
-			~Value();
+			virtual ~Value();
 
 			/**
 			* @return bool Is this value a boolean?
@@ -61,11 +61,11 @@ namespace snuffbox
 			ValueTypes type();
 
 			/**
-			* @brief Returns a copy of this value as a converted value
-			* @return T The copy of this value converted
+			* @brief Dynamically cast this value to a downcasted value
+			* @return T* The downcasted value (nullptr if conversion was invalid)
 			*/
 			template<typename T>
-			T As();
+			T* As();
 
 		private:
 			ValueTypes type_; //!< The type of this value
@@ -188,11 +188,47 @@ namespace snuffbox
 		/**
 		* @brief Maps a CVar to its corresponding map index
 		* @param[in] name (const std::string&) The name of the CVar
-		* @param[in] val (snuffbox::CVar::Value) The CVar value to map
+		* @param[in] val (snuffbox::CVar::Value*) The CVar value to map
 		*/
-		void Map(const std::string& name, Value val);
+		void Map(const std::string& name, Value* val);
+
+		/**
+		* @brief Retrieves a CVar from the registered CVars
+		* @param[in] name (std::string) The name of the CVar to retrieve
+		* @param[in] found (bool*) Will be false if not found
+		* @return (snuffbox::CVar::Value*) The corresponding value
+		*/
+		CVar::Value* Get(std::string name, bool* found);
+
+		/**
+		* @brief Checks if a CVar value was registered
+		* @param[in] name (std::string) The CVar name to search for
+		* @return bool Does it exist?
+		*/
+		bool Exists(std::string name);
+
+		/**
+		* @brief Parses the command line passed by the executable
+		* @param[in] argc (int) The argument count
+		* @param[in] argv (char**) The actual arguments
+		*/
+		void ParseCommandLine(int argc, char** argv);
+
+		/**
+		* @brief Registers command line arguments as CVars
+		* @param[in] argc (int) The argument count
+		* @param[in] argv (char**) The actual arguments
+		*/
+		void RegisterCommandLine(int argc, char** argv);
 
 	private:
-		std::map<std::string, CVar::Value> vars_; //!< The variables 
+		typedef std::map<std::string, CVar::Value*> CVarMap;
+		CVarMap vars_; //!< The variables 
 	};
+
+	template<typename T>
+	T* CVar::Value::As()
+	{
+		return dynamic_cast<T*>(this);
+	}
 }

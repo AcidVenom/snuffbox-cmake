@@ -7,6 +7,7 @@
 #include "../memory/shared_ptr.h"
 
 #include "../platform/platform_text_file.h"
+#include "../cvar/cvar.h"
 
 
 using namespace v8;
@@ -73,9 +74,16 @@ namespace snuffbox
 
 		TextFile file;
 
-		bool success = file.Open(path);
+		CVar* cvar = CVar::Instance();
+		bool found_dir = false;
+		CVar::String* src_directory = cvar->Get("src_directory", &found_dir)->As<CVar::String>();
 
-		SNUFF_XASSERT(success == true, "The file '" + path + "' could not be opened!", "JSStateWrapper::CompileAndRun");
+		SNUFF_XASSERT(found_dir == true, "The 'src_directory' CVar could not be found!", "JSStateWrapper::CompileAndRun");
+
+		std::string fullPath = src_directory->value() + path;
+		bool success = file.Open(fullPath);
+
+		SNUFF_XASSERT(success == true, "The file '" + fullPath + "' could not be opened!", "JSStateWrapper::CompileAndRun");
 
 		TryCatch try_catch;
 
@@ -84,12 +92,13 @@ namespace snuffbox
 
 		if (result.IsEmpty() == true)
 		{
-			bool error = false;
-			std::string exception(GetException(&try_catch, &error));
+			bool failed = false;
+			std::string exception(GetException(&try_catch, &failed));
 
-			SNUFF_XASSERT(error == false, "There was an error, but failed retrieving the error after compilation of " + path + "!", "JSStateWrapper::CompileAndRun::Error");
-
-			SNUFF_LOG_ERROR(exception);
+			if (failed == true)
+			{
+				SNUFF_LOG_ERROR(exception);
+			}
 			return;
 		}
 		else

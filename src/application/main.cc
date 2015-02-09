@@ -9,6 +9,8 @@
 #include "../input/keyboard.h"
 #include "../input/mouse.h"
 
+#include "../cvar/cvar.h"
+
 using namespace snuffbox;
 
 int main(int argc, char** argv)
@@ -32,6 +34,10 @@ int main(int argc, char** argv)
 	name += " " + std::to_string(SNUFF_VERSION_MAJOR) + "." + std::to_string(SNUFF_VERSION_MINOR);
 
 	Game* game = Game::Instance();
+	CVar* cvar = CVar::Instance();
+
+	cvar->RegisterCommandLine(argc, argv);
+
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
