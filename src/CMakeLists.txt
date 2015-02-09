@@ -77,6 +77,11 @@ SET (JavaScriptSources
 	js/js_wrapper.cc
 )
 
+SET (CVarSources
+	cvar/cvar.h
+	cvar/cvar.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -85,6 +90,7 @@ SOURCE_GROUP("ogl" 				FILES ${OGLSources})
 SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
 SOURCE_GROUP("js" 				FILES ${JavaScriptSources})
+SOURCE_GROUP("cvar" 				FILES ${CVarSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -93,6 +99,7 @@ SET (SNUFF_SOURCES
 	${MemorySources}
 	${InputSources}
 	${JavaScriptSources}
+	${CVarSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
