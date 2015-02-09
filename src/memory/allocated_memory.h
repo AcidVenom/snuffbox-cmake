@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../memory/shared_ptr.h"
-
 namespace snuffbox
 {
 	/**
@@ -12,9 +10,6 @@ namespace snuffbox
 	class AllocatedMemory
 	{
 	public:
-		/// Default constructor
-		AllocatedMemory();
-
 		/// Default destructor (Checks for leaks)
 		~AllocatedMemory();
 
@@ -58,6 +53,10 @@ namespace snuffbox
 		void DecreaseUsedMemory(const size_t size);
 
 	private:
+
+		/// Default constructor
+		AllocatedMemory();
+
 		unsigned int allocations_; //!< The number of allocations of this allocator
 		size_t allocated_memory_; //!< The total allocated memory in bytes of this allocator
 	};

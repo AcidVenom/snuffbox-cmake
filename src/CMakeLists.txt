@@ -58,6 +58,15 @@ SET (InputSources
 	input/mouse.cc
 )
 
+SET (JavaScriptSources
+	js/js_object.h
+	js/js_object_register.h
+	js/js_state_wrapper.h
+	js/js_state_wrapper.cc
+	js/js_wrapper.h
+	js/js_wrapper.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -65,6 +74,7 @@ SOURCE_GROUP("d3d11" 			FILES ${D3DSources})
 SOURCE_GROUP("ogl" 				FILES ${OGLSources})
 SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
+SOURCE_GROUP("js" 				FILES ${JavaScriptSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -72,6 +82,7 @@ SET (SNUFF_SOURCES
 	${ApplicationSources}
 	${MemorySources}
 	${InputSources}
+	${JavaScriptSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

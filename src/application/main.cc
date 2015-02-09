@@ -1,6 +1,8 @@
 #include "../memory/allocated_memory.h"
+#include "../memory/shared_ptr.h"
 
 #include "../application/game.h"
+#include "../js/js_state_wrapper.h"
 
 #include "../platform/platform_window.h"
 
@@ -30,6 +32,7 @@ int main(int argc, char** argv)
 	name += " " + std::to_string(SNUFF_VERSION_MAJOR) + "." + std::to_string(SNUFF_VERSION_MINOR);
 
 	Game* game = Game::Instance();
+	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
 	SharedPtr<Keyboard> keyboard = memory.Construct<Keyboard>();
