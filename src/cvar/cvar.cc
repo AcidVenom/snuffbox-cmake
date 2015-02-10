@@ -152,6 +152,36 @@ namespace snuffbox
 	void CVar::RegisterCommandLine(int argc, char** argv)
 	{
 		ParseCommandLine(argc, argv);
+
+		std::string arguments = "Command line arguments: ";
+
+		std::string value = "";
+		for (CVarMap::iterator it = vars_.begin(); it != vars_.end(); ++it)
+		{
+			if (it->second->IsNumber())
+			{
+				value = std::to_string(it->second->As<CVar::Number>()->value());
+			}
+			else if (it->second->IsBool())
+			{
+				if (it->second->As<CVar::Boolean>()->value() == true)
+				{
+					value = "true";
+				}
+				else
+				{
+					value = "false";
+				}
+			}
+			else
+			{
+				value = it->second->As<CVar::String>()->value();
+			}
+
+			arguments += "\n\t" + it->first + "\t\t" + value;
+		}
+
+		SNUFF_LOG_INFO(arguments);
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -84,7 +84,7 @@ namespace snuffbox
 		std::string fullPath = src_directory->As<CVar::String>()->value() + "/" + path;
 		bool success = file.Open(fullPath);
 
-		SNUFF_XASSERT(success == true, "The file '" + fullPath + "' could not be opened!", "JSStateWrapper::CompileAndRun");
+		SNUFF_XASSERT(success == true, "The file '" + path + "' could not be opened!", "JSStateWrapper::CompileAndRun");
 
 		TryCatch try_catch;
 
