@@ -3,11 +3,6 @@
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -85,29 +80,128 @@ namespace snuffbox
 	{
 		std::string arguments = "";
 
-		for (int i = 0; i < argc; ++i)
+		for (int i = 1; i < argc; ++i)
 		{
 			arguments += argv[i];
+			arguments += " ";
 		}
 
 		std::string delimiter = "\\";
 
 		size_t pos = 0;
 		std::string token;
-		std::string src_directory;
-		while ((pos = arguments.find(delimiter)) != std::string::npos) {
-			token = arguments.substr(0, pos);
-			arguments.erase(0, pos + delimiter.length());
-			src_directory += token + "/";
+		std::string src_directory = "";
+		std::string working_directory = argv[0];
+		bool atStart = true;
+
+		while ((pos = working_directory.find(delimiter)) != std::string::npos) {
+			if (atStart == false)
+			{
+				src_directory += "/";
+			}
+			token = working_directory.substr(0, pos);
+			working_directory.erase(0, pos + delimiter.length());
+			src_directory += token;
+			atStart = false;
 		}
 
 		Register("src_directory", src_directory);
+
+		int i = 0;
+		char ch;
+
+		while (i < arguments.size())
+		{
+			SkipWhiteSpaces(arguments, i);
+
+			ch = arguments.at(i);
+
+			if (Consume("-", arguments, i) == true)
+			{
+				SkipWhiteSpaces(arguments, i);
+				std::string name = RepeatUntil({" "}, arguments, i);
+				SkipWhiteSpaces(arguments, i);
+				std::string value = RepeatUntil({" "}, arguments, i);
+				
+				char* num;
+				double number_value = strtod(value.c_str(), &num);
+
+				if (!*num)
+				{
+					CVar::Register(name, number_value);
+				}
+				else
+				{
+					if (strcmp(value.c_str(), "true") == 0 || strcmp(value.c_str(), "false") == 0)
+					{
+						CVar::Register(name, strcmp(value.c_str(), "true") == 0);
+					}
+					else
+					{
+						CVar::Register(name, value);
+					}
+				}
+				--i;
+			}
+
+			++i;
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void CVar::RegisterCommandLine(int argc, char** argv)
 	{
 		ParseCommandLine(argc, argv);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void CVar::SkipWhiteSpaces(std::string& str, int& i)
+	{
+		char ch = str.at(i);
+		while ((ch == L'\n' || ch == L'\t' || ch == L'\r' || ch == L' ') && i == str.size())
+		{
+			ch = str.at(i);
+			++i;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	bool CVar::Consume(std::string consumer, std::string& str, int& i)
+	{
+		char ch = str.at(i);
+		int count = 0;
+
+		while (count < consumer.length())
+		{
+			if (consumer.at(count) != str.at(i + count))
+			{
+				return false;
+			}
+
+			++count;
+		}
+
+		i += count;
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	std::string CVar::RepeatUntil(std::vector<std::string> consumer, std::string& str, int& i)
+	{
+		std::string to_return = "";
+		bool consumed = false;
+		while (consumed == false)
+		{
+			to_return += str.at(i);
+			++i;
+
+			for (int c = 0; c < consumer.size(); ++c)
+			{
+				consumed = Consume(consumer.at(c), str, i);
+			}
+		}
+		
+		return to_return;
 	}
 
 	//-------------------------------------------------------------------------------------------

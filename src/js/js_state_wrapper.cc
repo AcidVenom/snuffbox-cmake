@@ -81,7 +81,7 @@ namespace snuffbox
 		SNUFF_XASSERT(found_dir == true, "The 'src_directory' CVar could not be found!", "JSStateWrapper::CompileAndRun");
 		SNUFF_XASSERT(src_directory != nullptr && src_directory->IsString() == true, "The 'src_directory' CVar is corrupt or is not of a string type!", "JSStateWrapper::CompileAndRun");
 		
-		std::string fullPath = src_directory->As<CVar::String>()->value() + path;
+		std::string fullPath = src_directory->As<CVar::String>()->value() + "/" + path;
 		bool success = file.Open(fullPath);
 
 		SNUFF_XASSERT(success == true, "The file '" + fullPath + "' could not be opened!", "JSStateWrapper::CompileAndRun");

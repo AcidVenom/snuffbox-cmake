@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace snuffbox
 {
@@ -224,6 +225,29 @@ namespace snuffbox
 	private:
 		typedef std::map<std::string, CVar::Value*> CVarMap;
 		CVarMap vars_; //!< The variables 
+
+		/** 
+		* @brief Skip the whitespaces of a string, incrementing the current index
+		* @param[in] str (std::string&) The string to skip on
+		* @param[in] i (int&) The current index to be incremented
+		*/ 
+		void SkipWhiteSpaces(std::string& str, int& i);
+
+		/**
+		* @brief Consumes for a given value, incrementing the i if there was a match
+		* @param[in] consumer (std::string) The to be consumed string
+		* @param[in] str (std::string&) The string to consume on
+		* @param[in] i (int&) The current index to be incremented
+		*/
+		bool Consume(std::string consumer, std::string& str, int& i);
+
+		/**
+		* @brief Repeat until we found a consumer, incrementing the i
+		* @param[in] consumer (std::vector<std::string>) The to be consumed strings, if either of the consumer match we can return the value
+		* @param[in] str (std::string&) The string to repeat on
+		* @param[in] i (int&) The current index to be incremented
+		*/
+		std::string RepeatUntil(std::vector<std::string> consumer, std::string& str, int& i);
 	};
 
 	template<typename T>
