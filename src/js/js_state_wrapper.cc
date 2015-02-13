@@ -9,6 +9,7 @@
 #include "../platform/platform_text_file.h"
 #include "../cvar/cvar.h"
 
+#include "../js/js_wrapper.h"
 
 using namespace v8;
 
@@ -49,7 +50,11 @@ namespace snuffbox
 		Handle<Context> context = CreateContext(global);
 		context_.Reset(isolate_, context);
 
-		CompileAndRun("main.js");
+		context->Enter();
+
+		JSRegisterFunctions();
+
+		context->Exit();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -93,23 +98,19 @@ namespace snuffbox
 
 		if (result.IsEmpty() == true)
 		{
-			bool failed = false;
-			std::string exception(GetException(&try_catch, &failed));
+			std::string error;
+			bool has_error = GetException(&try_catch, &error);
 
-			if (failed == true)
+			if (has_error == true)
 			{
-				SNUFF_LOG_ERROR(exception);
+				SNUFF_LOG_ERROR(error);
 			}
 			return;
-		}
-		else
-		{
-
 		}
 	}
 
 	//-------------------------------------------------------------------------------------------
-	std::string JSStateWrapper::GetException(TryCatch* try_catch, bool* failed)
+	bool JSStateWrapper::GetException(TryCatch* try_catch, std::string* buffer)
 	{
 		HandleScope handle_scope(isolate_);
 		String::Utf8Value exception(try_catch->Exception());
@@ -144,12 +145,25 @@ namespace snuffbox
 			error += "\n";
 
 			if (stack_trace.length() > 0) {
-				*failed = true;
-				return error;
+				*buffer = error;
+				return true;
 			}
 		}
 
-		return std::string("");
+		return false;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::RegisterGlobal(std::string name, Handle<Value> value)
+	{
+		Local<Object> global = Local<Context>::New(isolate_, context_)->Global();
+		global->Set(String::NewFromUtf8(isolate_, name.c_str()), value);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::RegisterToObject(Handle<Object> obj, std::string name, Handle<Value> value)
+	{
+		obj->Set(String::NewFromUtf8(isolate_, name.c_str()), value);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -181,5 +195,38 @@ namespace snuffbox
 	JSStateWrapper::~JSStateWrapper()
 	{
 		Destroy();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::JSRegisterFunctions()
+	{
+		RegisterGlobal("require", Function::New(isolate_, JSRequire));
+		RegisterGlobal("assert", Function::New(isolate_, JSAssert));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::JSRequire(JS_ARGS args)
+	{
+		HandleScope scope(args.GetIsolate());
+		JSWrapper wrapper(args);
+		bool check = wrapper.Check("S");
+		
+		if (check == false)
+		{
+			return;
+		}
+		else
+		{
+			JSStateWrapper::Instance()->CompileAndRun(wrapper.GetValue<std::string>(0, "") + ".js");
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::JSAssert(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		bool check = wrapper.Check("BS");
+
+		SNUFF_XASSERT(check == true ? wrapper.GetValue<bool>(0, false) : false, wrapper.GetValue<std::string>(1, "Assertion failed"), "JSStateWrapper::JSAssert");
 	}
 }

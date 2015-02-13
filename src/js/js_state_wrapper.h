@@ -52,10 +52,25 @@ namespace snuffbox
 		/**
 		* @brief Retrieves the last error from the JavaScript stack
 		* @param[in] try_catch (v8::TryCatch*) The try catch object of V8 that contains the error
-		* @param[in] failed (bool*) Did the error retrieval fail?
-		* @return std::string The error message
+		* @param[in] buffer (std::string*) A buffer to allocate the error message in
+		* @return bool If there was an actual error or not
 		*/
-		std::string GetException(v8::TryCatch* try_catch, bool* failed);
+		bool GetException(v8::TryCatch* try_catch, std::string* buffer);
+
+		/**
+		* @brief Registers a global JavaScript value
+		* @param[in] name (std::string) The name of the value to register
+		* @param[in] value (v8::Handle<v8::Value>) The value to register
+		*/
+		void RegisterGlobal(std::string name, v8::Handle<v8::Value> value);
+
+		/**
+		* @brief Registers a JavaScript value to an object
+		* @param[in] obj (v8::Handle<v8::Object>) The object to register to
+		* @param[in] name (std::string) The name of the value to register
+		* @param[in] value (v8::Handle<v8::Value>) The value to register
+		*/
+		void RegisterToObject(v8::Handle<v8::Object> obj, std::string name, v8::Handle<v8::Value> value);
 
 		/// Destroys the state wrapper and disposes V8
 		void Destroy();
@@ -74,5 +89,12 @@ namespace snuffbox
 		v8::Persistent<v8::Context> context_; //!< The context we will use for this JavaScript state
 		v8::Persistent<v8::ObjectTemplate> global_; //!< The global scope for use with the JavaScript state
 		v8::Platform* platform_; //!< The win32 platform
+
+	private:
+		/// Registers basic functions (require, assert, etc.)
+		void JSRegisterFunctions();
+
+		static void JSRequire(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSAssert(const v8::FunctionCallbackInfo<v8::Value>& args);
 	};
 }

@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 	cvar->RegisterCommandLine(argc, argv);
 
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
+	js_state_wrapper->CompileAndRun("main.js");
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
 	SharedPtr<Keyboard> keyboard = memory.Construct<Keyboard>();
