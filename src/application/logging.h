@@ -9,7 +9,7 @@
 #define SNUFF_LOG_SUCCESS(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kSuccess,##msg)
 #define SNUFF_LOG_ERROR(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kError,##msg)
 #define SNUFF_LOG_FATAL(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kFatal,##msg)
-#define SNUFF_LOG_RGB(msg, r1, g1, b1, r2, g2, b2) snuffbox::DebugLogging::Log(##msg,##r1,##g1,##b1,##r2,##g2,##b2)
+#define SNUFF_LOG_RGB(msg, r1, g1, b1, r2, g2, b2, a) snuffbox::DebugLogging::Log(##msg,##r1,##g1,##b1,##r2,##g2,##b2,##a)
 
 #ifdef SNUFF_OSX
 #define SNUFF_BREAK
@@ -41,8 +41,9 @@ namespace snuffbox
 		*/
 		struct LogColour
 		{
-			float rb, gb, bb;
-			float rf, gf, bf;
+			int rf, gf, bf;
+      int rb, gb, bb;
+      int a;
 		};
 
 		/**
@@ -71,14 +72,15 @@ namespace snuffbox
 		/**
 		* @brief Logs with a given RGB value and a message
 		* @param[in] msg (std::string) The message to log
-		* @param[in] float (rb) The R value of the background colour
-		* @param[in] float (gb) The G value of the background colour
-		* @param[in] float (bb) The B value of the background colour
-		* @param[in] float (rf) The R value of the foreground colour
-		* @param[in] float (gf) The G value of the foreground colour
-		* @param[in] float (bf) The B value of the foreground colour
+		* @param[in] rf (int) The R value of the foreground colour
+		* @param[in] gf (int) The G value of the foreground colour
+		* @param[in] bf (int) The B value of the foreground colour
+    * @param[in] rb (int) The R value of the background colour
+    * @param[in] gb (int) The G value of the background colour
+    * @param[in] bb (int) The B value of the background colour
+    * @param[in] a  (int) The alpha value of the background colour
 		*/
-		static void Log(std::string msg, float rb, float gb, float bb, float rf, float gf, float bf);
+    static void Log(std::string msg, int rf, int gf, int bf, int rb, int gb, int bb, int a);
 
     /// Halts the runtime
     static void Break();

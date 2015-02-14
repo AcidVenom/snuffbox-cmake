@@ -14,30 +14,34 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void DebugLogging::Log(DebugLogging::LogType type, std::string message)
 	{
-		std::string msg = "[" + TypeToString(type) + "] " + message;
+		std::string msg = "[" + TypeToString(type) + "] " + message + "\n";
 
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
     console->Log(TypeToColour(type), msg);
-#else
-		printf((msg + "\n").c_str());
 #endif
 
-#ifdef SNUFF_WIN32
+    printf(msg.c_str());
+
+#if defined SNUFF_WIN32 && _DEBUG
 		OutputDebugStringA(std::string(msg).c_str());
 #endif
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void DebugLogging::Log(std::string message, float rb, float gb, float bb, float rf, float gf, float bf)
+  void DebugLogging::Log(std::string message, int rf, int gf, int bf, int rb, int gb, int bb, int a)
 	{
     std::string msg = message + "\n";
 		
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
-    console->Log(DebugLogging::LogColour{ rb, gb, bb, rf, gf, bf }, message);
-#else
+    console->Log(DebugLogging::LogColour{ rf, gf, bf, rb, gb, bb, a}, msg);
+#endif
+    
     printf(msg.c_str());
+
+#if defined SNUFF_WIN32 && _DEBUG
+    OutputDebugStringA(std::string(msg).c_str());
 #endif
 	}
 
@@ -78,13 +82,13 @@ namespace snuffbox
 	{
 		switch (type)
 		{
-		case LogType::kDebug: return{ 128.0f, 128.0f, 128.0f, 0.0f, 0.0f, 0.0f};
-		case LogType::kInfo: return { 255.0f, 255.0f, 255.0f, 30.0f, 30.0f, 30.0f};
-		case LogType::kSuccess: return{ 35.0f, 255.0f, 0.0f, 70.0f, 120.0f, 55.0f};
-		case LogType::kWarning:return{ 255.0f, 185.0f, 0.0f, 70.0f, 65.0f, 15.0f};
-		case LogType::kError: return{ 255.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f};
-		case LogType::kFatal: return{ 255.0f, 255.0f, 255.0f, 255.0f, 0.0f, 0.0f};
-		default: return { 128.0f, 128.0f, 128.0f, 0.0f, 0.0f, 0.0f};
+		case LogType::kDebug: return{ 128, 128, 128, 0, 0, 0, 0};
+    case LogType::kInfo: return{ 255, 255, 255, 0, 0, 0, 0 };
+    case LogType::kSuccess: return{ 35, 255, 0, 0, 0, 0, 0 };
+    case LogType::kWarning:return{ 255, 185, 0, 0, 0, 0, 0 };
+    case LogType::kError: return{ 255, 0, 0, 0, 0, 0, 0 };
+    case LogType::kFatal: return{ 255, 255, 255, 255, 0, 0, 255 };
+		default: return { 128, 128, 128, 0, 0, 0, 0};
 		}
 	}
 }

@@ -85,8 +85,19 @@ namespace snuffbox
     {
       return;
     }
-  
-    ui_->terminal->append(message.c_str());
+
+    QTextCursor cursor = ui_->terminal->textCursor();
+    cursor.movePosition(QTextCursor::End);
+
+    QTextCharFormat format;
+    format.setForeground(QBrush(QColor(colour.rf, colour.gf, colour.bf)));
+    format.setBackground(QBrush(QColor(colour.rb, colour.gb, colour.bb, colour.a)));
+    format.setFontPointSize(10);
+    cursor.setCharFormat(format);
+
+    cursor.insertText(message.c_str());
+    cursor.movePosition(QTextCursor::End);
+    ui_->terminal->setTextCursor(cursor);
     
     ui_->terminal->verticalScrollBar()->setValue(ui_->terminal->verticalScrollBar()->maximum());
   }
@@ -106,6 +117,10 @@ namespace snuffbox
   //---------------------------------------------------------------------------------------------------------
   Console::~Console()
   {
+    if (enabled_ == false)
+    {
+      return;
+    }
     SNUFF_ASSERT_NOTNULL(parent_, "Console::~Console::parent_");
     delete parent_;
     parent_ = nullptr;

@@ -169,9 +169,8 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void JSStateWrapper::Destroy()
 	{
-		SNUFF_LOG_DEBUG("Collecting all garbage..");
+		SNUFF_LOG_INFO("Collecting all JavaScript garbage");
 		isolate_->LowMemoryNotification();
-		SNUFF_LOG_DEBUG(".. Collected garbage");
 
 		global_.Reset();
 		context_.Reset();

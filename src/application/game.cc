@@ -47,8 +47,6 @@ namespace snuffbox
 		keyboard_->Update();
 		mouse_->Update();
 
-    SNUFF_LOG_FATAL("AOIJCIOASJDIO");
-
 #ifdef SNUFF_BUILD_CONSOLE
     if (Console::Instance()->enabled())
     {
