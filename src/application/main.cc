@@ -63,7 +63,6 @@ int main(int argc, char** argv)
 #endif
 
   SNUFF_LOG_INFO(name);
-  SNUFF_LOG_INFO("Command line arguments: ");
   cvar->LogCVars();
 
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();

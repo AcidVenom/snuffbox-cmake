@@ -14,13 +14,13 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void DebugLogging::Log(DebugLogging::LogType type, std::string message)
 	{
-		std::string msg = "[" + TypeToString(type) + "] " + message + "\n";
+		std::string msg = "[" + TypeToString(type) + "] " + message;
 
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
     console->Log(TypeToColour(type), msg);
 #else
-		printf(msg.c_str());
+		printf((msg + "\n").c_str());
 #endif
 
 #ifdef SNUFF_WIN32
@@ -35,7 +35,7 @@ namespace snuffbox
 		
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
-    console->Log(DebugLogging::LogColour{ rb, gb, bb, rf, gf, bf }, msg);
+    console->Log(DebugLogging::LogColour{ rb, gb, bb, rf, gf, bf }, message);
 #else
     printf(msg.c_str());
 #endif

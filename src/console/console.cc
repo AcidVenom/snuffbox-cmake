@@ -6,6 +6,9 @@
 
 #include "../cvar/cvar.h"
 
+#include <qstylefactory.h>
+#include <qscrollbar.h>
+
 namespace snuffbox
 {
   //---------------------------------------------------------------------------------------------------------
@@ -41,6 +44,28 @@ namespace snuffbox
 
     parent_ = parent;
 
+    QApplication* app = qApp;
+
+    app->setStyle(QStyleFactory::create("Fusion"));
+
+    QPalette p;
+    p.setColor(QPalette::Window, QColor(75, 75, 75));
+    p.setColor(QPalette::WindowText, Qt::white);
+    p.setColor(QPalette::Base, QColor(48, 10, 36));
+    p.setColor(QPalette::AlternateBase, QColor(75 / 2, 75 / 2, 75 / 2));
+    p.setColor(QPalette::ToolTipBase, Qt::white);
+    p.setColor(QPalette::ToolTipText, Qt::white);
+    p.setColor(QPalette::Text, Qt::white);
+    p.setColor(QPalette::Button, QColor(75, 75, 75));
+    p.setColor(QPalette::ButtonText, Qt::white);
+    p.setColor(QPalette::BrightText, Qt::red);
+    p.setColor(QPalette::Link, QColor(159, 164, 98));
+
+    p.setColor(QPalette::Highlight, QColor(240, 115, 75));
+    p.setColor(QPalette::HighlightedText, Qt::black);
+
+    app->setPalette(p);
+
     Show();
   }
 
@@ -61,7 +86,9 @@ namespace snuffbox
       return;
     }
   
-    ui_->terminal->setText(ui_->terminal->toPlainText() + message.c_str());
+    ui_->terminal->append(message.c_str());
+    
+    ui_->terminal->verticalScrollBar()->setValue(ui_->terminal->verticalScrollBar()->maximum());
   }
 
   //---------------------------------------------------------------------------------------------------------

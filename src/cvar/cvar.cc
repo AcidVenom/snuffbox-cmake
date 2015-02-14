@@ -157,7 +157,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void CVar::LogCVars()
   {
-    std::string result = "";
+    std::string result = "\n\nConsole variables: ";
     std::string value = "";
     for (CVarMap::iterator it = vars_.begin(); it != vars_.end(); ++it)
     {
@@ -184,7 +184,7 @@ namespace snuffbox
       result += "\n\t" + it->first + "\t\t" + value;
     }
 
-    SNUFF_LOG_INFO(result);
+    SNUFF_LOG_INFO(result + "\n");
   }
 
 	//-------------------------------------------------------------------------------------------
