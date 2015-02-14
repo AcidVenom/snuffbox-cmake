@@ -14,7 +14,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void DebugLogging::Log(DebugLogging::LogType type, std::string message)
 	{
-		std::string msg = "[" + TypeToString(type) + "] " + message + "\n";
+    std::string msg = TypeToString(type) + " " + message + "\n";
 
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
@@ -66,13 +66,12 @@ namespace snuffbox
 	{
 		switch (type)
 		{
-		case LogType::kDebug: return "Debug";
-		case LogType::kInfo: return "Info";
-		case LogType::kSuccess: return "Success";
-		case LogType::kWarning: return "Warning";
-		case LogType::kError: return "Error";
-		case LogType::kFatal: return "FATAL";
-		case LogType::kRGB: return "RGB";
+    case LogType::kDebug: return "#";
+		case LogType::kInfo: return "$";
+    case LogType::kSuccess: return ">";
+		case LogType::kWarning: return "?";
+		case LogType::kError: return "!";
+		case LogType::kFatal: return "!!!";
 		default: return "unknown";
 		}
 	}
@@ -91,4 +90,83 @@ namespace snuffbox
 		default: return { 128, 128, 128, 0, 0, 0, 0};
 		}
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::RegisterJS(JS_SINGLETON obj)
+  {
+    JSFunctionRegister funcs[] = {
+      { "debug", JSLogDebug },
+      { "info", JSLogInfo },
+      { "warning", JSLogWarning },
+      { "success", JSLogSuccess },
+      { "error", JSLogError },
+      { "fatal", JSLogFatal },
+      { "rgb", JSLogRGB }
+    };
+
+    JSFunctionRegister::Register(funcs, 7, obj);
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogDebug(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kDebug, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogInfo(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kInfo, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogWarning(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kWarning, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogSuccess(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kSuccess, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogError(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kError, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogFatal(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(LogType::kFatal, wrapper.GetValue<std::string>(0, "undefined"));
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void DebugLogging::JSLogRGB(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("S");
+    Log(wrapper.GetValue<std::string>(0, "undefined"),
+      wrapper.GetValue<int>(1, 255),
+      wrapper.GetValue<int>(2, 255),
+      wrapper.GetValue<int>(3, 255),
+      wrapper.GetValue<int>(4, 128),
+      wrapper.GetValue<int>(5, 128),
+      wrapper.GetValue<int>(6, 128),
+      wrapper.GetValue<int>(7, 255));
+  }
 }

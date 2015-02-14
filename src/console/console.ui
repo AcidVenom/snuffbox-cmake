@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>421</height>
+    <width>623</width>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
       <item>
        <widget class="QTextBrowser" name="terminal">
         <property name="tabStopWidth">
-         <number>40</number>
+         <number>20</number>
         </property>
        </widget>
       </item>
@@ -38,8 +38,11 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>28</height>
+          <height>64</height>
          </size>
+        </property>
+        <property name="tabStopWidth">
+         <number>20</number>
         </property>
        </widget>
       </item>

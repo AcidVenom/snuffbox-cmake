@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string>
 
+#include "../js/js_object.h"
+
 #define SNUFF_LOG_INFO(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kInfo,##msg)
 #define SNUFF_LOG_DEBUG(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kDebug,##msg)
 #define SNUFF_LOG_WARNING(msg) snuffbox::DebugLogging::Log(snuffbox::DebugLogging::LogType::kWarning,##msg)
@@ -31,7 +33,7 @@ namespace snuffbox
 	* @brief A handful of functions for debug logging with an associated severity, this logs to the console, VS output window and the snuffbox console
 	* @author Daniël Konings
 	*/
-	class DebugLogging
+	class DebugLogging : public JSObject
 	{
 	public:
 		/**
@@ -98,5 +100,17 @@ namespace snuffbox
 		* @return snuffbox::DebugLogging::LogColour The converted colour
 		*/
 		static LogColour TypeToColour(LogType type);
+
+  public:
+    JS_NAME("Log");
+    static void RegisterJS(JS_SINGLETON obj);
+
+    static void JSLogDebug(JS_ARGS args);
+    static void JSLogInfo(JS_ARGS args);
+    static void JSLogWarning(JS_ARGS args);
+    static void JSLogSuccess(JS_ARGS args);
+    static void JSLogError(JS_ARGS args);
+    static void JSLogFatal(JS_ARGS args);
+    static void JSLogRGB(JS_ARGS args);
 	};
 }

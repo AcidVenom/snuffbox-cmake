@@ -73,6 +73,39 @@ namespace snuffbox
 		return Context::New(isolate_, NULL, global);
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void JSStateWrapper::Run(std::string src, std::string file, bool log)
+  {
+    HandleScope scope(isolate_);
+
+    Local<Context> context = Local<Context>::New(isolate_, context_);
+    Context::Scope context_scope(context);
+
+    TryCatch try_catch;
+
+    Local<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, file.c_str()));
+    Local<Value> result = script->Run();
+
+    if (result.IsEmpty() == true)
+    {
+      std::string error;
+      bool has_error = GetException(&try_catch, &error);
+
+      if (has_error == true)
+      {
+        SNUFF_LOG_ERROR(error);
+      }
+      return;
+    }
+    else
+    {
+      if (log == true)
+      {
+        SNUFF_LOG_DEBUG(*String::Utf8Value(result->ToString()));
+      }
+    }
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void JSStateWrapper::CompileAndRun(std::string path)
 	{
@@ -95,22 +128,7 @@ namespace snuffbox
 
 		SNUFF_XASSERT(success == true, "The file '" + path + "' could not be opened!", "JSStateWrapper::CompileAndRun");
 
-		TryCatch try_catch;
-
-		Local<Script> script = Script::Compile(String::NewFromUtf8(isolate_, file.Read().c_str()), String::NewFromUtf8(isolate_, path.c_str()));
-		Local<Value> result = script->Run();
-
-		if (result.IsEmpty() == true)
-		{
-			std::string error;
-			bool has_error = GetException(&try_catch, &error);
-
-			if (has_error == true)
-			{
-				SNUFF_LOG_ERROR(error);
-			}
-			return;
-		}
+    Run(file.Read(), path);
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -6,7 +6,6 @@
 #include "../js/js_function_register.h"
 
 #define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>&
-#define JS_NAME(name) static const char* js_name(){ return ##name; }
 #define JS_SETUP(type) JSWrapper wrapper(args); type* self = wrapper.GetPointer<type>(args.This());
 
 namespace snuffbox
@@ -163,11 +162,7 @@ namespace snuffbox
 			return def;
 		}
 
-		if (args_[arg]->IsString() == true)
-		{
-			return *v8::String::Utf8Value(args_[arg]->ToString());
-		}
-		return def;
+    return *v8::String::Utf8Value(args_[arg]->ToString());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -179,11 +174,7 @@ namespace snuffbox
 			return def;
 		}
 
-		if (args_[arg]->IsString() == true)
-		{
-			return *v8::String::Utf8Value(args_[arg]->ToString());
-		}
-		return def;
+		return *v8::String::Utf8Value(args_[arg]->ToString());
 	}
 
   //-------------------------------------------------------------------------------------------

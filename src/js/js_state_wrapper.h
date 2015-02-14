@@ -45,6 +45,14 @@ namespace snuffbox
 		*/
 		v8::Handle<v8::Context> CreateContext(v8::Handle<v8::ObjectTemplate> global);
 
+    /**
+    * @brief Executes a string within the current JavaScript context
+    * @param[in] src (std::string) The string to execute
+    * @param[in] file (std::string) The file context the snippet will run in
+    * @param[in] log (bool) Should the result be logged to the console?
+    */
+    void Run(std::string src, std::string file, bool log = false);
+
 		/**
 		* @brief Compiles JavaScript source code from a file and executes it
 		* @param[in] path (std::string) The source code file to compile and run

@@ -48,6 +48,9 @@ namespace snuffbox
     */
     void Log(DebugLogging::LogColour colour, std::string message);
 
+    /// Handles the current command in the input field
+    void HandleCommand();
+
     /**
     * @return bool Is the console visible?
     */
@@ -62,5 +65,11 @@ namespace snuffbox
     Ui::Console* ui_; //!< The Qt UI associated with the console
     QMainWindow* parent_; //!< The parent window of the console
     bool enabled_; //!< Is the console enabled?
+    bool shift_pressed_; //!< Is shift being held?
+    QStringList history_; //!< A list of text previously entered into the console
+    int history_index_; //!< The current history index
+
+  protected:
+    bool eventFilter(QObject*, QEvent* event);
   };
 }

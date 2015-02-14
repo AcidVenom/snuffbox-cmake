@@ -1,13 +1,15 @@
 #include "../console/console.h"
-#include "moc_console.cpp"
 
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
 #include "../cvar/cvar.h"
+#include "../js/js_state_wrapper.h"
 
 #include <qstylefactory.h>
 #include <qscrollbar.h>
+#include <qevent.h>
+
 #include <time.h>
 
 namespace snuffbox
@@ -16,7 +18,9 @@ namespace snuffbox
   Console::Console() :
     ui_(nullptr),
     parent_(nullptr),
-    enabled_(false)
+    enabled_(false),
+    shift_pressed_(false),
+    history_index_(0)
   {
     
   }
@@ -67,6 +71,7 @@ namespace snuffbox
 
     app->setPalette(p);
 
+    ui_->input->installEventFilter(this);
     Show();
   }
 
@@ -127,6 +132,25 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------------------------------------
+  void Console::HandleCommand()
+  {
+    QString plain = ui_->input->toPlainText();
+
+    if (plain.size() == 0)
+    {
+      return;
+    }
+
+    history_.push_back(plain);
+    ++history_index_;
+
+    std::string src = plain.toStdString();
+    
+    JSStateWrapper::Instance()->Run(src, "console", true);
+    ui_->input->setText("");
+  }
+
+  //---------------------------------------------------------------------------------------------------------
   bool Console::IsVisible()
   {
     return parent_ != nullptr && parent_->isVisible();
@@ -152,5 +176,72 @@ namespace snuffbox
     SNUFF_ASSERT_NOTNULL(ui_, "Console::~Console::ui_");
     delete ui_;
     ui_ = nullptr;
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  bool Console::eventFilter(QObject* obj, QEvent* event)
+  {
+    if (obj == ui_->input)
+    {
+      if (event->type() == QEvent::KeyPress)
+      {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Return && !shift_pressed_)
+        {
+          HandleCommand();
+          return true;
+        }
+
+        if (keyEvent->key() == Qt::Key_Shift)
+        {
+          shift_pressed_ = true;
+        }
+      }
+
+      if (event->type() == QEvent::KeyRelease)
+      {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Shift)
+        {
+          shift_pressed_ = false;
+        }
+
+        if (shift_pressed_)
+        {
+          if (keyEvent->key() == Qt::Key_Up)
+          {
+            --history_index_;
+            if (history_index_ >= 0)
+            {
+              ui_->input->setText(history_[history_index_]);
+              return true;
+            }
+            else
+            {
+              history_index_ = 0;
+              return true;
+            }
+          }
+
+          if (keyEvent->key() == Qt::Key_Down)
+          {
+            ++history_index_;
+            if (history_index_ < static_cast<int>(history_.size()))
+            {
+              ui_->input->setText(history_[history_index_]);
+              return true;
+            }
+            else
+            {
+              ui_->input->setText("");
+              history_index_ = static_cast<int>(history_.size());
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }

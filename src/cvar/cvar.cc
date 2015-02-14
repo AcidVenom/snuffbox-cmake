@@ -183,7 +183,7 @@ namespace snuffbox
         value = it->second->As<CVar::String>()->value();
       }
 
-      result += "\n\t" + it->first + "\t\t" + value;
+      result += "\n\t" + it->first + "\t" + value;
     }
 
     SNUFF_LOG_INFO(result + "\n");
