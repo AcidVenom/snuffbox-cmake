@@ -66,6 +66,7 @@ int main(int argc, char** argv)
   cvar->LogCVars();
 
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
+  js_state_wrapper->Initialise();
 	js_state_wrapper->CompileAndRun("main.js");
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
@@ -83,6 +84,7 @@ int main(int argc, char** argv)
 	while (game->started())
 	{
 		game->Run();
+    js_state_wrapper->isolate()->IdleNotification(32);
 	}
 
 	SNUFF_LOG_INFO("Shutting down");

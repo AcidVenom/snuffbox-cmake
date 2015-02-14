@@ -8,6 +8,7 @@
 
 #include <qstylefactory.h>
 #include <qscrollbar.h>
+#include <time.h>
 
 namespace snuffbox
 {
@@ -86,6 +87,29 @@ namespace snuffbox
       return;
     }
 
+    time_t t = time(0);
+    struct tm now;
+    localtime_s(&now, &t);
+    QString hour = QString::number(now.tm_hour);
+
+    if (hour.size() < 2)
+    {
+      hour = "0" + hour;
+    }
+
+    QString min = QString::number(now.tm_min);
+    if (min.size() < 2)
+    {
+      min = "0" + min;
+    }
+
+    QString sec = QString::number(now.tm_sec);
+    if (sec.size() < 2)
+    {
+      sec = "0" + sec;
+    }
+    QString timeStamp = hour + ":" + min + ":" + sec + " ";
+
     QTextCursor cursor = ui_->terminal->textCursor();
     cursor.movePosition(QTextCursor::End);
 
@@ -95,7 +119,7 @@ namespace snuffbox
     format.setFontPointSize(10);
     cursor.setCharFormat(format);
 
-    cursor.insertText(message.c_str());
+    cursor.insertText(timeStamp + message.c_str());
     cursor.movePosition(QTextCursor::End);
     ui_->terminal->setTextCursor(cursor);
     

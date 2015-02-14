@@ -3,6 +3,8 @@
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
+#include "../js/js_state_wrapper.h"
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -356,4 +358,38 @@ namespace snuffbox
 	{
 		
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void CVar::RegisterJS(JS_SINGLETON obj)
+  {
+    JSFunctionRegister funcs[] = {
+      { "register", JSRegister }
+    };
+
+    JSFunctionRegister::Register(funcs, 1, obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void CVar::JSRegister(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    CVar* self = CVar::Instance();
+
+    if (wrapper.Check("SB"))
+    {
+      self->Register(wrapper.GetValue<std::string>(0, "undefined"), wrapper.GetValue<bool>(1, false));
+    }
+    else if (wrapper.Check("SS"))
+    {
+      self->Register(wrapper.GetValue<std::string>(0, "undefined"), wrapper.GetValue<std::string>(1, "undefined"));
+    }
+    else if (wrapper.Check("SN"))
+    {
+      self->Register(wrapper.GetValue<std::string>(0, "undefined"), wrapper.GetValue<double>(1, 0.0));
+    }
+    else
+    {
+      SNUFF_LOG_ERROR("Could not register CVar!");
+    }
+  }
 }

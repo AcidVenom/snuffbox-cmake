@@ -3,7 +3,11 @@
 #include <v8.h>
 #include <string>
 
+#include "../js/js_function_register.h"
+
 #define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>&
+#define JS_NAME(name) static const char* js_name(){ return ##name; }
+#define JS_SETUP(type) JSWrapper wrapper(args); type* self = wrapper.GetPointer<type>(args.This());
 
 namespace snuffbox
 {
@@ -40,6 +44,12 @@ namespace snuffbox
 
 		template<typename T>
 		T GetValue(int arg, T def);
+
+    template<typename T>
+    T* GetPointer(v8::Handle<v8::Value> val);
+
+    template<typename T>
+    T* GetPointer(int arg);
 
 		/**
 		* @brief Returns the type of a local value
@@ -175,6 +185,40 @@ namespace snuffbox
 		}
 		return def;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  template<typename T>
+  inline T* JSWrapper::GetPointer(v8::Handle<v8::Value> val)
+  {
+    v8::Local<v8::Object> obj = val->ToObject();
+    v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
+
+    if (ext->IsExternal() == false)
+    {
+      return nullptr;
+    }
+    else
+    {
+      return static_cast<T*>(ext.As<v8::External>()->Value());
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  template<typename T>
+  inline T* JSWrapper::GetPointer(int arg)
+  {
+    v8::Local<v8::Object> obj = args_[arg]->ToObject();
+    v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
+
+    if (ext->IsExternal() == false)
+    {
+      return nullptr;
+    }
+    else
+    {
+      return static_cast<T*>(ext.As<v8::External>()->Value());
+    }
+  }
 
 	//-------------------------------------------------------------------------------------------
 	template<>

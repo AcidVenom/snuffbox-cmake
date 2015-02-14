@@ -10,6 +10,8 @@ namespace v8
 
 namespace snuffbox
 {
+  class JSObject;
+
 	/**
 	* @class snuffbox::JSStateWrapper
 	* @brief Wraps Google's V8 for easier use with different applications
@@ -90,10 +92,14 @@ namespace snuffbox
 		v8::Persistent<v8::ObjectTemplate> global_; //!< The global scope for use with the JavaScript state
 		v8::Platform* platform_; //!< The win32 platform
 
-	private:
+	public:
 		/// Registers basic functions (require, assert, etc.)
 		void JSRegisterFunctions();
 
+    template<typename T>
+    static void JSNew(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    static void JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data);
 		static void JSRequire(const v8::FunctionCallbackInfo<v8::Value>& args);
 		static void JSAssert(const v8::FunctionCallbackInfo<v8::Value>& args);
 	};

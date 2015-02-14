@@ -76,7 +76,10 @@ SET (InputSources
 SET (JavaScriptSources
 	js/js_object.h
 	js/js_callback.h
+	js/js_function_register.h
+	js/js_function_register.cc
 	js/js_object_register.h
+	js/js_object_register.cc
 	js/js_state_wrapper.h
 	js/js_state_wrapper.cc
 	js/js_wrapper.h

@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "../js/js_object.h"
+#include "../js/js_wrapper.h"
+
 namespace snuffbox
 {
 	/**
@@ -11,7 +14,7 @@ namespace snuffbox
 	* @brief A class to register CVars with and to parse the command line for CVars
 	* @author Daniël Konings
 	*/
-	class CVar
+  class CVar : public JSObject
 	{
 	public:
 		/**
@@ -157,7 +160,7 @@ namespace snuffbox
 		CVar();
 
 		/// Default destructor
-		~CVar();
+		virtual ~CVar();
 
 		/**
 		* @brief Retrieves the singleton instance of this class
@@ -251,6 +254,11 @@ namespace snuffbox
 		* @param[in] i (int&) The current index to be incremented
 		*/
 		std::string RepeatUntil(std::vector<std::string> consumer, std::string& str, int& i);
+
+  public:
+    JS_NAME("CVar");
+    static void RegisterJS(JS_SINGLETON obj);
+    static void JSRegister(JS_ARGS args);
 	};
 
 	template<typename T>

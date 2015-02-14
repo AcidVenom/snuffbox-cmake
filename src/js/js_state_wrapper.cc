@@ -11,6 +11,9 @@
 
 #include "../js/js_wrapper.h"
 
+#include "../js/js_object_register.h"
+#include "../js/js_object.h"
+
 using namespace v8;
 
 namespace snuffbox
@@ -19,7 +22,7 @@ namespace snuffbox
 	JSStateWrapper::JSStateWrapper() :
 		platform_(nullptr)
 	{
-		Initialise();
+		
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -53,6 +56,7 @@ namespace snuffbox
 		context->Enter();
 
 		JSRegisterFunctions();
+    JSRegister::Register();
 
 		context->Exit();
 	}
@@ -170,11 +174,11 @@ namespace snuffbox
 	void JSStateWrapper::Destroy()
 	{
 		SNUFF_LOG_INFO("Collecting all JavaScript garbage");
-		isolate_->LowMemoryNotification();
 
 		global_.Reset();
 		context_.Reset();
 
+    isolate_->LowMemoryNotification();
 		isolate_->Exit();
 		isolate_->Dispose();
 
@@ -202,6 +206,37 @@ namespace snuffbox
 		RegisterGlobal("require", Function::New(isolate_, JSRequire));
 		RegisterGlobal("assert", Function::New(isolate_, JSAssert));
 	}
+
+  //-------------------------------------------------------------------------------------------
+  template<typename T>
+  void JSStateWrapper::JSNew(JS_ARGS args)
+  {
+    JSStateWrapper* wrapper = JSStateWrapper::Instance();
+    Isolate* isolate = wrapper->isolate();
+    T* ptr = AllocatedMemory::Instance().Construct<T>(args);
+
+    Handle<Object> obj = args.This();
+    ptr->object().Reset(isolate, obj);
+    ptr->object().SetWeak(static_cast<JSObject*>(ptr), JSDestroy);
+    ptr->object().MarkIndependent();
+    obj->SetHiddenValue(String::NewFromUtf8(isolate, "__ptr"), External::New(isolate, static_cast<void*>(ptr)));
+    int64_t size = static_cast<int64_t>(sizeof(ptr));
+
+    isolate->AdjustAmountOfExternalAllocatedMemory(size);
+    args.GetReturnValue().Set(obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void JSStateWrapper::JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data)
+  {
+    JSObject* ptr = data.GetParameter();
+
+    int64_t size = -static_cast<int64_t>(sizeof(ptr));
+    ptr->object().Reset();
+    AllocatedMemory::Instance().Destruct<JSObject>(ptr);
+    data.GetValue().Clear();
+    JSStateWrapper::Instance()->isolate()->AdjustAmountOfExternalAllocatedMemory(size);
+  }
 
 	//-------------------------------------------------------------------------------------------
 	void JSStateWrapper::JSRequire(JS_ARGS args)
