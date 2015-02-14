@@ -52,6 +52,9 @@ namespace snuffbox
 		*/
 		void DecreaseUsedMemory(const size_t size);
 
+    /// Checks the environment for memory leaks, if the console exists, keep it running to display the message
+    void CheckForLeaks();
+
 	private:
 
 		/// Default constructor

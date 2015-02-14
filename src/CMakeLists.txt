@@ -1,3 +1,10 @@
+IF (SNUFF_BUILD_CONSOLE)
+	SET (CMAKE_AUTOMOC ON)
+	SET (CMAKE_AUTOUIC ON)
+	
+	SET (CMAKE_INCLUDE_CURRENT_DIR ON)
+ENDIF (SNUFF_BUILD_CONSOLE)
+
 SET (Win32Sources 
 	win32/win32_window.cc
 	win32/win32_window.h
@@ -31,7 +38,6 @@ SET (PlatformSources
 	platform/platform_file_watch.h
 	platform/platform_text_file_base.h
 	platform/platform_text_file.h
-	platform/platform_text_file.cc
 )
 
 SET (ApplicationSources
@@ -123,6 +129,14 @@ ENDIF (WIN32 AND NOT SNUFF_BUILD_OPENGL)
 
 SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+
+IF (SNUFF_BUILD_CONSOLE)
+	ADD_SUBDIRECTORY (console)
+	SOURCE_GROUP("console" FILES ${ConsoleSources})
+	
+	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${ConsoleSources})
+ENDIF (SNUFF_BUILD_CONSOLE)
+
 ADD_EXECUTABLE(snuffbox ${SNUFF_SOURCES})
 
 SET (SNUFF_BASE_LIBS "${V8_LIBRARIES};${FBX_LIBRARY};${FMOD_LIBRARY};${FREETYPE_LIBRARY}")

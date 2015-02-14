@@ -11,10 +11,24 @@
 
 #include "../cvar/cvar.h"
 
+#ifdef SNUFF_BUILD_CONSOLE
+#include <qapplication.h>
+#include <qmainwindow.h>
+#include "../console/console.h"
+#endif
+
 using namespace snuffbox;
 
 int main(int argc, char** argv)
 {
+#ifdef SNUFF_BUILD_CONSOLE
+  QApplication* app = new QApplication(argc, argv);
+  app->setApplicationName("Snuffbox Console");
+
+  QMainWindow* console_window = new QMainWindow();
+  Console* console = Console::Instance();
+#endif
+
 	AllocatedMemory& memory = AllocatedMemory::Instance();
 
 	std::string name = "Snuffbox_";
@@ -37,6 +51,20 @@ int main(int argc, char** argv)
 	CVar* cvar = CVar::Instance();
 
 	cvar->RegisterCommandLine(argc, argv);
+  
+#ifdef SNUFF_BUILD_CONSOLE
+  console->CheckEnabled();
+  if (console->enabled() == true)
+  {
+    console->Initialise(console_window);
+
+    SNUFF_LOG_INFO("Succesfully initialised the console");
+  }
+#endif
+
+  SNUFF_LOG_INFO(name);
+  SNUFF_LOG_INFO("Command line arguments: ");
+  cvar->LogCVars();
 
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
 	js_state_wrapper->CompileAndRun("main.js");
@@ -59,5 +87,7 @@ int main(int argc, char** argv)
 	}
 
 	SNUFF_LOG_INFO("Shutting down");
+  js_state_wrapper->Destroy();
+
 	return 0;
 }

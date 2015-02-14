@@ -1,6 +1,10 @@
 #include "../memory/allocated_memory.h"
 #include "../application/logging.h"
 
+#ifdef SNUFF_BUILD_CONSOLE
+  #include "../console/console.h"
+#endif
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -42,11 +46,29 @@ namespace snuffbox
 		allocated_memory_ -= size;
 	}
 
+  void AllocatedMemory::CheckForLeaks()
+  {
+    SNUFF_XASSERT(allocations_ == 0 && allocated_memory_ == 0, "Detected a memory leak on the heap!", "AllocatedMemory::CheckForLeaks");
+    SNUFF_LOG_SUCCESS("No memory leaks detected");
+    SNUFF_LOG_INFO("Shutdown succesful");
+
+#ifdef SNUFF_BUILD_CONSOLE
+    Console* console = Console::Instance();
+    SNUFF_ASSERT_NOTNULL(console, "AllocatedMemory::CheckForLeaks::console");
+    
+    while (console->enabled() && console->IsVisible())
+    {
+      qApp->exec();
+    }
+
+    delete console;
+    console = nullptr;
+#endif
+  }
+
 	//-------------------------------------------------------------------------------------------
 	AllocatedMemory::~AllocatedMemory()
 	{
-		SNUFF_XASSERT(allocations_ == 0 && allocated_memory_ == 0, "Detected a memory leak on the heap!", "AllocatedMemory::~AllocatedMemory");
-		SNUFF_LOG_SUCCESS("No memory leaks detected");
-		SNUFF_LOG_INFO("Shutdown succesful");
+    CheckForLeaks();
 	}
 }

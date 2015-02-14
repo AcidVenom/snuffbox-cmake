@@ -222,6 +222,9 @@ namespace snuffbox
 		*/
 		void RegisterCommandLine(int argc, char** argv);
 
+    /// Logs all currently registered CVars
+    void LogCVars();
+
 	private:
 		typedef std::map<std::string, CVar::Value*> CVarMap;
 		CVarMap vars_; //!< The variables 

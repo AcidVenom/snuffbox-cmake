@@ -9,6 +9,10 @@
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
+#ifdef SNUFF_BUILD_CONSOLE
+#include "../console/console.h"
+#endif
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -18,7 +22,7 @@ namespace snuffbox
 		mouse_(nullptr),
 		started_(true)
 	{
-		SNUFF_LOG_INFO("Created an instance of the engine");
+		
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -42,6 +46,13 @@ namespace snuffbox
 		window_->ProcessMessages();
 		keyboard_->Update();
 		mouse_->Update();
+
+#ifdef SNUFF_BUILD_CONSOLE
+    if (Console::Instance()->enabled())
+    {
+      qApp->processEvents();
+    }
+#endif
 	}
 
 	//-------------------------------------------------------------------------------------------
