@@ -3,6 +3,8 @@
 #include "../input/key.h"
 #include <queue>
 
+#include "../js/js_object.h"
+
 namespace snuffbox
 {
 	/**
@@ -10,7 +12,7 @@ namespace snuffbox
 	* @brief This class handles all keyboard input
 	* @author Daniël Konings
 	*/
-	class Keyboard
+	class Keyboard : public JSObject
 	{
 	public:
 		/**
@@ -57,6 +59,12 @@ namespace snuffbox
 		/// Default destructor
 		~Keyboard();
 
+    /**
+    * @brief Returns the singleton instance of this object
+    * @return snuffbox::Keyboard* The pointer to the singleton
+    */
+    static Keyboard* Instance();
+
 		/// Reset all key states
 		void ResetStates();
 
@@ -95,5 +103,15 @@ namespace snuffbox
 		KeyState						states_[255]; //!< A list of key states
 		Key::Keys						last_pressed_; //!< The key last pressed
 		Key::Keys						last_released_; //!< The key last released
+
+    /// Enumerates the key enumerator, sets it all to JavaScript
+    static void JSEnumerateKeys();
+
+  public:
+    JS_NAME("Keyboard");
+    static void RegisterJS(JS_SINGLETON obj);
+    static void JSIsPressed(JS_ARGS args);
+    static void JSIsDown(JS_ARGS args);
+    static void JSIsReleased(JS_ARGS args);
 	};
 }

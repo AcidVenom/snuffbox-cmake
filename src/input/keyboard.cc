@@ -1,5 +1,8 @@
 #include "../input/keyboard.h"
 
+#include "../memory/allocated_memory.h"
+#include "../memory/shared_ptr.h"
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -9,6 +12,13 @@ namespace snuffbox
 	{
 		ResetStates();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  Keyboard* Keyboard::Instance()
+  {
+    static SharedPtr<Keyboard> keyboard = AllocatedMemory::Instance().Construct<Keyboard>();
+    return keyboard.get();
+  }
 
 	//-------------------------------------------------------------------------------------------
 	void Keyboard::ResetStates()
@@ -82,4 +92,57 @@ namespace snuffbox
 	{
 		ResetStates();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void Keyboard::JSEnumerateKeys()
+  {
+    v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+    for (int i = 0; i < 255; ++i)
+    {
+      JSWrapper::SetObjectValue<double>(obj, Key::KeyToString(static_cast<Key::Keys>(i)), static_cast<double>(i));
+    }
+
+    JSStateWrapper::Instance()->RegisterGlobal("Key", obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Keyboard::RegisterJS(JS_SINGLETON obj)
+  {
+    JSFunctionRegister funcs[] = {
+      { "isPressed", JSIsPressed },
+      { "isDown", JSIsDown },
+      { "isReleased", JSIsReleased }
+    };
+
+    JSEnumerateKeys();
+
+    JSFunctionRegister::Register(funcs, 3, obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Keyboard::JSIsPressed(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("N");
+
+    wrapper.ReturnValue<bool>(Keyboard::Instance()->IsPressed(static_cast<Key::Keys>(wrapper.GetValue<int>(0, 0))));
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Keyboard::JSIsDown(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("N");
+
+    wrapper.ReturnValue<bool>(Keyboard::Instance()->IsDown(static_cast<Key::Keys>(wrapper.GetValue<int>(0, 0))));
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Keyboard::JSIsReleased(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    wrapper.Check("N");
+
+    wrapper.ReturnValue<bool>(Keyboard::Instance()->IsReleased(static_cast<Key::Keys>(wrapper.GetValue<int>(0, 0))));
+  }
 }

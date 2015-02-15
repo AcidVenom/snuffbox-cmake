@@ -144,9 +144,18 @@ namespace snuffbox
     history_.push_back(plain);
     ++history_index_;
 
-    std::string src = plain.toStdString();
-    
-    JSStateWrapper::Instance()->Run(src, "console", true);
+    JSStateWrapper* wrapper = JSStateWrapper::Instance();
+
+    if (wrapper->running() == true)
+    {
+      std::string src = plain.toStdString();
+
+      JSStateWrapper::Instance()->Run(src, "console", true);
+    }
+    else
+    {
+      SNUFF_LOG_ERROR("No JavaScript execution context available\nIs the engine still running?");
+    }
     ui_->input->setText("");
   }
 

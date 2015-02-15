@@ -12,6 +12,13 @@ namespace snuffbox
 		
 	}
 
+  //------------------------------------------------------------------------------
+  Handle<Object> JSWrapper::CreateObject()
+  {
+    Isolate* isolate = JSStateWrapper::Instance()->isolate();
+    return Object::New(isolate);
+  }
+
 	//------------------------------------------------------------------------------
 	JSWrapper::Types JSWrapper::TypeOf(Local<Value> value)
 	{

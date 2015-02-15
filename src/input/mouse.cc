@@ -1,5 +1,8 @@
 #include "../input/mouse.h"
 
+#include "../memory/allocated_memory.h"
+#include "../memory/shared_ptr.h"
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -13,6 +16,13 @@ namespace snuffbox
 	{
 		ResetStates();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  Mouse* Mouse::Instance()
+  {
+    static SharedPtr<Mouse> mouse = AllocatedMemory::Instance().Construct<Mouse>();
+    return mouse.get();
+  }
 
 	//-------------------------------------------------------------------------------------------
 	void Mouse::ResetStates()

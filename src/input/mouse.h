@@ -75,6 +75,12 @@ namespace snuffbox
 		/// Default destructor
 		~Mouse();
 
+    /**
+    * @brief Returns the singleton instance of this object
+    * @return snuffbox::Mouse* The pointer to the singleton
+    */
+    static Mouse* Instance();
+
 		/// Reset all button states
 		void ResetStates();
 

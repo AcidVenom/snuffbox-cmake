@@ -3,6 +3,8 @@
 #include "../application/logging.h"
 #include "../cvar/cvar.h"
 
+#include "../input/keyboard.h"
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -10,6 +12,7 @@ namespace snuffbox
   {
     JSObjectRegister<DebugLogging>::RegisterSingleton();
     JSObjectRegister<CVar>::RegisterSingleton();
+    JSObjectRegister<Keyboard>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------

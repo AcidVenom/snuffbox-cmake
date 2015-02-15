@@ -85,20 +85,32 @@ namespace snuffbox
 		/// Destroys the state wrapper and disposes V8
 		void Destroy();
 
+    /**
+    * @brief Retrieves the isolate running on this thread
+    * @return v8::Isolate* The pointer to the current isolate
+    */
+    v8::Isolate* isolate();
+
+    /**
+    * @brief Retrieves the global object
+    * @return v8::Local<v8::Object> The global object
+    */
+    v8::Local<v8::Object> global();
+
+    /**
+    * @return const bool& Is the JavaScript engine still running?
+    */
+    const bool& running() const;
+
 		/// Default destructor
 		~JSStateWrapper();
-
-		/**
-		* @brief Retrieves the isolate running on this thread
-		* @return v8::Isolate* The pointer to the current isolate
-		*/
-		v8::Isolate* isolate();
 
 	private:
 		v8::Isolate*	isolate_; //!< Used to create the isolated JavaScript state for this instance of the engine
 		v8::Persistent<v8::Context> context_; //!< The context we will use for this JavaScript state
 		v8::Persistent<v8::ObjectTemplate> global_; //!< The global scope for use with the JavaScript state
 		v8::Platform* platform_; //!< The win32 platform
+    bool running_; //!< Is the JavaScript engine still running?
 
 	public:
 		/// Registers basic functions (require, assert, etc.)

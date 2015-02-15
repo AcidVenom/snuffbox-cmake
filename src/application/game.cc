@@ -9,6 +9,8 @@
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
+#include "../js/js_callback.h"
+
 #ifdef SNUFF_BUILD_CONSOLE
 #include "../console/console.h"
 #endif
@@ -22,7 +24,7 @@ namespace snuffbox
 		mouse_(nullptr),
 		started_(true)
 	{
-		
+    
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -38,6 +40,11 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(window_, "Game::Verify::Window");
 		SNUFF_ASSERT_NOTNULL(keyboard_, "Game::Verify::Keyboard");
 		SNUFF_ASSERT_NOTNULL(mouse_, "Game::Verify::Mouse");
+
+    js_init_.Set("Game", "initialise");
+    js_update_.Set("Game", "update");
+
+    js_init_.Call();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -53,6 +60,8 @@ namespace snuffbox
       qApp->processEvents();
     }
 #endif
+
+    js_update_.Call(0.0);
 	}
 
 	//-------------------------------------------------------------------------------------------

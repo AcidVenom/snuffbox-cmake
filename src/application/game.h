@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../js/js_callback.h"
+
 namespace snuffbox
 {
 	class Window;
@@ -90,5 +92,9 @@ namespace snuffbox
 		Keyboard* keyboard_;
 		Mouse* mouse_;
 		bool started_;
+
+  public:
+    JSCallback<> js_init_; //!< The initialisation callback
+    JSCallback<double> js_update_;  //!< The update callback
 	};
 }

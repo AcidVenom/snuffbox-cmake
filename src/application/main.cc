@@ -70,12 +70,12 @@ int main(int argc, char** argv)
 	js_state_wrapper->CompileAndRun("main.js");
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
-	SharedPtr<Keyboard> keyboard = memory.Construct<Keyboard>();
-	SharedPtr<Mouse> mouse = memory.Construct<Mouse>();
+  Keyboard* keyboard = Keyboard::Instance();
+  Mouse* mouse = Mouse::Instance();
 
 	game->set_window(window.get());
-	game->set_keyboard(keyboard.get());
-	game->set_mouse(mouse.get());
+	game->set_keyboard(keyboard);
+	game->set_mouse(mouse);
 
 	game->Verify();
 

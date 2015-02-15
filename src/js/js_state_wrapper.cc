@@ -57,8 +57,6 @@ namespace snuffbox
 
 		JSRegisterFunctions();
     JSRegister::Register();
-
-		context->Exit();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -207,10 +205,22 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	v8::Isolate* JSStateWrapper::isolate()
+	Isolate* JSStateWrapper::isolate()
 	{
 		return isolate_;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  Local<Object> JSStateWrapper::global()
+  {
+    return Local<Context>::New(isolate_, context_)->Global();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  const bool& JSStateWrapper::running() const
+  {
+    return running_;
+  }
 
 	//-------------------------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
