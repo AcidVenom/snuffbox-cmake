@@ -19,8 +19,9 @@ using namespace v8;
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
-	JSStateWrapper::JSStateWrapper() :
-		platform_(nullptr)
+  JSStateWrapper::JSStateWrapper() :
+    platform_(nullptr),
+    running_(false)
 	{
 		
 	}
@@ -57,6 +58,8 @@ namespace snuffbox
 
 		JSRegisterFunctions();
     JSRegister::Register();
+
+    running_ = true;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -202,6 +205,8 @@ namespace snuffbox
 
 		delete platform_;
 		platform_ = nullptr;
+
+    running_ = false;
 	}
 
 	//-------------------------------------------------------------------------------------------
