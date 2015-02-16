@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../js/js_callback.h"
+#include "../js/js_object.h"
 
 namespace snuffbox
 {
@@ -8,7 +9,7 @@ namespace snuffbox
 	class Keyboard;
 	class Mouse;
 
-	class Game
+	class Game : public JSObject
 	{
 	public:
 		/**
@@ -88,13 +89,19 @@ namespace snuffbox
 		~Game();
 
 	private:
-		Window* window_;
-		Keyboard* keyboard_;
-		Mouse* mouse_;
-		bool started_;
+		Window* window_; //!< The window the game is running in
+		Keyboard* keyboard_; //!< The keyboard the game currently uses
+		Mouse* mouse_; //!< The mouse the game currently uses
+		bool started_; //!< Is the game started?
+		double delta_time_; //!< The delta time since the previous frame
 
   public:
     JSCallback<> js_init_; //!< The initialisation callback
     JSCallback<double> js_update_;  //!< The update callback
+
+	public:
+		JS_NAME("Game");
+		static void RegisterJS(JS_SINGLETON obj);
+		static void JSQuit(JS_ARGS args);
 	};
 }

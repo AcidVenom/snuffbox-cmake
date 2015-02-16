@@ -1,7 +1,5 @@
 require("require");
 
-var Game = {};
-
 Game.initialise = function()
 {
 
@@ -9,5 +7,8 @@ Game.initialise = function()
 
 Game.update = function(dt)
 {
-	
+	if (Keyboard.isReleased(Key.Q))
+	{
+		Game.quit();
+	}
 }

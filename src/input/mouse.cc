@@ -175,7 +175,7 @@ namespace snuffbox
 		JSWrapper::SetObjectValue<double>(obj, "Right", Mouse::MouseButton::kRight);
 		JSWrapper::SetObjectValue<double>(obj, "Middle", Mouse::MouseButton::kMiddle);
 
-		JSStateWrapper::Instance()->RegisterGlobal("Button", obj);
+		JSStateWrapper::Instance()->RegisterGlobal("MouseButton", obj);
 	}
 
 	//-------------------------------------------------------------------------------------------

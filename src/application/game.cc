@@ -135,4 +135,20 @@ namespace snuffbox
 	{
 
 	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::RegisterJS(JS_SINGLETON obj)
+	{
+		JSFunctionRegister funcs[] = {
+			{ "quit", JSQuit }
+		};
+
+		JSFunctionRegister::Register(funcs, 1, obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::JSQuit(JS_ARGS args)
+	{
+		Game::Instance()->Notify(GameNotifications::kQuit);
+	}
 }
