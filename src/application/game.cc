@@ -15,6 +15,10 @@
 #include "../console/console.h"
 #endif
 
+#include <chrono>
+
+using namespace std::chrono;
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -22,7 +26,8 @@ namespace snuffbox
 		window_(nullptr),
 		keyboard_(nullptr),
 		mouse_(nullptr),
-		started_(true)
+		started_(true),
+		delta_time_(0.0)
 	{
     
 	}
@@ -50,7 +55,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Run()
 	{
-		window_->ProcessMessages();
+		high_resolution_clock::time_point last_time = high_resolution_clock::now();
+
+		window_->ProcessMessages(); 
 		keyboard_->Update();
 		mouse_->Update();
 
@@ -61,7 +68,12 @@ namespace snuffbox
     }
 #endif
 
-    js_update_.Call(0.0);
+    js_update_.Call(delta_time_);
+
+		high_resolution_clock::time_point now = high_resolution_clock::now();
+
+		duration<double, std::milli> dt_duration = duration_cast<duration<double, std::milli>>(now - last_time);
+		delta_time_ = dt_duration.count() * 1e-3f;
 	}
 
 	//-------------------------------------------------------------------------------------------

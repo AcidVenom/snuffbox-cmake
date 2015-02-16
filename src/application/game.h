@@ -3,6 +3,8 @@
 #include "../js/js_callback.h"
 #include "../js/js_object.h"
 
+#include <chrono>
+
 namespace snuffbox
 {
 	class Window;
@@ -94,8 +96,7 @@ namespace snuffbox
 		Mouse* mouse_; //!< The mouse the game currently uses
 		bool started_; //!< Is the game started?
 		double delta_time_; //!< The delta time since the previous frame
-
-  public:
+		std::chrono::high_resolution_clock::time_point last_time_; //!< What was the time the last time?
     JSCallback<> js_init_; //!< The initialisation callback
     JSCallback<double> js_update_;  //!< The update callback
 
