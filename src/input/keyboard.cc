@@ -70,19 +70,19 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Keyboard::IsPressed(Key::Keys key)
+	const bool& Keyboard::IsPressed(Key::Keys key) const
 	{
 		return states_[key].pressed;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Keyboard::IsDown(Key::Keys key)
+	const bool& Keyboard::IsDown(Key::Keys key) const
 	{
 		return states_[key].down;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Keyboard::IsReleased(Key::Keys key)
+	const bool& Keyboard::IsReleased(Key::Keys key) const
 	{
 		return states_[key].released;
 	}

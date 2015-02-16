@@ -90,36 +90,36 @@ namespace snuffbox
 			x_ = top.x;
 			y_ = top.y;
 
-			dx_ = x_ - prev_x_;
-			dy_ = y_ - prev_y_;
-
-			prev_x_ = x_;
-			prev_y_ = y_;
-
 			queue_.pop();
 		}
+
+		dx_ = x_ - prev_x_;
+		dy_ = y_ - prev_y_;
+
+		prev_x_ = x_;
+		prev_y_ = y_;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Mouse::IsPressed(Mouse::MouseButton button)
+	const bool& Mouse::IsPressed(Mouse::MouseButton button) const
 	{
 		return states_[button].pressed;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Mouse::IsDown(Mouse::MouseButton button)
+	const bool& Mouse::IsDown(Mouse::MouseButton button) const
 	{
 		return states_[button].down;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Mouse::IsReleased(Mouse::MouseButton button)
+	const bool& Mouse::IsReleased(Mouse::MouseButton button) const
 	{
 		return states_[button].released;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Mouse::IsDoubleClicked(Mouse::MouseButton button)
+	const bool& Mouse::IsDoubleClicked(Mouse::MouseButton button) const
 	{
 		return states_[button].double_clicked;
 	}
@@ -164,5 +164,126 @@ namespace snuffbox
 	Mouse::~Mouse()
 	{
 		ResetStates();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSEnumerateButtons()
+	{
+		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+
+		JSWrapper::SetObjectValue<double>(obj, "Left", Mouse::MouseButton::kLeft);
+		JSWrapper::SetObjectValue<double>(obj, "Right", Mouse::MouseButton::kRight);
+		JSWrapper::SetObjectValue<double>(obj, "Middle", Mouse::MouseButton::kMiddle);
+
+		JSStateWrapper::Instance()->RegisterGlobal("Button", obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::RegisterJS(JS_SINGLETON obj)
+	{
+		JSFunctionRegister funcs[] = {
+			{ "isDown", JSIsDown },
+			{ "isPressed", JSIsPressed },
+			{ "isReleased", JSIsReleased },
+			{ "isDoubleClicked", JSIsDoubleClicked },
+			{ "wheelDown", JSWheelDown },
+			{ "wheelUp", JSWheelUp },
+			{ "position", JSPosition },
+			{ "movement", JSMovement }
+		};
+
+		JSEnumerateButtons();
+
+		JSFunctionRegister::Register(funcs, 8, obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSIsDown(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+		wrapper.Check("N");
+
+		wrapper.ReturnValue<bool>(self->IsDown(static_cast<MouseButton>(wrapper.GetValue<int>(0, 0))));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSIsPressed(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+		wrapper.Check("N");
+
+		wrapper.ReturnValue<bool>(self->IsPressed(static_cast<MouseButton>(wrapper.GetValue<int>(0, 0))));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSIsReleased(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+		wrapper.Check("N");
+
+		wrapper.ReturnValue<bool>(self->IsReleased(static_cast<MouseButton>(wrapper.GetValue<int>(0, 0))));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSIsDoubleClicked(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+		wrapper.Check("N");
+
+		wrapper.ReturnValue<bool>(self->IsDoubleClicked(static_cast<MouseButton>(wrapper.GetValue<int>(0, 0))));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSWheelDown(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+
+		wrapper.ReturnValue<bool>(self->wheel_down());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSWheelUp(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+
+		wrapper.ReturnValue<bool>(self->wheel_up());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSPosition(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+
+		int x = self->x();
+		int y = self->y();
+
+		v8::Handle<v8::Object> obj = wrapper.CreateObject();
+		JSWrapper::SetObjectValue(obj, "x", static_cast<double>(x));
+		JSWrapper::SetObjectValue(obj, "y", static_cast<double>(y));
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Mouse::JSMovement(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		Mouse* self = Mouse::Instance();
+
+		int dx = self->dx();
+		int dy = self->dy();
+
+		v8::Handle<v8::Object> obj = wrapper.CreateObject();
+		JSWrapper::SetObjectValue(obj, "x", static_cast<double>(dx));
+		JSWrapper::SetObjectValue(obj, "y", static_cast<double>(dy));
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
 	}
 }

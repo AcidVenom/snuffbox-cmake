@@ -80,23 +80,23 @@ namespace snuffbox
 		/**
 		* @brief Is a given key pressed?
 		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsPressed(Key::Keys keycode);
+		const bool& IsPressed(Key::Keys keycode) const;
 
 		/**
 		* @brief Is a given key down?
 		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsDown(Key::Keys keycode);
+		const bool& IsDown(Key::Keys keycode) const;
 
 		/**
 		* @brief Is a given key released?
 		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsReleased(Key::Keys keycode);
+		const bool& IsReleased(Key::Keys keycode) const;
 
 	private:
 		std::queue<KeyData> queue_; //!< The message queue that still needs processing

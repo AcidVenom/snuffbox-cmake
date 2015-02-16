@@ -2,6 +2,8 @@
 
 #include <queue>
 
+#include "../js/js_object.h"
+
 namespace snuffbox
 {
 	/**
@@ -9,7 +11,7 @@ namespace snuffbox
 	* @brief This class handles all mouse input
 	* @author Daniël Konings
 	*/
-	class Mouse
+	class Mouse : public JSObject
 	{
 	public:
 		/**
@@ -96,30 +98,30 @@ namespace snuffbox
 		/**
 		* @brief Is a given button pressed?
 		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsPressed(MouseButton button);
+		const bool& IsPressed(MouseButton button) const;
 
 		/**
 		* @brief Is a given button down?
 		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsDown(MouseButton button);
+		const bool& IsDown(MouseButton button) const;
 
 		/**
 		* @brief Is a given button released?
 		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsReleased(MouseButton button);
+		const bool& IsReleased(MouseButton button) const;
 
 		/**
 		* @brief Is a given button double clicked?
 		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
-		* @return bool The boolean value
+		* @return const bool& The boolean value
 		*/
-		bool IsDoubleClicked(MouseButton button);
+		const bool& IsDoubleClicked(MouseButton button) const;
 
 		/**
 		* @brief Was there a mouse wheel down?
@@ -164,5 +166,19 @@ namespace snuffbox
 		int										dy_; //!< The y movement since last frame
 		int										prev_x_; //!< The previous x position
 		int										prev_y_; //!< The previous y position
+
+		/// Enumerates all buttons to a 'Button' enumeration
+		static void JSEnumerateButtons();
+	public:
+		JS_NAME("Mouse");
+		static void RegisterJS(JS_SINGLETON obj);
+		static void JSIsDown(JS_ARGS args);
+		static void JSIsPressed(JS_ARGS args);
+		static void JSIsReleased(JS_ARGS args);
+		static void JSIsDoubleClicked(JS_ARGS args);
+		static void JSWheelDown(JS_ARGS args);
+		static void JSWheelUp(JS_ARGS args);
+		static void JSPosition(JS_ARGS args);
+		static void JSMovement(JS_ARGS args);
 	};
 }
