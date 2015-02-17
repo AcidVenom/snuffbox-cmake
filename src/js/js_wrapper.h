@@ -114,8 +114,9 @@ namespace snuffbox
 		* @brief Constructs an argument error and logs it
 		* @param[in] expected (snuffbox::JSWrapper::Types) The expected type
 		* @param[in] got (snuffbox::JSWrapper::Types) The type that was actually received
+		* @param[in] arg (int) The current argument
 		*/
-		void Error(Types expected, Types got);
+		void Error(Types expected, Types got, int arg);
 
 		/**
 		* @brief Checks the argument scope if the format is as it should be

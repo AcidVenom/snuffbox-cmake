@@ -1,8 +1,23 @@
 require("require");
 
+var stack3 = function()
+{
+	CVar.register();
+}
+
+var stack2 = function()
+{
+	stack3();
+}
+
+var stack1 = function()
+{
+	stack2();
+}
+
 Game.Initialise = function()
 {
-
+	stack1();
 }
 
 Game.Update = function(dt)
@@ -15,7 +30,7 @@ Game.Update = function(dt)
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
 {
-	Log.info(Game.fixedStep())
+	
 }
 
 Game.Shutdown = function()

@@ -127,7 +127,7 @@ namespace snuffbox
 			got = TypeOf(args_[i]);
 			if (got != expected)
 			{
-				Error(expected, got);
+				Error(expected, got, i);
 				return false;
 			}
 		}
@@ -136,7 +136,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void JSWrapper::Error(JSWrapper::Types expected, JSWrapper::Types got)
+	void JSWrapper::Error(JSWrapper::Types expected, JSWrapper::Types got, int arg)
 	{
 		if (error_checks_ == false)
 		{
@@ -150,8 +150,8 @@ namespace snuffbox
 		error += *String::Utf8Value(args_.Callee()->GetName()->ToString());
 		error += ") ";
 
-		error += "Expected '" + TypeToString(expected) + "', but got '" + TypeToString(got) + "'\n\t";
-		Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 3);
+		error += "Expected '" + TypeToString(expected) + "', but got '" + TypeToString(got) + "' for argument " + std::to_string(arg + 1) + "\n\t";
+		Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 20);
 
 		Local<StackFrame> frame;
 		for (int i = 0; i < stack->GetFrameCount(); ++i)
