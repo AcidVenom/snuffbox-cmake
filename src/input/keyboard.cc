@@ -116,7 +116,7 @@ namespace snuffbox
 
     JSEnumerateKeys();
 
-    JSFunctionRegister::Register(funcs, 3, obj);
+		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
   }
 
   //-------------------------------------------------------------------------------------------

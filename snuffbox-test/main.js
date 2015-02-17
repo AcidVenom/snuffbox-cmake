@@ -1,14 +1,29 @@
 require("require");
 
-Game.initialise = function()
+Game.Initialise = function()
 {
 
 }
 
-Game.update = function(dt)
+Game.Update = function(dt)
 {
 	if (Keyboard.isReleased(Key.Q))
 	{
 		Game.quit();
 	}
+}
+
+Game.FixedUpdate = function(timeSteps, fixedDelta)
+{
+	Log.info(Game.fixedStep())
+}
+
+Game.Shutdown = function()
+{
+
+}
+
+Game.OnReload = function()
+{
+
 }

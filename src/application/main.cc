@@ -81,6 +81,8 @@ int main(int argc, char** argv)
 
 	window->Show();
 
+	game->Initialise();
+
 	while (game->started())
 	{
 		game->Run();

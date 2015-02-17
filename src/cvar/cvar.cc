@@ -366,7 +366,7 @@ namespace snuffbox
       { "register", JSRegister }
     };
 
-    JSFunctionRegister::Register(funcs, 1, obj);
+		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
   }
 
   //-------------------------------------------------------------------------------------------

@@ -194,7 +194,7 @@ namespace snuffbox
 
 		JSEnumerateButtons();
 
-		JSFunctionRegister::Register(funcs, 8, obj);
+		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
 	}
 
 	//-------------------------------------------------------------------------------------------
