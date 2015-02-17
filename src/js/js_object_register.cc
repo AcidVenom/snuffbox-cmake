@@ -15,7 +15,7 @@ namespace snuffbox
   {
 		JSObjectRegister<Game>::RegisterSingleton();
     JSObjectRegister<DebugLogging>::RegisterSingleton();
-    JSObjectRegister<CVar>::RegisterSingleton();
+		JSObjectRegister<CVar>::RegisterSingleton();
     JSObjectRegister<Keyboard>::RegisterSingleton();
 		JSObjectRegister<Mouse>::RegisterSingleton();
   }

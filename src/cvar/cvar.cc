@@ -375,6 +375,8 @@ namespace snuffbox
     JSWrapper wrapper(args);
     CVar* self = CVar::Instance();
 
+		wrapper.set_error_checks(false);
+
     if (wrapper.Check("SB"))
     {
       self->Register(wrapper.GetValue<std::string>(0, "undefined"), wrapper.GetValue<bool>(1, false));
@@ -389,6 +391,8 @@ namespace snuffbox
     }
     else
     {
+			wrapper.set_error_checks(true);
+			wrapper.Check("SS");
       SNUFF_LOG_ERROR("Could not register CVar!");
     }
   }

@@ -1,4 +1,5 @@
 #include "../js/js_wrapper.h"
+#include "../application/logging.h"
 
 using namespace v8;
 
@@ -66,6 +67,7 @@ namespace snuffbox
 		switch (type)
 		{
 		case Types::kVoid: return "void";
+		case Types::kString: return "string";
 		case Types::kFunction: return "function";
 		case Types::kArray: return "array";
 		case Types::kObject: return "object";
@@ -81,7 +83,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	bool JSWrapper::Check(std::string format)
 	{
-		if (format.size() == 0 || error_checks_ == false)
+		if (format.size() == 0)
 		{
 			return true;
 		}
@@ -136,7 +138,40 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void JSWrapper::Error(JSWrapper::Types expected, JSWrapper::Types got)
 	{
+		if (error_checks_ == false)
+		{
+			return;
+		}
+		Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		std::string error = "(";
 
+		error += *String::Utf8Value(args_.This()->ToString());
+		error += ".";
+		error += *String::Utf8Value(args_.Callee()->GetName()->ToString());
+		error += ") ";
+
+		error += "Expected '" + TypeToString(expected) + "', but got '" + TypeToString(got) + "'\n\t";
+		Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 3);
+
+		Local<StackFrame> frame;
+		for (int i = 0; i < stack->GetFrameCount(); ++i)
+		{
+			frame = stack->GetFrame(i);
+			error += "\n\t";
+			error += "at " + std::string(*String::Utf8Value(frame->GetFunctionName())) +
+				" (" + std::string(*String::Utf8Value(frame->GetScriptName())) +
+				":" + std::to_string(frame->GetLineNumber()) + ":" + std::to_string(frame->GetColumn()) + ")";
+		}
+
+		error += "\n";
+
+		SNUFF_LOG_ERROR(error);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSWrapper::set_error_checks(bool value)
+	{
+		error_checks_ = value;
 	}
 
 	//-------------------------------------------------------------------------------------------

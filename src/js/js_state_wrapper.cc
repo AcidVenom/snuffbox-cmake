@@ -1,10 +1,9 @@
 #include <algorithm>
 #include <libplatform\libplatform.h>
 
-#include "../js/js_state_wrapper.h"
+#include "../application/logging.h"
 
-#include "../memory/allocated_memory.h"
-#include "../memory/shared_ptr.h"
+#include "../js/js_state_wrapper.h"
 
 #include "../platform/platform_text_file.h"
 #include "../cvar/cvar.h"
@@ -13,6 +12,8 @@
 
 #include "../js/js_object_register.h"
 #include "../js/js_object.h"
+
+#include "../memory/shared_ptr.h"
 
 using namespace v8;
 
@@ -239,25 +240,6 @@ namespace snuffbox
 		RegisterGlobal("require", Function::New(isolate_, JSRequire));
 		RegisterGlobal("assert", Function::New(isolate_, JSAssert));
 	}
-
-  //-------------------------------------------------------------------------------------------
-  template<typename T>
-  void JSStateWrapper::JSNew(JS_ARGS args)
-  {
-    JSStateWrapper* wrapper = JSStateWrapper::Instance();
-    Isolate* isolate = wrapper->isolate();
-    T* ptr = AllocatedMemory::Instance().Construct<T>(args);
-
-    Handle<Object> obj = args.This();
-    ptr->object().Reset(isolate, obj);
-    ptr->object().SetWeak(static_cast<JSObject*>(ptr), JSDestroy);
-    ptr->object().MarkIndependent();
-    obj->SetHiddenValue(String::NewFromUtf8(isolate, "__ptr"), External::New(isolate, static_cast<void*>(ptr)));
-    int64_t size = static_cast<int64_t>(sizeof(ptr));
-
-    isolate->AdjustAmountOfExternalAllocatedMemory(size);
-    args.GetReturnValue().Set(obj);
-  }
 
   //-------------------------------------------------------------------------------------------
   void JSStateWrapper::JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data)

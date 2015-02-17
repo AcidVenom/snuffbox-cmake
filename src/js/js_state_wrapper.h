@@ -3,6 +3,8 @@
 #include <v8.h>
 #include <string>
 
+#include "../memory/allocated_memory.h"
+
 namespace v8
 {
 	class Platform;
@@ -123,4 +125,22 @@ namespace snuffbox
 		static void JSRequire(const v8::FunctionCallbackInfo<v8::Value>& args);
 		static void JSAssert(const v8::FunctionCallbackInfo<v8::Value>& args);
 	};
+
+	//-------------------------------------------------------------------------------------------
+	template<typename T> inline void JSStateWrapper::JSNew(const v8::FunctionCallbackInfo<v8::Value>& args)
+	{
+		JSStateWrapper* wrapper = JSStateWrapper::Instance();
+		v8::Isolate* isolate = wrapper->isolate();
+		T* ptr = AllocatedMemory::Instance().Construct<T>(args);
+
+		v8::Handle<v8::Object> obj = args.This();
+		ptr->object().Reset(isolate, obj);
+		ptr->object().SetWeak(static_cast<JSObject*>(ptr), JSDestroy);
+		ptr->object().MarkIndependent();
+		obj->SetHiddenValue(v8::String::NewFromUtf8(isolate, "__ptr"), v8::External::New(isolate, static_cast<void*>(ptr)));
+		int64_t size = static_cast<int64_t>(sizeof(ptr));
+
+		isolate->AdjustAmountOfExternalAllocatedMemory(size);
+		args.GetReturnValue().Set(obj);
+	}
 }

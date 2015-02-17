@@ -39,6 +39,10 @@ namespace snuffbox
 
     /// Registers the T object as a function template
     static void Register();
+
+		/// Uses to set the to string function of each Snuffbox exposed class
+		template <typename Y>
+		static void ToString(JS_ARGS args);
   };
 
   //---------------------------------------------------------------------------------------------------------
@@ -53,6 +57,7 @@ namespace snuffbox
     v8::Handle<v8::Object> object = v8::Object::New(isolate);
     T::RegisterJS(object);
 
+		object->Set(v8::String::NewFromUtf8(isolate, "toString"), v8::Function::New(isolate, JSObjectRegister::ToString<T>));
     wrapper->RegisterGlobal(T::js_name(), object);
   }
 
@@ -65,12 +70,22 @@ namespace snuffbox
 
     v8::HandleScope scope(isolate);
 
-    v8::Handle<FunctionTemplate> object = v8::FunctionTemplate::New(isolate);
+    v8::Handle<v8::FunctionTemplate> object = v8::FunctionTemplate::New(isolate);
     T::RegisterJS(object->PrototypeTemplate());
 
+		object->PrototypeTemplate()->Set(v8::String::NewFromUtf8(isolate, "toString"), v8::Function::New(isolate, JSObjectRegister::ToString<T>));
     object->SetCallHandler(JSStateWrapper::JSNew<T>);
-    object->SetClassName(String::NewFromUtf8(isolate, T::js_name()));
+    object->SetClassName(v8::String::NewFromUtf8(isolate, T::js_name()));
 
     wrapper->RegisterGlobal(T::js_name(), object->GetFunction());
   }
+
+	//---------------------------------------------------------------------------------------------------------
+	template <typename T> template <typename Y>
+	inline void JSObjectRegister<T>::ToString(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		wrapper.ReturnValue<std::string>(Y::js_name());
+	}
 }

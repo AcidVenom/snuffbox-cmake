@@ -13,7 +13,8 @@ namespace snuffbox
 
     for (int i = 0; i < num; ++i)
     {
-      obj->Set(isolate, funcs[i].name.c_str(), v8::FunctionTemplate::New(isolate, funcs[i].callback));
+			v8::Local<v8::FunctionTemplate> func = v8::FunctionTemplate::New(isolate, funcs[i].callback);
+      obj->Set(isolate, funcs[i].name.c_str(), func);
     }
   }
 
@@ -25,7 +26,9 @@ namespace snuffbox
 
     for (int i = 0; i < num; ++i)
     {
-      obj->Set(v8::String::NewFromUtf8(isolate, funcs[i].name.c_str()), v8::Function::New(isolate, funcs[i].callback));
+			v8::Local<v8::Function> func = v8::Function::New(isolate, funcs[i].callback);
+			func->SetName(v8::String::NewFromUtf8(isolate, funcs[i].name.c_str()));
+      obj->Set(v8::String::NewFromUtf8(isolate, funcs[i].name.c_str()), func);
     }
   }
 }

@@ -115,7 +115,7 @@ namespace snuffbox
 		* @param[in] expected (snuffbox::JSWrapper::Types) The expected type
 		* @param[in] got (snuffbox::JSWrapper::Types) The type that was actually received
 		*/
-		static void Error(Types expected, Types got);
+		void Error(Types expected, Types got);
 
 		/**
 		* @brief Checks the argument scope if the format is as it should be
