@@ -35,6 +35,7 @@ SET (LinuxSources
 SET (PlatformSources
 	platform/platform_window_base.h
 	platform/platform_window.h
+	platform/platform_file_watch_base.h
 	platform/platform_file_watch.h
 	platform/platform_text_file_base.h
 	platform/platform_text_file.h
@@ -91,6 +92,13 @@ SET (CVarSources
 	cvar/cvar.cc
 )
 
+SET (ContentSources
+	content/content.h
+	content/content.cc
+	content/content_manager.h
+	content/content_manager.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -100,6 +108,7 @@ SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
 SOURCE_GROUP("js" 				FILES ${JavaScriptSources})
 SOURCE_GROUP("cvar" 				FILES ${CVarSources})
+SOURCE_GROUP("content" 		FILES ${ContentSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -109,6 +118,7 @@ SET (SNUFF_SOURCES
 	${InputSources}
 	${JavaScriptSources}
 	${CVarSources}
+	${ContentSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

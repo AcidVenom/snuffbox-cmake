@@ -16,7 +16,10 @@ namespace snuffbox
 	class FileWatch : public PlatformFileWatch
 	{
 	public:
-		FileWatch();
-		virtual ~FileWatch();
+		/// Default constructor
+		FileWatch(){};
+
+		/// Default destructor
+		virtual ~FileWatch(){};
 	};
 }
