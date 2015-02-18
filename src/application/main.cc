@@ -104,7 +104,10 @@ int main(int argc, char** argv)
 		game->Run();
     js_state_wrapper->isolate()->IdleNotification(32);
 
-		file_watch->Process();
+		if (should_reload)
+		{
+			file_watch->Process();
+		}
 	}
 
 	SNUFF_LOG_INFO("Shutting down");

@@ -2,6 +2,7 @@
 
 #include <map>
 #include "../memory/shared_ptr.h"
+#include "../js/js_object.h"
 
 namespace snuffbox
 {
@@ -22,7 +23,7 @@ namespace snuffbox
 		kSound
 	};
 
-	class ContentManager
+	class ContentManager : public JSObject
 	{
 	public:
 		/**
@@ -80,5 +81,9 @@ namespace snuffbox
 
 	private:
 		std::map<std::string, SharedPtr<Content>> content;
+
+	public:
+		JS_NAME("ContentManager");
+		static void RegisterJS(JS_SINGLETON obj);
 	};
 }

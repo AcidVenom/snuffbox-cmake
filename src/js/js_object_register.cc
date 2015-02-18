@@ -8,6 +8,8 @@
 #include "../input/keyboard.h"
 #include "../input/mouse.h"
 
+#include "../content/content_manager.h"
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -18,6 +20,7 @@ namespace snuffbox
 		JSObjectRegister<CVar>::RegisterSingleton();
     JSObjectRegister<Keyboard>::RegisterSingleton();
 		JSObjectRegister<Mouse>::RegisterSingleton();
+		JSObjectRegister<ContentManager>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------
