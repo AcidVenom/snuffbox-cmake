@@ -39,6 +39,8 @@ SET (PlatformSources
 	platform/platform_file_watch.h
 	platform/platform_text_file_base.h
 	platform/platform_text_file.h
+	platform/platform_render_device_base.h
+	platform/platform_render_device.h
 )
 
 SET (ApplicationSources

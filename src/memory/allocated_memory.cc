@@ -50,7 +50,7 @@ namespace snuffbox
   {
     SNUFF_XASSERT(allocations_ == 0 && allocated_memory_ == 0, "Detected a memory leak on the heap!", "AllocatedMemory::CheckForLeaks");
     SNUFF_LOG_SUCCESS("No memory leaks detected");
-    SNUFF_LOG_INFO("Shutdown succesful");
+		SNUFF_LOG_SUCCESS("Shutdown succesful");
 
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();

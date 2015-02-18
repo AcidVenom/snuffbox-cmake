@@ -5,6 +5,8 @@
 
 #include <chrono>
 
+#include "../platform/platform_render_device.h"
+
 namespace snuffbox
 {
 	class Window;
@@ -58,6 +60,9 @@ namespace snuffbox
 		/// Reloads the game
 		void Reload();
 
+		/// Draws to the window
+		void Draw();
+
 		/**
 		* @brief Sends a notification to the game instance
 		* @param[in] evt (snuffbox::Game::GameNotifications) The notification to send
@@ -93,6 +98,11 @@ namespace snuffbox
 		Mouse* mouse();
 
 		/**
+		* @return snuffbox::PlatformRenderDevice* The render device associated with this instance of the engine
+		*/
+		PlatformRenderDevice* render_device();
+
+		/**
 		* @return const double& The current fixed time step
 		*/
 		const double& fixed_step() const;
@@ -121,6 +131,12 @@ namespace snuffbox
 		void set_mouse(Mouse* mouse);
 
 		/**
+		* @brief Sets the render device of this object
+		* @param[in] mouse (snuffbox::PlatformRenderDevice*) The render device to be associated with this instance of the engine
+		*/
+		void set_render_device(PlatformRenderDevice* render_device);
+
+		/**
 		* @brief Sets the fixed time step
 		* @param[in] step (double) The fixed time step to set
 		*/
@@ -140,6 +156,7 @@ namespace snuffbox
 		Window* window_; //!< The window the game is running in
 		Keyboard* keyboard_; //!< The keyboard the game currently uses
 		Mouse* mouse_; //!< The mouse the game currently uses
+		PlatformRenderDevice* render_device_; //!< The render device the game currently uses
 		bool started_; //!< Is the game started?
 		double delta_time_; //!< The delta time since the previous frame
 		std::chrono::high_resolution_clock::time_point last_time_; //!< What was the time the last time?

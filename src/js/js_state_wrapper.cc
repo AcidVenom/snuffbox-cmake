@@ -64,6 +64,8 @@ namespace snuffbox
     JSRegister::Register();
 
     running_ = true;
+
+		SNUFF_LOG_SUCCESS("Succesfully initialised the JavaScript state");
 	}
 
 	//-------------------------------------------------------------------------------------------

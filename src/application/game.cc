@@ -13,6 +13,7 @@
 #include "../cvar/cvar.h"
 
 #include "../platform/platform_file_watch.h"
+#include "../platform/platform_render_device.h"
 
 #undef min
 
@@ -31,6 +32,7 @@ namespace snuffbox
 		window_(nullptr),
 		keyboard_(nullptr),
 		mouse_(nullptr),
+		render_device_(nullptr),
 		started_(true),
 		delta_time_(0.0),
 		fixed_step_(16.67),
@@ -61,6 +63,7 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(window_, "Game::Verify::Window");
 		SNUFF_ASSERT_NOTNULL(keyboard_, "Game::Verify::Keyboard");
 		SNUFF_ASSERT_NOTNULL(mouse_, "Game::Verify::Mouse");
+		SNUFF_ASSERT_NOTNULL(render_device_, "Game::Verify::RenderDevice");
 
     js_init_.Set("Game", "Initialise");
     js_update_.Set("Game", "Update");
@@ -72,6 +75,8 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Initialise()
 	{
+		render_device_->Initialise();
+
 		js_init_.Call();
 	}
 
@@ -128,6 +133,7 @@ namespace snuffbox
 		UpdateInput();
 		Update();
 		UpdateConsole();
+		Draw();
 
 		high_resolution_clock::time_point now = high_resolution_clock::now();
 
@@ -145,6 +151,12 @@ namespace snuffbox
 		js_on_reload_.Set("Game", "OnReload");
 
 		js_on_reload_.Call(FileWatch::Instance()->last_reloaded());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::Draw()
+	{
+		render_device_->Draw();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -166,6 +178,8 @@ namespace snuffbox
 	{
 		SNUFF_LOG_INFO("Received quit message");
 		js_shutdown_.Call();
+
+		render_device_->Dispose();
 		started_ = false;
 	}
 
@@ -200,6 +214,12 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	PlatformRenderDevice* Game::render_device()
+	{
+		return render_device_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	const double& Game::fixed_step() const
 	{
 		return fixed_step_;
@@ -230,6 +250,13 @@ namespace snuffbox
 	{
 		SNUFF_ASSERT_NOTNULL(mouse, "Game::set_mouse");
 		mouse_ = mouse;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::set_render_device(PlatformRenderDevice* render_device)
+	{
+		SNUFF_ASSERT_NOTNULL(render_device, "Game::render_device");
+		render_device_ = render_device;
 	}
 
 	//-------------------------------------------------------------------------------------------

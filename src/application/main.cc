@@ -67,7 +67,7 @@ int main(int argc, char** argv)
   {
     console->Initialise(console_window);
 
-    SNUFF_LOG_INFO("Succesfully initialised the console");
+    SNUFF_LOG_SUCCESS("Succesfully initialised the console");
   }
 #endif
 
@@ -75,12 +75,15 @@ int main(int argc, char** argv)
   cvar->LogCVars();
 	
 	SharedPtr<Window> window = memory.Construct<Window>(SNUFF_WINDOW_CENTERED, SNUFF_WINDOW_CENTERED, 640, 480, name);
-  Keyboard* keyboard = Keyboard::Instance();
+  
+	Keyboard* keyboard = Keyboard::Instance();
   Mouse* mouse = Mouse::Instance();
+	PlatformRenderDevice* render_device = PlatformRenderDevice::Instance();
 
 	game->set_window(window.get());
 	game->set_keyboard(keyboard);
 	game->set_mouse(mouse);
+	game->set_render_device(render_device);
 
 	IOManager* io_manager = IOManager::Instance();
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
