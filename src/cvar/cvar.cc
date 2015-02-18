@@ -183,7 +183,7 @@ namespace snuffbox
         value = it->second->As<CVar::String>()->value();
       }
 
-      result += "\n\t" + it->first + "\t" + value;
+			result += "\n\t" + it->first + " => " + value;
     }
 
     SNUFF_LOG_INFO(result + "\n");
@@ -365,7 +365,8 @@ namespace snuffbox
     JSFunctionRegister funcs[] = {
       { "register", JSRegister },
 			{ "exists", JSExists },
-			{ "get", JSGet }
+			{ "get", JSGet },
+			{ "log", JSLog }
     };
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -450,5 +451,11 @@ namespace snuffbox
 		{
 			SNUFF_LOG_ERROR("Could not retrieve CVar, no name was given");
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void CVar::JSLog(JS_ARGS args)
+	{
+		CVar::Instance()->LogCVars();
 	}
 }

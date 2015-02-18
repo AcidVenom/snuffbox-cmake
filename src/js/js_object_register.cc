@@ -10,6 +10,8 @@
 
 #include "../content/content_manager.h"
 
+#include "../io/io_manager.h"
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -21,6 +23,7 @@ namespace snuffbox
     JSObjectRegister<Keyboard>::RegisterSingleton();
 		JSObjectRegister<Mouse>::RegisterSingleton();
 		JSObjectRegister<ContentManager>::RegisterSingleton();
+		JSObjectRegister<IOManager>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------

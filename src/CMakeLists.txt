@@ -99,6 +99,11 @@ SET (ContentSources
 	content/content_manager.cc
 )
 
+SET (IOSources
+	io/io_manager.h
+	io/io_manager.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -109,6 +114,7 @@ SOURCE_GROUP("input" 			FILES ${InputSources})
 SOURCE_GROUP("js" 				FILES ${JavaScriptSources})
 SOURCE_GROUP("cvar" 				FILES ${CVarSources})
 SOURCE_GROUP("content" 		FILES ${ContentSources})
+SOURCE_GROUP("io" 				FILES ${IOSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -119,6 +125,7 @@ SET (SNUFF_SOURCES
 	${JavaScriptSources}
 	${CVarSources}
 	${ContentSources}
+	${IOSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

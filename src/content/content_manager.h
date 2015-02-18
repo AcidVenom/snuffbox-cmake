@@ -20,7 +20,8 @@ namespace snuffbox
 		kShader,
 		kMaterial,
 		kModel,
-		kSound
+		kSound,
+		kCustom
 	};
 
 	class ContentManager : public JSObject
@@ -76,6 +77,12 @@ namespace snuffbox
 		*/
 		void Unload(const ContentTypes& type, const std::string& path);
 
+		/**
+		* @brief Watches any file for file changes
+		* @param[in] path (std::string) The path to the file to watch
+		*/
+		void Watch(std::string path);
+
 		/// Default destructor
 		~ContentManager();
 
@@ -85,5 +92,6 @@ namespace snuffbox
 	public:
 		JS_NAME("ContentManager");
 		static void RegisterJS(JS_SINGLETON obj);
+		static void JSWatch(JS_ARGS args);
 	};
 }

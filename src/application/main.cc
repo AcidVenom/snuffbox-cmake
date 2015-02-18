@@ -13,6 +13,8 @@
 
 #include "../content/content_manager.h"
 
+#include "../io/io_manager.h"
+
 #include "../platform/platform_file_watch.h"
 
 #ifdef SNUFF_BUILD_CONSOLE
@@ -80,6 +82,7 @@ int main(int argc, char** argv)
 	game->set_keyboard(keyboard);
 	game->set_mouse(mouse);
 
+	IOManager* io_manager = IOManager::Instance();
 	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
 	js_state_wrapper->Initialise();
 	js_state_wrapper->CompileAndRun("main.js");

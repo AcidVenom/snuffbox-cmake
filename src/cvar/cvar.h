@@ -261,6 +261,7 @@ namespace snuffbox
     static void JSRegister(JS_ARGS args);
 		static void JSExists(JS_ARGS args);
 		static void JSGet(JS_ARGS args);
+		static void JSLog(JS_ARGS args);
 	};
 
 	template<typename T>

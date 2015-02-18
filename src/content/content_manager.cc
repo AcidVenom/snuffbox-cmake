@@ -60,12 +60,31 @@ namespace snuffbox
 			JSStateWrapper::Instance()->CompileAndRun(path, true);
 			return;
 		}
+		else if (type == ContentTypes::kCustom)
+		{
+			SNUFF_LOG_INFO("Hot reloaded custom file '" + path + "'");
+			return;
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::Unload(const ContentTypes& type, const std::string& path)
 	{
 
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void ContentManager::Watch(std::string path)
+	{
+		bool success = FileWatch::Instance()->Add(path, ContentTypes::kCustom);
+
+		if (success == true)
+		{
+			SNUFF_LOG_INFO("Added '" + path + "' to the file watch");
+			return;
+		}
+		
+		SNUFF_LOG_ERROR("'" + path + "' could not be added to the file watch");
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -77,6 +96,23 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::RegisterJS(JS_SINGLETON obj)
 	{
+		JSFunctionRegister funcs[] = {
+			{ "watch", JSWatch }
+		};
 
+		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void ContentManager::JSWatch(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		if (wrapper.Check("S"))
+		{
+			ContentManager::Instance()->Watch(wrapper.GetValue<std::string>(0, "undefined"));
+			return;
+		}
+		
+		SNUFF_LOG_ERROR("No path specified to watch, file will not be added to file watch");
 	}
 }
