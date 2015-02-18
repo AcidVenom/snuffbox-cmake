@@ -363,7 +363,9 @@ namespace snuffbox
   void CVar::RegisterJS(JS_SINGLETON obj)
   {
     JSFunctionRegister funcs[] = {
-      { "register", JSRegister }
+      { "register", JSRegister },
+			{ "exists", JSExists },
+			{ "get", JSGet }
     };
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -396,4 +398,57 @@ namespace snuffbox
       SNUFF_LOG_ERROR("Could not register CVar!");
     }
   }
+
+	//-------------------------------------------------------------------------------------------
+	void CVar::JSExists(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		CVar* self = CVar::Instance();
+
+		if (wrapper.Check("S"))
+		{
+			wrapper.ReturnValue<bool>(self->Exists(wrapper.GetValue<std::string>(0, "undefined")));
+		}
+		else
+		{
+			SNUFF_LOG_ERROR("Could not retrieve CVar, no name was given");
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void CVar::JSGet(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		CVar* self = CVar::Instance();
+
+		if (wrapper.Check("S"))
+		{
+			bool found = true;
+			std::string name = wrapper.GetValue<std::string>(0, "undefined");
+			CVar::Value* val = self->Get(name, &found);
+
+			if (found == false)
+			{
+				SNUFF_LOG_ERROR("Could not retrieve CVar, no cvar with name '" + name + "' exists");
+				return;
+			}
+			
+			if (val->IsBool())
+			{
+				wrapper.ReturnValue<bool>(val->As<CVar::Boolean>()->value());
+			}
+			else if (val->IsNumber())
+			{
+				wrapper.ReturnValue<double>(val->As<CVar::Number>()->value());
+			}
+			else if (val->IsString())
+			{
+				wrapper.ReturnValue<std::string>(val->As<CVar::String>()->value());
+			}
+		}
+		else
+		{
+			SNUFF_LOG_ERROR("Could not retrieve CVar, no name was given");
+		}
+	}
 }

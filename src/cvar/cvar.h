@@ -259,6 +259,8 @@ namespace snuffbox
     JS_NAME("CVar");
     static void RegisterJS(JS_SINGLETON obj);
     static void JSRegister(JS_ARGS args);
+		static void JSExists(JS_ARGS args);
+		static void JSGet(JS_ARGS args);
 	};
 
 	template<typename T>
