@@ -30,5 +30,13 @@ namespace snuffbox
 
 		/// Updates the file watch, checks for file changes
 		virtual void Update() = 0;
+
+		/// Processes the file watch queues, to prevent interfering with the content manager
+		virtual void Process() = 0;
+
+		/**
+		* @return std::string The last reloaded file
+		*/
+		virtual const std::string& last_reloaded() const = 0;
 	};
 }

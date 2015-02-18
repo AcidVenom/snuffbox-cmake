@@ -33,8 +33,8 @@ namespace snuffbox
 		enum Events
 		{
 			kLoad,
-			kUnload,
-			kReload
+			kReload,
+			kUnload
 		};
 
 		/// Default constructor
@@ -53,6 +53,27 @@ namespace snuffbox
 		* @param[in] path (std::string) The path to the file that was changed
 		*/
 		void Notify(Events evt, ContentTypes type, std::string path);
+
+		/**
+		* @brief Loads a given file
+		* @param[in] type (const snuffbox::ContentTypes&) The type of the content to load
+		* @param[in] path (const std::string&) The path of the file to load
+		*/
+		void Load(const ContentTypes& type, const std::string& path);
+
+		/**
+		* @brief Reloads a given file
+		* @param[in] type (const snuffbox::ContentTypes&) The type of the content to reload
+		* @param[in] path (const std::string&) The path of the file to reload
+		*/
+		void Reload(const ContentTypes& type, const std::string& path);
+
+		/**
+		* @brief Unloads a given file
+		* @param[in] type (const snuffbox::ContentTypes&) The type of the content to unload
+		* @param[in] path (const std::string&) The path of the file to unload
+		*/
+		void Unload(const ContentTypes& type, const std::string& path);
 
 		/// Default destructor
 		~ContentManager();

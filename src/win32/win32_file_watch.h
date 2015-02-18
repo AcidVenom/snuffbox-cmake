@@ -64,6 +64,11 @@ namespace snuffbox
 		/// Processes the queue and adds new files into the map
 		void Process();
 
+		/**
+		* @see snuffbox::IFileWatchBase::last_reloaded
+		*/
+		const std::string& last_reloaded() const;
+
 		/// Default destructor
 		virtual ~Win32FileWatch();
 
@@ -71,5 +76,7 @@ namespace snuffbox
 		typedef std::map<std::string, WatchedFile> FileMap;
 		FileMap watched_files_; //!< A map of watched files by path
 		std::queue<WatchedFile> queue_; //!< A queue to add files to without interfering with the content manager
+		std::queue<std::string> to_remove_; //!< A queue to remove files without interfering with the content manager
+		std::string last_reloaded_; //!< The last reloaded file
 	};
 }

@@ -55,6 +55,9 @@ namespace snuffbox
 		/// Runs this instance of the engine
 		void Run();
 
+		/// Reloads the game
+		void Reload();
+
 		/**
 		* @brief Sends a notification to the game instance
 		* @param[in] evt (snuffbox::Game::GameNotifications) The notification to send
@@ -63,6 +66,11 @@ namespace snuffbox
 
 		/// Quits the engine
 		void Quit();
+
+		/**
+		* @return std::string& The path the engine is running in
+		*/
+		const std::string& path() const;
 
 		/**
 		* @return const bool& Is the engine running?
@@ -112,7 +120,6 @@ namespace snuffbox
 		*/
 		void set_mouse(Mouse* mouse);
 
-
 		/**
 		* @brief Sets the fixed time step
 		* @param[in] step (double) The fixed time step to set
@@ -129,6 +136,7 @@ namespace snuffbox
 		~Game();
 
 	private:
+		std::string path_; //!< The path the game is running in
 		Window* window_; //!< The window the game is running in
 		Keyboard* keyboard_; //!< The keyboard the game currently uses
 		Mouse* mouse_; //!< The mouse the game currently uses

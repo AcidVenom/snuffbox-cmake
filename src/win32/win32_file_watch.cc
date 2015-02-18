@@ -2,12 +2,15 @@
 
 #include "../memory/shared_ptr.h"
 
+#include "../cvar/cvar.h"
+#include "../application/game.h"
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
 	Win32FileWatch::Win32FileWatch()
 	{
-
+		
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -47,7 +50,15 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void Win32FileWatch::Remove(std::string path)
 	{
+		FileMap::iterator it = watched_files_.find(path);
 
+		if (it == watched_files_.end())
+		{
+			SNUFF_LOG_ERROR("Attempted to remove file '" + path + "' from the file watch, but it was never added");
+			return;
+		}
+
+		to_remove_.push(path);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -55,6 +66,7 @@ namespace snuffbox
 	{
 		bool success = false;
 		FILETIME time;
+		FILETIME last_edited;
 		ContentManager* content_manager = ContentManager::Instance();
 
 		for (FileMap::iterator& it = watched_files_.begin(); it != watched_files_.end(); ++it)
@@ -68,10 +80,13 @@ namespace snuffbox
 				continue;
 			}
 
-			if (file.last_edited.dwLowDateTime != time.dwLowDateTime || file.last_edited.dwHighDateTime != time.dwHighDateTime)
+			last_edited = file.last_edited;
+			if (last_edited.dwLowDateTime != time.dwLowDateTime || last_edited.dwHighDateTime != time.dwHighDateTime)
 			{
 				file.last_edited = time;
+				last_reloaded_ = file.path;
 				content_manager->Notify(ContentManager::Events::kReload, file.type, file.path);
+				Game::Instance()->Notify(Game::GameNotifications::kReload);
 			}
 		}
 	}
@@ -79,7 +94,48 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	bool Win32FileWatch::GetLastEditedTime(std::string path, FILETIME* time)
 	{
-		return true;
+		FILETIME creation_time;
+		FILETIME last_access_time;
+
+		std::string full_path = Game::Instance()->path() + "/" + path;
+
+		HANDLE file = CreateFileA(full_path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+
+		int count = 0;
+		bool invalid = false;
+		while (file == INVALID_HANDLE_VALUE && count < 30)
+		{
+			LPTSTR msg = nullptr;
+			DWORD err = GetLastError();
+			FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM |
+				FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				err,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				reinterpret_cast<LPTSTR>(&msg),
+				0, NULL);
+
+			++count;
+
+			if (count >= 30)
+			{
+				SNUFF_LOG_ERROR(msg);
+				invalid = true;
+			}
+			else
+			{
+				file = CreateFileA(full_path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+			}
+
+			LocalFree(msg);
+		}
+
+		BOOL result = GetFileTime(file, &creation_time, &last_access_time, time);
+
+		CloseHandle(file);
+		return result == TRUE && invalid == false;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -93,6 +149,21 @@ namespace snuffbox
 
 			queue_.pop();
 		}
+
+		while (to_remove_.empty() == false)
+		{
+			const std::string& top = to_remove_.front();
+
+			watched_files_.erase(watched_files_.find(top));
+
+			queue_.pop();
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const std::string& Win32FileWatch::last_reloaded() const
+	{
+		return last_reloaded_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

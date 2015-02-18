@@ -2,6 +2,7 @@
 
 #include <v8.h>
 #include <string>
+#include <map>
 
 #include "../memory/allocated_memory.h"
 
@@ -58,8 +59,9 @@ namespace snuffbox
 		/**
 		* @brief Compiles JavaScript source code from a file and executes it
 		* @param[in] path (std::string) The source code file to compile and run
+		* @param[in] reloading (bool) Are we reloading? Default = false
 		*/
-		void CompileAndRun(std::string path);
+		void CompileAndRun(std::string path, bool reloading = false);
 
 		/**
 		* @brief Retrieves the last error from the JavaScript stack
@@ -104,6 +106,11 @@ namespace snuffbox
     */
     const bool& running() const;
 
+		/**
+		* @return std::map<std::string, bool>& The map of required JavaScript files
+		*/
+		std::map<std::string, bool>& required();
+
 		/// Default destructor
 		~JSStateWrapper();
 
@@ -113,6 +120,7 @@ namespace snuffbox
 		v8::Persistent<v8::ObjectTemplate> global_; //!< The global scope for use with the JavaScript state
 		v8::Platform* platform_; //!< The win32 platform
     bool running_; //!< Is the JavaScript engine still running?
+		std::map<std::string, bool> required_; //!< Already required files
 
 	public:
 		/// Registers basic functions (require, assert, etc.)

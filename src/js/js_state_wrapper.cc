@@ -2,6 +2,7 @@
 #include <libplatform\libplatform.h>
 
 #include "../application/logging.h"
+#include "../application/game.h"
 
 #include "../js/js_state_wrapper.h"
 
@@ -12,6 +13,8 @@
 
 #include "../js/js_object_register.h"
 #include "../js/js_object.h"
+
+#include "../content/content_manager.h"
 
 #include "../memory/shared_ptr.h"
 
@@ -109,7 +112,7 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void JSStateWrapper::CompileAndRun(std::string path)
+	void JSStateWrapper::CompileAndRun(std::string path, bool reloading)
 	{
 		HandleScope handle_scope(isolate_);
 
@@ -118,19 +121,18 @@ namespace snuffbox
 
 		TextFile file;
 
-		CVar* cvar = CVar::Instance();
-		bool found_dir = false;
-		CVar::Value* src_directory = cvar->Get("src_directory", &found_dir);
-
-		SNUFF_XASSERT(found_dir == true, "The 'src_directory' CVar could not be found!", "JSStateWrapper::CompileAndRun");
-		SNUFF_XASSERT(src_directory != nullptr && src_directory->IsString() == true, "The 'src_directory' CVar is corrupt or is not of a string type!", "JSStateWrapper::CompileAndRun");
-		
-		std::string fullPath = src_directory->As<CVar::String>()->value() + "/" + path;
-		bool success = file.Open(fullPath);
+		std::string full_path = Game::Instance()->path() + "/" + path;
+		bool success = file.Open(full_path);
 
 		SNUFF_XASSERT(success == true, "The file '" + path + "' could not be opened!", "JSStateWrapper::CompileAndRun");
 
     Run(file.Read(), path);
+
+		if (reloading == true)
+		{
+			return;
+		}
+		ContentManager::Instance()->Notify(ContentManager::Events::kLoad, ContentTypes::kScript, path);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -229,6 +231,12 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
+	std::map<std::string, bool>& JSStateWrapper::required()
+	{
+		return required_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
 	{
 		
@@ -259,6 +267,8 @@ namespace snuffbox
 		HandleScope scope(args.GetIsolate());
 		JSWrapper wrapper(args);
 		bool check = wrapper.Check("S");
+
+		JSStateWrapper* instance = JSStateWrapper::Instance();
 		
 		if (check == false)
 		{
@@ -266,7 +276,16 @@ namespace snuffbox
 		}
 		else
 		{
-			JSStateWrapper::Instance()->CompileAndRun(wrapper.GetValue<std::string>(0, "") + ".js");
+			std::string path = wrapper.GetValue<std::string>(0, "");
+			std::map<std::string, bool>& required = instance->required();
+
+			if (required.find(path) != required.end())
+			{
+				return;
+			}
+
+			instance->CompileAndRun(path + ".js");
+			required.emplace(path, true);
 		}
 	}
 

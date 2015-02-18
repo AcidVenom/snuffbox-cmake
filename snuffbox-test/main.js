@@ -2,7 +2,7 @@ require("require");
 
 var stack3 = function()
 {
-	CVar.register();
+	
 }
 
 var stack2 = function()
@@ -38,7 +38,7 @@ Game.Shutdown = function()
 
 }
 
-Game.OnReload = function()
+Game.OnReload = function(path)
 {
-
+	
 }

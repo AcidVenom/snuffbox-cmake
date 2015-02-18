@@ -10,6 +10,9 @@
 #include "../memory/shared_ptr.h"
 
 #include "../js/js_callback.h"
+#include "../cvar/cvar.h"
+
+#include "../platform/platform_file_watch.h"
 
 #undef min
 
@@ -35,7 +38,14 @@ namespace snuffbox
 		accumulated_time_(0.0),
 		time_(0.0)
 	{
-    
+		CVar* cvar = CVar::Instance();
+		bool found_dir = false;
+		CVar::Value* src_directory = cvar->Get("src_directory", &found_dir);
+
+		SNUFF_XASSERT(found_dir == true, "The 'src_directory' CVar could not be found!", "Game::Game");
+		SNUFF_XASSERT(src_directory != nullptr && src_directory->IsString() == true, "The 'src_directory' CVar is corrupt or is not of a string type!", "Game::Game");
+
+		path_ = src_directory->As<CVar::String>()->value();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -126,12 +136,24 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void Game::Reload()
+	{
+		js_init_.Set("Game", "Initialise");
+		js_update_.Set("Game", "Update");
+		js_fixed_update_.Set("Game", "FixedUpdate");
+		js_shutdown_.Set("Game", "Shutdown");
+		js_on_reload_.Set("Game", "OnReload");
+
+		js_on_reload_.Call(FileWatch::Instance()->last_reloaded());
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void Game::Notify(Game::GameNotifications evt)
 	{
 		switch (evt)
 		{
 		case Game::GameNotifications::kReload:
-
+			Reload();
 			break;
 		case Game::GameNotifications::kQuit:
 			Quit();
@@ -143,7 +165,14 @@ namespace snuffbox
 	void Game::Quit()
 	{
 		SNUFF_LOG_INFO("Received quit message");
+		js_shutdown_.Call();
 		started_ = false;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const std::string& Game::path() const
+	{
+		return path_;
 	}
 
 	//-------------------------------------------------------------------------------------------
