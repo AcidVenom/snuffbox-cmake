@@ -24,8 +24,11 @@ namespace snuffbox
 		/// @see snuffbox::ITextFileBase
 		std::string Read();
 
+		/// @see snuffbox::ITextFileBase
+		bool Write(std::string path, std::string src);
+
 	private:
-		std::string path_;
-		bool valid_;
+		std::string path_; //!< The current path in use
+		bool valid_; //!< Is this text file valid?
 	};
 }

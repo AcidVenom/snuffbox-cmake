@@ -34,10 +34,18 @@ namespace snuffbox
 		*/
 		bool Exists(std::string path);
 
+		/**
+		* @brief Writes to a given location
+		* @param[in] path (std::string) The path to write to
+		* @return bool Was it a success?
+		*/
+		bool Write(std::string path, std::string src);
+
 	public:
 		JS_NAME("IO");
 		static void RegisterJS(JS_SINGLETON obj);
 		static void JSRead(JS_ARGS args);
 		static void JSExists(JS_ARGS args);
+		static void JSWrite(JS_ARGS args);
 	};
 }

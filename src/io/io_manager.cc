@@ -42,6 +42,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	bool IOManager::Write(std::string path, std::string src)
+	{
+		TextFile file;
+		return file.Write(Game::Instance()->path() + "/" + path, src);
+	}
+
+	//-------------------------------------------------------------------------------------------
 	IOManager::~IOManager()
 	{
 
@@ -52,7 +59,8 @@ namespace snuffbox
 	{
 		JSFunctionRegister funcs[] = {
 			{ "read", JSRead },
-			{ "exists", JSExists }
+			{ "exists", JSExists },
+			{ "write", JSWrite }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -91,5 +99,25 @@ namespace snuffbox
 		}
 
 		SNUFF_LOG_ERROR("Unspecified path while trying to check if a file exists");
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void IOManager::JSWrite(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("SS") == true)
+		{
+			std::string path = wrapper.GetValue<std::string>(0, "undefined");
+			bool success = IOManager::Instance()->Write(path, wrapper.GetValue<std::string>(1, "undefined"));
+			
+			if (success == false)
+			{
+				SNUFF_LOG_ERROR("Could not write to location '" + path + "'");
+				return;
+			}
+			
+			SNUFF_LOG_INFO("Saved '" + path + "'");
+		}
 	}
 }

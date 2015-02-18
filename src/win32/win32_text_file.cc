@@ -47,6 +47,23 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	bool Win32TextFile::Write(std::string path, std::string src)
+	{
+		std::ofstream out(path);
+
+		if (!out)
+		{
+			SNUFF_LOG_ERROR("Could not save to location '" + path + "'");
+			return false;
+		}
+
+		out << std::noskipws << src;
+
+		out.close();
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	Win32TextFile::~Win32TextFile()
 	{
 

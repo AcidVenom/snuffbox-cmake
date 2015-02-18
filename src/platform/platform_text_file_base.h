@@ -24,5 +24,13 @@ namespace snuffbox
 		* @return std::string All data contained in the text file as a string
 		*/
 		virtual std::string Read() = 0;
+
+		/**
+		* @brief Writes to a file from a given path
+		* @param[in] path (std::string) The path to write to
+		* @param[in] src (std::string) The source text to write
+		* @return bool Was it a success or not?
+		*/
+		virtual bool Write(std::string path, std::string src) = 0;
 	};
 }
