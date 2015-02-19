@@ -18,6 +18,7 @@
 namespace snuffbox
 {
 	class D3D11RenderTarget;
+  class D3D11VertexBuffer;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -49,6 +50,12 @@ namespace snuffbox
 
 		/// Creates the device
 		void CreateDevice();
+
+    /// Creates the backbuffer
+    void CreateBackBuffer();
+
+    /// Creates the screen quad
+    void CreateScreenQuad();
 
 		/// Finds the default adapter to use
 		void FindAdapter();
@@ -85,6 +92,17 @@ namespace snuffbox
 		*/
 		D3D11RenderTarget* back_buffer();
 
+    /**
+    * @return const int& The current vertex buffer type
+    */
+    const int& vertex_buffer_type() const;
+
+    /**
+    * @brief Sets the current vertex buffer type
+    * @param[in] type (int) The type to set
+    */
+    void set_vertex_buffer_type(int type);
+
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
 
@@ -95,5 +113,8 @@ namespace snuffbox
 		ID3D11DeviceContext* context_; //!< The device context
 		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
 		std::map<std::string, D3D11RenderTarget*> render_targets_; //!< The map of render targets
+
+    SharedPtr<D3D11VertexBuffer> screen_quad_; //!< The vertex buffer of the screen quad
+    int vertex_buffer_type_; //!< The current vertex buffer type
 	};
 }

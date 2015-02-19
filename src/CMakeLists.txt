@@ -58,10 +58,17 @@ SET (D3DSources
 	d3d11/d3d11_render_target.cc
 	d3d11/d3d11_render_settings.h
 	d3d11/d3d11_render_settings.cc
-	d3d11/d3d11_back_buffer.h
-	d3d11/d3d11_back_buffer.cc
 	d3d11/d3d11_viewport.h
 	d3d11/d3d11_viewport.cc
+	d3d11/d3d11_vertex_buffer.h
+	d3d11/d3d11_vertex_buffer.cc
+)
+
+SET (D3DElements
+	d3d11/elements/d3d11_render_element.h
+	d3d11/elements/d3d11_render_element.cc
+	d3d11/elements/d3d11_quad_element.h
+	d3d11/elements/d3d11_quad_element.cc
 )
 
 SET (OGLSources
@@ -118,6 +125,7 @@ SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
 SOURCE_GROUP("d3d11" 			FILES ${D3DSources})
+SOURCE_GROUP("d3d11\\elements" 			FILES ${D3DElements})
 SOURCE_GROUP("ogl" 				FILES ${OGLSources})
 SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
@@ -151,6 +159,7 @@ ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 IF (WIN32 AND NOT SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DSources})
+	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DElements})
 ELSEIF (SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${OGLSources})
 ELSE ()

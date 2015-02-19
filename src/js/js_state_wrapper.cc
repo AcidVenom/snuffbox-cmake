@@ -201,7 +201,7 @@ namespace snuffbox
 
 		HandleScope scope(isolate_);
 		Local<Object> g = global();
-		for (int i = 0; i < g->GetPropertyNames()->Length(); ++i)
+		for (unsigned int i = 0; i < g->GetPropertyNames()->Length(); ++i)
 		{
 			g->Delete(g->GetPropertyNames()->Get(i));
 		}

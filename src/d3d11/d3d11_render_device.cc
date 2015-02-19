@@ -1,5 +1,6 @@
 #include "../d3d11/d3d11_render_device.h"
 #include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_vertex_buffer.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -15,7 +16,8 @@ namespace snuffbox
 		adapter_(nullptr),
 		swap_chain_(nullptr),
 		device_(nullptr),
-		context_(nullptr)
+		context_(nullptr),
+    vertex_buffer_type_(-1)
 	{
 
 	}
@@ -38,11 +40,8 @@ namespace snuffbox
 	bool D3D11RenderDevice::Initialise()
 	{
 		CreateDevice();
-
-		back_buffer_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("Backbuffer");
-		back_buffer_->Create(D3D11RenderTarget::RenderTargets::kBackBuffer, swap_chain_, device_);
-
-		back_buffer_->Set(context_);
+    CreateBackBuffer();
+    CreateScreenQuad();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 		return true;
@@ -102,7 +101,36 @@ namespace snuffbox
 		{
 			SNUFF_ASSERT(HRToString(result, "D3D11CreateDeviceAndSwapChain"), "D3D11DisplayDevice::CreateDevice");
 		}
+
+    context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::CreateBackBuffer()
+  {
+    back_buffer_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("Backbuffer");
+    back_buffer_->Create(D3D11RenderTarget::RenderTargets::kBackBuffer, swap_chain_, device_);
+
+    back_buffer_->Set(context_);
+  }
+  
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::CreateScreenQuad()
+  {
+    std::vector<Vertex> vertices({
+      { XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
+    });
+
+    std::vector<int> indices({
+      0, 1, 2, 3
+    });
+
+    screen_quad_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kScreen);
+    screen_quad_->Create(vertices, indices);
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::FindAdapter()
@@ -150,6 +178,7 @@ namespace snuffbox
 	void D3D11RenderDevice::Draw()
 	{
 		back_buffer_->Clear(context_);
+
 		swap_chain_->Present(0, 0);
 	}
 
@@ -204,6 +233,18 @@ namespace snuffbox
 	{
 		return back_buffer_.get();
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  const int& D3D11RenderDevice::vertex_buffer_type() const
+  {
+    return vertex_buffer_type_;
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::set_vertex_buffer_type(int type)
+  {
+    vertex_buffer_type_ = type;
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()
