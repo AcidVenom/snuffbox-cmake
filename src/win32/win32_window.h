@@ -126,9 +126,9 @@ namespace snuffbox
 		const int& height() const;
 
 		/**
-		* @return const void* The handle to this window
+		* @return HWND The handle to this window
 		*/
-		const void* handle() const;
+		HWND handle();
 
 		/**
 		* @return const bool& Is the window currently focussed?

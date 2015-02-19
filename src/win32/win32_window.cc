@@ -317,7 +317,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const void* Win32Window::handle() const
+	HWND Win32Window::handle()
 	{
 		return handle_;
 	}
