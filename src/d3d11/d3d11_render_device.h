@@ -8,11 +8,17 @@
 #include <xnamath.h>
 
 #include <string>
+#include <map>
 
 #include "../platform/platform_render_device_base.h"
+#include "../memory/shared_ptr.h"
+
+#define SNUFF_SAFE_RELEASE(ptr, ctx) SNUFF_ASSERT_NOTNULL(ptr, ctx) ptr->Release(); ptr = nullptr;
 
 namespace snuffbox
 {
+	class D3D11RenderTarget;
+
 	/**
 	* @class snuffbox::D3D11RenderDevice
 	* @brief A Direct3D 11 render device to display graphics with
@@ -53,6 +59,32 @@ namespace snuffbox
 		/// @see snuffbox::IRenderDeviceBase::Dispose
 		void Dispose();
 
+		/**
+		* @brief Adds a render target to the map of render targets
+		* @param[in] target (snuffbox::D3D11RenderTarget*) The render target to add
+		*/
+		void AddRenderTarget(D3D11RenderTarget* target);
+
+		/**
+		* @return snuffbox::D3D11RenderTarget* The swap chain of this device
+		*/
+		IDXGISwapChain* swap_chain();
+
+		/**
+		* @return snuffbox::D3D11RenderTarget* The device of this device
+		*/
+		ID3D11Device* device();
+
+		/**
+		* @return snuffbox::D3D11RenderTarget* The context of this device
+		*/
+		ID3D11DeviceContext* context();
+
+		/**
+		* @return snuffbox::D3D11RenderTarget* The back buffer of this device
+		*/
+		D3D11RenderTarget* back_buffer();
+
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
 
@@ -61,5 +93,7 @@ namespace snuffbox
 		IDXGISwapChain* swap_chain_; //!< The swap chain this device will be created with
 		ID3D11Device* device_; //!< The actual device
 		ID3D11DeviceContext* context_; //!< The device context
+		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
+		std::map<std::string, D3D11RenderTarget*> render_targets_; //!< The map of render targets
 	};
 }

@@ -1,23 +1,10 @@
 require("require");
 
-var stack3 = function()
-{
-	
-}
-
-var stack2 = function()
-{
-	stack3();
-}
-
-var stack1 = function()
-{
-	stack2();
-}
+Game.renderTarget = new RenderTarget("Default");
 
 Game.Initialise = function()
 {
-	stack1();
+	
 }
 
 Game.Update = function(dt)

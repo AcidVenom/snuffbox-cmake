@@ -199,19 +199,15 @@ namespace snuffbox
 	{
 		SNUFF_LOG_INFO("Collecting all JavaScript garbage");
 
+		HandleScope scope(isolate_);
+		Local<Object> g = global();
+		for (int i = 0; i < g->GetPropertyNames()->Length(); ++i)
+		{
+			g->Delete(g->GetPropertyNames()->Get(i));
+		}
+
 		global_.Reset();
 		context_.Reset();
-
-    isolate_->LowMemoryNotification();
-		isolate_->Exit();
-		isolate_->Dispose();
-
-		V8::Dispose();
-
-		delete platform_;
-		platform_ = nullptr;
-
-    running_ = false;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -241,7 +237,18 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
 	{
-		
+		Destroy();
+
+		isolate_->LowMemoryNotification();
+		isolate_->Exit();
+		isolate_->Dispose();
+
+		V8::Dispose();
+
+		delete platform_;
+		platform_ = nullptr;
+
+		running_ = false;
 	}
 
 	//-------------------------------------------------------------------------------------------

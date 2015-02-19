@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 	CVar* cvar = CVar::Instance();
 	cvar->RegisterCommandLine(argc, argv);
 
+	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
 	Game* game = Game::Instance();
 	
 	ContentManager* content_manager = ContentManager::Instance();
@@ -86,7 +87,9 @@ int main(int argc, char** argv)
 	game->set_render_device(render_device);
 
 	IOManager* io_manager = IOManager::Instance();
-	JSStateWrapper* js_state_wrapper = JSStateWrapper::Instance();
+
+	render_device->Initialise();
+
 	js_state_wrapper->Initialise();
 	js_state_wrapper->CompileAndRun("main.js");
 
@@ -117,7 +120,6 @@ int main(int argc, char** argv)
 	}
 
 	SNUFF_LOG_INFO("Shutting down");
-  js_state_wrapper->Destroy();
 
 	return 0;
 }

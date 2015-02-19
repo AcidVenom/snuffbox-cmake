@@ -1,5 +1,5 @@
 #include "../d3d11/d3d11_render_device.h"
-#include "../memory/shared_ptr.h"
+#include "../d3d11/d3d11_render_target.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -7,8 +7,6 @@
 #include "../cvar/cvar.h"
 
 #include <comdef.h>
-
-#define SNUFF_SAFE_RELEASE(ptr, ctx) SNUFF_ASSERT_NOTNULL(ptr, ctx) ptr->Release(); ptr = nullptr;
 
 namespace snuffbox
 {
@@ -40,6 +38,12 @@ namespace snuffbox
 	bool D3D11RenderDevice::Initialise()
 	{
 		CreateDevice();
+
+		back_buffer_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("Backbuffer");
+		back_buffer_->Create(D3D11RenderTarget::RenderTargets::kBackBuffer, swap_chain_, device_);
+
+		back_buffer_->Set(context_);
+
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 		return true;
 	}
@@ -145,21 +149,65 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Draw()
 	{
+		back_buffer_->Clear(context_);
 		swap_chain_->Present(0, 0);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Dispose()
 	{
+		SNUFF_SAFE_RELEASE(adapter_, "D3D11RenderDevice::Dispose::adapter_");
+		SNUFF_SAFE_RELEASE(swap_chain_, "D3D11RenderDevice::Dispose::swap_chain_");
+		SNUFF_SAFE_RELEASE(device_, "D3D11RenderDevice::Dispose::device_");
+		SNUFF_SAFE_RELEASE(context_, "D3D11RenderDevice::Dispose::context_");
+
 		SNUFF_LOG_INFO("Disposed the Direct3D 11 render device");
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::AddRenderTarget(D3D11RenderTarget* target)
+	{
+		const std::string& name = target->name();
+		std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.find(name);
+
+		if (it != render_targets_.end())
+		{
+			SNUFF_LOG_WARNING("Attempted to add a render target with an already existing name '" + name + "'");
+			return;
+		}
+
+		render_targets_.emplace(name, target);
+
+		SNUFF_LOG_INFO("Added render target '" + name + "'");
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	IDXGISwapChain* D3D11RenderDevice::swap_chain()
+	{
+		return swap_chain_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	ID3D11Device* D3D11RenderDevice::device()
+	{
+		return device_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	ID3D11DeviceContext* D3D11RenderDevice::context()
+	{
+		return context_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	D3D11RenderTarget* D3D11RenderDevice::back_buffer()
+	{
+		return back_buffer_.get();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()
 	{
-		SNUFF_SAFE_RELEASE(adapter_, "~D3D11RenderDevice::adapter_");
-		SNUFF_SAFE_RELEASE(swap_chain_, "~D3D11RenderDevice::swap_chain_");
-		SNUFF_SAFE_RELEASE(device_, "~D3D11RenderDevice::device_");
-		SNUFF_SAFE_RELEASE(context_, "~D3D11RenderDevice::context_");
+	
 	}
 }

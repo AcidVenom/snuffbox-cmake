@@ -119,6 +119,7 @@ namespace snuffbox
   template<typename ... Args>
   inline bool JSCallback<Args...>::Set(std::string obj, std::string field)
   {
+		callback_.Reset();
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
     v8::Isolate* isolate = wrapper->isolate();
     v8::HandleScope scope(isolate);
@@ -222,6 +223,6 @@ namespace snuffbox
   template<typename ... Args>
   inline JSCallback<Args...>::~JSCallback()
   {
-
+		callback_.Reset();
   }
 }

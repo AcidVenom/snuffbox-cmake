@@ -54,6 +54,14 @@ SET (ApplicationSources
 SET (D3DSources
 	d3d11/d3d11_render_device.h
 	d3d11/d3d11_render_device.cc
+	d3d11/d3d11_render_target.h
+	d3d11/d3d11_render_target.cc
+	d3d11/d3d11_render_settings.h
+	d3d11/d3d11_render_settings.cc
+	d3d11/d3d11_back_buffer.h
+	d3d11/d3d11_back_buffer.cc
+	d3d11/d3d11_viewport.h
+	d3d11/d3d11_viewport.cc
 )
 
 SET (OGLSources
