@@ -19,6 +19,8 @@ namespace snuffbox
 {
 	class D3D11RenderTarget;
   class D3D11VertexBuffer;
+  class D3D11InputLayout;
+  class D3D11Viewport;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -56,6 +58,12 @@ namespace snuffbox
 
     /// Creates the screen quad
     void CreateScreenQuad();
+
+    /// Creates the input layout
+    void CreateInputLayout();
+
+    /// Creates the base viewport
+    void CreateBaseViewport();
 
 		/// Finds the default adapter to use
 		void FindAdapter();
@@ -111,10 +119,15 @@ namespace snuffbox
 		IDXGISwapChain* swap_chain_; //!< The swap chain this device will be created with
 		ID3D11Device* device_; //!< The actual device
 		ID3D11DeviceContext* context_; //!< The device context
+
 		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
 		std::map<std::string, D3D11RenderTarget*> render_targets_; //!< The map of render targets
 
     SharedPtr<D3D11VertexBuffer> screen_quad_; //!< The vertex buffer of the screen quad
     int vertex_buffer_type_; //!< The current vertex buffer type
+
+    SharedPtr<D3D11InputLayout> input_layout_; //!< The input layout
+
+    SharedPtr<D3D11Viewport> viewport_; //!< The base viewport
 	};
 }

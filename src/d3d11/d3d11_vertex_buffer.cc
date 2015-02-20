@@ -80,7 +80,8 @@ namespace snuffbox
     {
       render_device->set_vertex_buffer_type(type);
 
-      ctx->IASetVertexBuffers(0, 0, &vertex_buffer_, &Vertex::stride_size, 0);
+      UINT offset = 0;
+      ctx->IASetVertexBuffers(0, 1, &vertex_buffer_, &Vertex::stride_size, &offset);
       ctx->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
     }
 

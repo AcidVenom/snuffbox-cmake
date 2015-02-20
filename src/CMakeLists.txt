@@ -62,6 +62,10 @@ SET (D3DSources
 	d3d11/d3d11_viewport.cc
 	d3d11/d3d11_vertex_buffer.h
 	d3d11/d3d11_vertex_buffer.cc
+	d3d11/d3d11_shader.h
+	d3d11/d3d11_shader.cc
+	d3d11/d3d11_input_layout.h
+	d3d11/d3d11_input_layout.cc
 )
 
 SET (D3DElements

@@ -3,6 +3,8 @@
 
 #include "../platform/platform_file_watch.h"
 
+#include "../d3d11/d3d11_shader.h"
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
@@ -47,6 +49,14 @@ namespace snuffbox
 		{
 			SNUFF_LOG_INFO("Loaded JavaScript file '" + path + "'");
 		}
+    else if (type == ContentTypes::kShader)
+    {
+      SharedPtr<Content> shader = AllocatedMemory::Instance().Construct<D3D11Shader>();
+      static_cast<D3D11Shader*>(shader.get())->Load(path);
+
+      loaded_content_.emplace(path, shader);
+      SNUFF_LOG_INFO("Loaded shader file '" + path + "'");
+    }
 
 		FileWatch::Instance()->Add(path, type);
 	}
@@ -60,6 +70,12 @@ namespace snuffbox
 			JSStateWrapper::Instance()->CompileAndRun(path, true);
 			return;
 		}
+    else if (type == ContentTypes::kShader)
+    {
+      static_cast<D3D11Shader*>(loaded_content_.find(path)->second.get())->Load(path);
+      SNUFF_LOG_INFO("Hot reloaded shader file '" + path + "'");
+      return;
+    }
 		else if (type == ContentTypes::kCustom)
 		{
 			SNUFF_LOG_INFO("Hot reloaded custom file '" + path + "'");
@@ -86,6 +102,50 @@ namespace snuffbox
 		
 		SNUFF_LOG_ERROR("'" + path + "' could not be added to the file watch");
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  Content* ContentManager::Get(std::string path)
+  {
+    std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
+
+    if (it != loaded_content_.end())
+    {
+      return it->second.get();
+    }
+
+    SNUFF_LOG_ERROR("Could not find content '" + path + "', are you sure it's been loaded correctly?");
+    return nullptr;
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  ContentTypes ContentManager::StringToType(std::string type)
+  {
+    if (type == "texture")
+    {
+      return ContentTypes::kTexture;
+    }
+    else if (type == "shader")
+    {
+      return ContentTypes::kShader;
+    }
+    else if (type == "material")
+    {
+      return ContentTypes::kMaterial;
+    }
+    else if (type == "model")
+    {
+      return ContentTypes::kModel;
+    }
+    else if (type == "sound")
+    {
+      return ContentTypes::kSound;
+    }
+    else
+    {
+      SNUFF_LOG_WARNING("Tried to load unknown content type '" + type + "'");
+      return ContentTypes::kUnknown;
+    }
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	ContentManager::~ContentManager()

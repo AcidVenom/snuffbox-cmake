@@ -1,11 +1,15 @@
 #include "../d3d11/d3d11_render_device.h"
 #include "../d3d11/d3d11_render_target.h"
 #include "../d3d11/d3d11_vertex_buffer.h"
+#include "../d3d11/d3d11_input_layout.h"
+#include "../d3d11/d3d11_shader.h"
+#include "../d3d11/d3d11_viewport.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
 
 #include "../cvar/cvar.h"
+#include "../content/content_manager.h"
 
 #include <comdef.h>
 
@@ -42,6 +46,9 @@ namespace snuffbox
 		CreateDevice();
     CreateBackBuffer();
     CreateScreenQuad();
+    ContentManager::Instance()->Load(ContentTypes::kShader, "base.fx");
+    CreateInputLayout();
+    CreateBaseViewport();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 		return true;
@@ -118,10 +125,10 @@ namespace snuffbox
   void D3D11RenderDevice::CreateScreenQuad()
   {
     std::vector<Vertex> vertices({
-      { XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-      { XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-      { XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-      { XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
+      { XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(-1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
     });
 
     std::vector<int> indices({
@@ -130,6 +137,31 @@ namespace snuffbox
 
     screen_quad_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kScreen);
     screen_quad_->Create(vertices, indices);
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::CreateInputLayout()
+  {
+    D3D11Shader* shader = static_cast<D3D11Shader*>(ContentManager::Instance()->Get("base.fx"));
+    input_layout_ = AllocatedMemory::Instance().Construct<D3D11InputLayout>();
+    input_layout_->Create({
+      { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    }, shader->vs_buffer());
+
+    input_layout_->Set();
+    shader->Set();
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::CreateBaseViewport()
+  {
+    viewport_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
+    viewport_->Create(0.0f, 0.0f, 640.0f, 480.0f);
+
+    viewport_->Set();
   }
 
 	//---------------------------------------------------------------------------------------------------------
@@ -178,7 +210,8 @@ namespace snuffbox
 	void D3D11RenderDevice::Draw()
 	{
 		back_buffer_->Clear(context_);
-
+    screen_quad_->Set();
+    screen_quad_->Draw();
 		swap_chain_->Present(0, 0);
 	}
 

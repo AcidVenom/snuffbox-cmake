@@ -12,12 +12,12 @@ namespace snuffbox
   */
   struct Vertex
   {
-    XMFLOAT3 position; //!< The position of the vertex
+    XMFLOAT4 position; //!< The position of the vertex
     XMFLOAT4 colour; //!< The colour of the vertex
     XMFLOAT2 tex_coords; //!< The texture coordinates of the vertex
     XMFLOAT3 normal; //!< The normal of the vertex
 
-    static const UINT stride_size = sizeof(XMFLOAT3)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3);
+    static const UINT stride_size = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3);
   };
 
   /**

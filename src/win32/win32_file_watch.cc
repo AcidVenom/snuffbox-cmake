@@ -76,7 +76,6 @@ namespace snuffbox
 
 			if (success == false)
 			{
-				SNUFF_LOG_ERROR("Could not retrieve the last edited time for file '" + file.path + "'");
 				continue;
 			}
 
@@ -101,41 +100,10 @@ namespace snuffbox
 
 		HANDLE file = CreateFileA(full_path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 
-		int count = 0;
-		bool invalid = false;
-		while (file == INVALID_HANDLE_VALUE && count < 30)
-		{
-			LPTSTR msg = nullptr;
-			DWORD err = GetLastError();
-			FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				err,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				reinterpret_cast<LPTSTR>(&msg),
-				0, NULL);
-
-			++count;
-
-			if (count >= 30)
-			{
-				SNUFF_LOG_ERROR(msg);
-				invalid = true;
-			}
-			else
-			{
-				file = CreateFileA(full_path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-			}
-
-			LocalFree(msg);
-		}
-
 		BOOL result = GetFileTime(file, &creation_time, &last_access_time, time);
 
 		CloseHandle(file);
-		return result == TRUE && invalid == false;
+		return result == TRUE;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

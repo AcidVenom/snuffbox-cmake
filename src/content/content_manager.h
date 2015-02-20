@@ -21,7 +21,8 @@ namespace snuffbox
 		kMaterial,
 		kModel,
 		kSound,
-		kCustom
+		kCustom,
+    kUnknown
 	};
 
 	class ContentManager : public JSObject
@@ -83,11 +84,25 @@ namespace snuffbox
 		*/
 		void Watch(std::string path);
 
+    /**
+    * @brief Retrieves content by name
+    * @param[in] std::string The path to the content to be retrieved
+    * @return snuffbox::Content* A pointer to the actual content, or nullptr if not found
+    */
+    Content* Get(std::string path);
+
+    /**
+    * @brief Converts a string to a content type
+    * @param[in] type (std::string) The type to convert
+    * @return snuffbox::ContentTypes The converted value
+    */
+    static ContentTypes StringToType(std::string type);
+
 		/// Default destructor
 		~ContentManager();
 
 	private:
-		std::map<std::string, SharedPtr<Content>> content;
+		std::map<std::string, SharedPtr<Content>> loaded_content_;
 
 	public:
 		JS_NAME("ContentManager");
