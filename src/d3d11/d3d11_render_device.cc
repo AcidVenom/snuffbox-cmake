@@ -153,7 +153,12 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateInputLayout()
   {
-    D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("base.fx");
+    D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
+    if (shader == nullptr)
+    {
+      return;
+    }
+
     input_layout_ = AllocatedMemory::Instance().Construct<D3D11InputLayout>();
     input_layout_->Create({
       { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -227,6 +232,10 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Draw()
 	{
+    if (input_layout_ == nullptr)
+    {
+      return;
+    }
 		back_buffer_->Clear(context_);
 
     for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)

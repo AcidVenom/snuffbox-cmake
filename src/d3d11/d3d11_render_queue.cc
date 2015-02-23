@@ -33,9 +33,19 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::Draw(ID3D11DeviceContext* context)
   {
-    for (D3D11RenderElement* element : elements_)
+    D3D11RenderElement* element = nullptr;
+    for (int i = static_cast<int>(elements_.size()) - 1; i >= 0; --i)
     {
-      DrawElement(context, element);
+      element = elements_.at(i);
+
+      if (element->spawned() == true)
+      {
+        DrawElement(context, element);
+      }
+      else
+      {
+        elements_.erase(elements_.begin() + i);
+      }
     }
   }
 
