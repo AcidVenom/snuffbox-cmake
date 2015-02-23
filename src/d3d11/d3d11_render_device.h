@@ -21,6 +21,7 @@ namespace snuffbox
   class D3D11VertexBuffer;
   class D3D11InputLayout;
   class D3D11Viewport;
+  class D3D11SamplerState;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -71,6 +72,12 @@ namespace snuffbox
 		/// @see snuffbox::IRenderDeviceBase::Draw
 		void Draw();
 
+    /**
+    * @brief Draws a given render target
+    * @param[in] target (snuffbox::D3D11RenderTarget*) The render target to draw
+    */
+    void DrawRenderTarget(D3D11RenderTarget* target);
+
 		/// @see snuffbox::IRenderDeviceBase::ResizeBuffers
 		void ResizeBuffers(int w, int h);
 
@@ -81,7 +88,13 @@ namespace snuffbox
 		* @brief Adds a render target to the map of render targets
 		* @param[in] target (snuffbox::D3D11RenderTarget*) The render target to add
 		*/
-		void AddRenderTarget(D3D11RenderTarget* target);
+    void AddRenderTarget(D3D11RenderTarget* target);
+
+    /**
+    * @brief Retrieves a render target by name
+    * @param[in] name (const std::string&) The name of the render target to retrieve
+    */
+    D3D11RenderTarget* GetTarget(const std::string& name);
 
 		/**
 		* @return snuffbox::D3D11RenderTarget* The swap chain of this device
@@ -134,5 +147,8 @@ namespace snuffbox
     SharedPtr<D3D11InputLayout> input_layout_; //!< The input layout
 
     SharedPtr<D3D11Viewport> viewport_; //!< The base viewport
+
+    SharedPtr<D3D11SamplerState> sampler_linear_; //!< The linear sampler state
+    SharedPtr<D3D11SamplerState> sampler_point_; //!< The point sampler state
 	};
 }

@@ -25,6 +25,11 @@ namespace snuffbox
     kUnknown
 	};
 
+  /**
+  * @class snuffbox::ContentManager
+  * @brief Used to load, unload and retrieve content within the environment
+  * @author Daniël Konings
+  */
 	class ContentManager : public JSObject
 	{
 	public:

@@ -5,6 +5,7 @@
 #include "../d3d11/d3d11_shader.h"
 #include "../d3d11/d3d11_viewport.h"
 #include "../d3d11/d3d11_render_settings.h"
+#include "../d3d11/d3d11_sampler_state.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -16,7 +17,7 @@
 
 namespace snuffbox
 {
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice::D3D11RenderDevice() :
 		ready_(false),
 		adapter_(nullptr),
@@ -28,29 +29,35 @@ namespace snuffbox
 
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice* D3D11RenderDevice::Instance()
 	{
 		static SharedPtr<D3D11RenderDevice> render_device = AllocatedMemory::Instance().Construct<D3D11RenderDevice>();
 		return render_device.get();
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	std::string D3D11RenderDevice::HRToString(HRESULT hr, std::string context)
 	{
 		_com_error error(hr);
 		return "(" + context + ") " + error.ErrorMessage();
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	bool D3D11RenderDevice::Initialise()
 	{
 		CreateDevice();
     CreateBackBuffer();
     CreateScreenQuad();
-    ContentManager::Instance()->Load(ContentTypes::kShader, "base.fx");
+    ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
+    ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
     CreateInputLayout();
     CreateBaseViewport();
+
+    sampler_linear_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kLinear);
+    sampler_point_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kPoint);
+
+    sampler_linear_->Set();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -58,7 +65,7 @@ namespace snuffbox
 		return true;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::CreateDevice()
 	{
 		DXGI_SWAP_CHAIN_DESC desc;
@@ -116,7 +123,7 @@ namespace snuffbox
     context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateBackBuffer()
   {
     back_buffer_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("Backbuffer");
@@ -125,7 +132,7 @@ namespace snuffbox
     back_buffer_->Set(context_);
   }
   
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateScreenQuad()
   {
     std::vector<Vertex> vertices({
@@ -143,7 +150,7 @@ namespace snuffbox
     screen_quad_->Create(vertices, indices);
   }
 
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateInputLayout()
   {
     D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("base.fx");
@@ -159,7 +166,7 @@ namespace snuffbox
     shader->Set();
   }
 
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateBaseViewport()
   {
     viewport_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
@@ -175,7 +182,7 @@ namespace snuffbox
     viewport_->Set();
   }
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::FindAdapter()
 	{
 		IDXGIFactory* factory = NULL;
@@ -217,16 +224,40 @@ namespace snuffbox
 		SNUFF_LOG_INFO(result);
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Draw()
 	{
 		back_buffer_->Clear(context_);
-    screen_quad_->Set();
-    screen_quad_->Draw();
+
+    for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+    {
+      DrawRenderTarget(it->second);
+    }
+
+    ID3D11ShaderResourceView *const null_resource[1] = { NULL };
+    context_->PSSetShaderResources(0, 1, null_resource);
+
 		swap_chain_->Present(0, 0);
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::DrawRenderTarget(D3D11RenderTarget* target)
+  {
+    target->Clear(context_);
+    target->Set(context_);
+    target->Draw(context_);
+
+    back_buffer_->Set(context_);
+
+    screen_quad_->Set();
+
+    ID3D11ShaderResourceView* resource = target->resource();
+    context_->PSSetShaderResources(0, 1, &resource);
+
+    screen_quad_->Draw();
+  }
+
+  //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::ResizeBuffers(int w, int h)
 	{
 		if (ready_ == false)
@@ -247,9 +278,11 @@ namespace snuffbox
 		ready_ = true;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Dispose()
 	{
+    swap_chain_->SetFullscreenState(FALSE, NULL);
+
 		SNUFF_SAFE_RELEASE(adapter_, "D3D11RenderDevice::Dispose::adapter_");
 		SNUFF_SAFE_RELEASE(swap_chain_, "D3D11RenderDevice::Dispose::swap_chain_");
 		SNUFF_SAFE_RELEASE(device_, "D3D11RenderDevice::Dispose::device_");
@@ -258,8 +291,8 @@ namespace snuffbox
 		SNUFF_LOG_INFO("Disposed the Direct3D 11 render device");
 	}
 
-	//---------------------------------------------------------------------------------------------------------
-	void D3D11RenderDevice::AddRenderTarget(D3D11RenderTarget* target)
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::AddRenderTarget(D3D11RenderTarget* target)
 	{
 		const std::string& name = target->name();
 		std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.find(name);
@@ -275,43 +308,57 @@ namespace snuffbox
 		SNUFF_LOG_INFO("Added render target '" + name + "'");
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
+  D3D11RenderTarget* D3D11RenderDevice::GetTarget(const std::string& name)
+  {
+    std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.find(name);
+
+    if (it != render_targets_.end())
+    {
+      return it->second;
+    }
+
+    SNUFF_LOG_WARNING("Attempted to retrieve a non-existant render target '" + name + "'");
+    return nullptr;
+  }
+
+  //-------------------------------------------------------------------------------------------
 	IDXGISwapChain* D3D11RenderDevice::swap_chain()
 	{
 		return swap_chain_;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	ID3D11Device* D3D11RenderDevice::device()
 	{
 		return device_;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	ID3D11DeviceContext* D3D11RenderDevice::context()
 	{
 		return context_;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	D3D11RenderTarget* D3D11RenderDevice::back_buffer()
 	{
 		return back_buffer_.get();
 	}
 
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   const int& D3D11RenderDevice::vertex_buffer_type() const
   {
     return vertex_buffer_type_;
   }
 
-  //---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(int type)
   {
     vertex_buffer_type_ = type;
   }
 
-	//---------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()
 	{
 	

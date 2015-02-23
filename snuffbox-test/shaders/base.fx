@@ -16,6 +16,9 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 	return output;
 }
 
+Texture2D Tex2D;
+SamplerState Sampler;
+
 float4 PS(VOut input) : SV_TARGET
 {
 	return input.colour;

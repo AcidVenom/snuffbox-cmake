@@ -28,12 +28,6 @@ namespace snuffbox
 			return DefWindowProcA(hWnd, message, wParam, lParam);
 		}
 
-		if (message == WM_SIZE)
-		{
-			window->set_width(LOWORD(lParam));
-			window->set_height(HIWORD(lParam));
-		}
-
 		POINT p;
 		if (GetCursorPos(&p))
 		{
@@ -201,7 +195,7 @@ namespace snuffbox
 		height_ = HIWORD(lParam);
 
 		PlatformRenderDevice::Instance()->ResizeBuffers(width_, height_);
-		SNUFF_LOG_INFO("The window was resized to " + std::to_string(width_) + "x" + std::to_string(height_));
+		SNUFF_LOG_INFO("The window was resized to " + std::to_string(width_) + " x " + std::to_string(height_));
 	}
 
 	//-------------------------------------------------------------------------------------------

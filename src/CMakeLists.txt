@@ -66,6 +66,10 @@ SET (D3DSources
 	d3d11/d3d11_shader.cc
 	d3d11/d3d11_input_layout.h
 	d3d11/d3d11_input_layout.cc
+	d3d11/d3d11_render_queue.h
+	d3d11/d3d11_render_queue.cc
+	d3d11/d3d11_sampler_state.h
+	d3d11/d3d11_sampler_state.cc
 )
 
 SET (D3DElements

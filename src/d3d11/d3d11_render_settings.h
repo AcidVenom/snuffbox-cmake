@@ -48,6 +48,7 @@ namespace snuffbox
 		XMFLOAT2 resolution_; //!< The resolution of the renderer
 
 	public:
+    JS_NAME("RenderSettings");
 		static void RegisterJS(JS_SINGLETON obj);
 		static void JSSetVsync(JS_ARGS args);
 		static void JSVsync(JS_ARGS args);

@@ -1,4 +1,6 @@
 #include "../d3d11/d3d11_render_settings.h"
+#include "../application/game.h"
+#include "../platform/platform_window.h"
 
 namespace snuffbox
 {
@@ -40,6 +42,9 @@ namespace snuffbox
 	{
 		resolution_.x = width;
 		resolution_.y = height;
+
+    Window* window = Game::Instance()->window();
+    D3D11RenderDevice::Instance()->ResizeBuffers(window->width(), window->height());
 	}
 
 	//---------------------------------------------------------------------------------------------------------

@@ -1,4 +1,6 @@
 #include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_render_queue.h"
+
 #include "../application/logging.h"
 
 namespace snuffbox
@@ -11,7 +13,7 @@ namespace snuffbox
 		view_(nullptr),
 		resource_(nullptr)
 	{
-
+    
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -78,6 +80,8 @@ namespace snuffbox
 			result = device->CreateRenderTargetView(buffer_, NULL, &view_);
 
 			SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateRenderTargetView"), "D3D11RenderTarget::Create");
+
+      queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>();
 		}
 		else
 		{
@@ -134,7 +138,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11RenderTarget::Set(ID3D11DeviceContext* context)
+	void D3D11RenderTarget::Set(ID3D11DeviceContext* context, ID3D11DepthStencilView* depth_stencil)
 	{
 		if (valid_ == false)
 		{
@@ -142,8 +146,14 @@ namespace snuffbox
 			return;
 		}
 
-		context->OMSetRenderTargets(1, &view_, NULL);
+    context->OMSetRenderTargets(1, &view_, depth_stencil);
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::Draw(ID3D11DeviceContext* context)
+  {
+    queue_->Draw(context);
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Release()
@@ -168,6 +178,18 @@ namespace snuffbox
 	{
 		return name_;
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  ID3D11ShaderResourceView* D3D11RenderTarget::resource()
+  {
+    return resource_;
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  D3D11RenderQueue* D3D11RenderTarget::queue()
+  {
+    return queue_.get();
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderTarget::~D3D11RenderTarget()

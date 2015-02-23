@@ -27,10 +27,6 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Viewport::SetToAspectRatio(float width, float height, float r_width, float r_height)
 	{
-		DXGI_SWAP_CHAIN_DESC desc;
-
-		D3D11RenderDevice::Instance()->swap_chain()->GetDesc(&desc);
-
 		float target_aspect = r_width / r_height;
 		float current_aspect = width / height;
 

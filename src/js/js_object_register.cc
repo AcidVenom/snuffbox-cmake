@@ -13,6 +13,9 @@
 #include "../io/io_manager.h"
 
 #include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_render_settings.h"
+
+#include "../d3d11/elements/d3d11_quad_element.h"
 
 namespace snuffbox
 {
@@ -26,12 +29,14 @@ namespace snuffbox
 		JSObjectRegister<Mouse>::RegisterSingleton();
 		JSObjectRegister<ContentManager>::RegisterSingleton();
 		JSObjectRegister<IOManager>::RegisterSingleton();
+    JSObjectRegister<D3D11RenderSettings>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------
   void JSRegister::RegisterConstructables()
   {
 		JSObjectRegister<D3D11RenderTarget>::Register();
+    JSObjectRegister<D3D11Quad>::Register();
   }
 
   //-------------------------------------------------------------------------------------------

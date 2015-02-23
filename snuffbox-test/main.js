@@ -4,7 +4,8 @@ Game.renderTarget = new RenderTarget("Default");
 
 Game.Initialise = function()
 {
-	
+	Game.quad = new Quad();
+	Game.quad.spawn("Default");
 }
 
 Game.Update = function(dt)

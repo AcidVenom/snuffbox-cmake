@@ -5,6 +5,8 @@
 
 namespace snuffbox
 {
+  class D3D11RenderQueue;
+
 	/**
 	* @class snuffbox::D3D11RenderTarget
 	* @brief Contains a Direct3D 11 back buffer object for use with the render device
@@ -64,8 +66,15 @@ namespace snuffbox
 		/**
 		* @brief Sets the render target
 		* @param[in] context ID3D11DeviceContext* The context to set the target with
+    * @param[in] depth_stencil ID3D11DepthStencilView* The depth stencil view to do depth tests with, defaults to NULL
 		*/
-		void Set(ID3D11DeviceContext* context);
+    void Set(ID3D11DeviceContext* context, ID3D11DepthStencilView* depth_stencil = NULL);
+
+    /** 
+    * @brief Draws to this render target
+    * @param[in] context ID3D11DeviceContext* The context to use for rendering
+    */
+    void Draw(ID3D11DeviceContext* context);
 
 		/// Releases all referenced D3D11 com objects
 		void Release();
@@ -74,6 +83,16 @@ namespace snuffbox
 		* @return const std::string& The name of this render target
 		*/
 		const std::string& name() const;
+
+    /**
+    * @return ID3D11ShaderResourceView* The texture resource of a normal render target
+    */
+    ID3D11ShaderResourceView* resource();
+
+    /**
+    * @return snuffbox::D3D11RenderQueue* The render queue of this render target
+    */
+    D3D11RenderQueue* queue();
 
 		/// Default destructor
 		virtual ~D3D11RenderTarget();
@@ -85,6 +104,7 @@ namespace snuffbox
 		ID3D11Texture2D* buffer_; //!< The buffer of this render target
 		ID3D11RenderTargetView* view_; //!< The actual view of this render target
 		ID3D11ShaderResourceView* resource_; //!< When used as a normal render target, use this to store the texture
+    SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
 
 	public:
 		JS_NAME("RenderTarget");

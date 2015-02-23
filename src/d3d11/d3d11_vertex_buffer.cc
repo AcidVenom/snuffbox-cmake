@@ -72,6 +72,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11VertexBuffer::Set()
   {
+    if (valid_ == false)
+    {
+      SNUFF_LOG_WARNING("Attempted to set an invalid vertex buffer");
+      return;
+    }
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     ID3D11DeviceContext* ctx = render_device->context();
 
@@ -97,6 +102,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11VertexBuffer::Draw()
   {
+    if (valid_ == false)
+    {
+      SNUFF_LOG_WARNING("Attempted to draw an invalid vertex buffer");
+      return;
+    }
     D3D11RenderDevice::Instance()->context()->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
   }
 
