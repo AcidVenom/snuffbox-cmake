@@ -71,6 +71,9 @@ namespace snuffbox
 		/// @see snuffbox::IRenderDeviceBase::Draw
 		void Draw();
 
+		/// @see snuffbox::IRenderDeviceBase::ResizeBuffers
+		void ResizeBuffers(int w, int h);
+
 		/// @see snuffbox::IRenderDeviceBase::Dispose
 		void Dispose();
 
@@ -115,6 +118,8 @@ namespace snuffbox
 		virtual ~D3D11RenderDevice();
 
 	private:
+		bool ready_; //!< Is the device ready?
+
 		IDXGIAdapter* adapter_; //!< The adapter that will be used for rendering
 		IDXGISwapChain* swap_chain_; //!< The swap chain this device will be created with
 		ID3D11Device* device_; //!< The actual device

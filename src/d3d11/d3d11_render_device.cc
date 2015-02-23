@@ -4,6 +4,7 @@
 #include "../d3d11/d3d11_input_layout.h"
 #include "../d3d11/d3d11_shader.h"
 #include "../d3d11/d3d11_viewport.h"
+#include "../d3d11/d3d11_render_settings.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -17,6 +18,7 @@ namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderDevice::D3D11RenderDevice() :
+		ready_(false),
 		adapter_(nullptr),
 		swap_chain_(nullptr),
 		device_(nullptr),
@@ -37,7 +39,7 @@ namespace snuffbox
 	std::string D3D11RenderDevice::HRToString(HRESULT hr, std::string context)
 	{
 		_com_error error(hr);
-		return "(" + context + ")" + error.ErrorMessage();
+		return "(" + context + ") " + error.ErrorMessage();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -51,6 +53,8 @@ namespace snuffbox
     CreateBaseViewport();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
+
+		ready_ = true;
 		return true;
 	}
 
@@ -125,9 +129,9 @@ namespace snuffbox
   void D3D11RenderDevice::CreateScreenQuad()
   {
     std::vector<Vertex> vertices({
-      { XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-      { XMFLOAT4(-1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-      { XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(-1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+      { XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
       { XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
     });
 
@@ -142,7 +146,7 @@ namespace snuffbox
   //---------------------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateInputLayout()
   {
-    D3D11Shader* shader = static_cast<D3D11Shader*>(ContentManager::Instance()->Get("base.fx"));
+    D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("base.fx");
     input_layout_ = AllocatedMemory::Instance().Construct<D3D11InputLayout>();
     input_layout_->Create({
       { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -159,7 +163,14 @@ namespace snuffbox
   void D3D11RenderDevice::CreateBaseViewport()
   {
     viewport_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
-    viewport_->Create(0.0f, 0.0f, 640.0f, 480.0f);
+    
+		const XMFLOAT2& resolution = D3D11RenderSettings::Instance()->resolution();
+		Window* window = Game::Instance()->window();
+		viewport_->SetToAspectRatio(
+			static_cast<float>(window->width()), 
+			static_cast<float>(window->height()), 
+			resolution.x, 
+			resolution.y);
 
     viewport_->Set();
   }
@@ -213,6 +224,27 @@ namespace snuffbox
     screen_quad_->Set();
     screen_quad_->Draw();
 		swap_chain_->Present(0, 0);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::ResizeBuffers(int w, int h)
+	{
+		if (ready_ == false)
+		{
+			return;
+		}
+
+		ready_ = false;
+
+		back_buffer_->Release();
+
+		HRESULT result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		SNUFF_XASSERT(result == S_OK, HRToString(result, "ResizeBuffers"), "D3D11RenderDevice::ResizeBuffers");
+
+		CreateBackBuffer();
+		CreateBaseViewport();
+
+		ready_ = true;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

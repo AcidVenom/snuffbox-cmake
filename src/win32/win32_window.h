@@ -42,6 +42,12 @@ namespace snuffbox
 		/// @see snuffbox::IWindowBase
 		void SendQuitMessage();
 
+		/**
+		* @brief Called when the window is being resized
+		* @param[in] lParam (LPARAM) The LOWORD of contains the new width, the HIWORD the new height
+		*/
+		void OnResize(LPARAM lParam);
+
 		/// When the window retrieves focus execute this function
 		void OnSetFocus();
 

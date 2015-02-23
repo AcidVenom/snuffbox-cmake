@@ -40,6 +40,7 @@ namespace snuffbox
 
 		if (type == RenderTargets::kBackBuffer)
 		{
+			name_ = "Backbuffer";
 			result = swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<LPVOID*>(&buffer_));
 
 			SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "GetBuffer"), "D3D11RenderTarget::Create");
@@ -145,13 +146,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	const std::string& D3D11RenderTarget::name() const
-	{
-		return name_;
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	D3D11RenderTarget::~D3D11RenderTarget()
+	void D3D11RenderTarget::Release()
 	{
 		if (valid_ == false)
 		{
@@ -164,6 +159,20 @@ namespace snuffbox
 		{
 			SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::~D3D11RenderTarget::resource_");
 		}
+
+		valid_ = false;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const std::string& D3D11RenderTarget::name() const
+	{
+		return name_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	D3D11RenderTarget::~D3D11RenderTarget()
+	{
+		Release();
 	}
 
 	//---------------------------------------------------------------------------------------------------------

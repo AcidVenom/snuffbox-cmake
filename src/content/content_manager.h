@@ -87,9 +87,10 @@ namespace snuffbox
     /**
     * @brief Retrieves content by name
     * @param[in] std::string The path to the content to be retrieved
-    * @return snuffbox::Content* A pointer to the actual content, or nullptr if not found
+    * @return T* A pointer to the actual content, or nullptr if not found
     */
-    Content* Get(std::string path);
+		template<typename T>
+    T* Get(std::string path);
 
     /**
     * @brief Converts a string to a content type
@@ -109,4 +110,19 @@ namespace snuffbox
 		static void RegisterJS(JS_SINGLETON obj);
 		static void JSWatch(JS_ARGS args);
 	};
+
+	//---------------------------------------------------------------------------------------------------------
+	template<typename T>
+	inline T* ContentManager::Get(std::string path)
+	{
+		std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
+
+		if (it != loaded_content_.end())
+		{
+			return dynamic_cast<T*>(it->second.get());
+		}
+
+		SNUFF_LOG_ERROR("Could not find content '" + path + "', are you sure it's been loaded correctly?");
+		return nullptr;
+	}
 }

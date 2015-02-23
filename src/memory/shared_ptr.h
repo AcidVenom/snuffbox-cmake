@@ -281,8 +281,8 @@ namespace snuffbox
 	void SharedPtr<T>::Reset()
 	{
 		if (ref_ != nullptr)
-			ref_->IncreaseRev();
-		reset_raw(ptr_, ref_);
+			ref_->IncreaseRef();
+		ResetRaw(ptr_, ref_);
 	}
 
 	//-------------------------------------------------------------------------------------------------

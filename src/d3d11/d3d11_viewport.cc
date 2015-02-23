@@ -22,9 +22,39 @@ namespace snuffbox
     height_ = h;
 
     Adjust();
-
-    valid_ = true;
   }
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Viewport::SetToAspectRatio(float width, float height, float r_width, float r_height)
+	{
+		DXGI_SWAP_CHAIN_DESC desc;
+
+		D3D11RenderDevice::Instance()->swap_chain()->GetDesc(&desc);
+
+		float target_aspect = r_width / r_height;
+		float current_aspect = width / height;
+
+		float w = width;
+		float h = height;
+
+		if (target_aspect > current_aspect) {
+			w = width;
+			h = w / target_aspect;
+		}
+		else 
+		{
+			h = height;
+			w = h * target_aspect;
+		}
+
+		x_ = width / 2 - w / 2;
+		y_ = height / 2 - h / 2;
+
+		width_ = w;
+		height_ = h;
+
+		Adjust();
+	}
 
   //---------------------------------------------------------------------------------------------------------
   void D3D11Viewport::Set()
@@ -53,5 +83,7 @@ namespace snuffbox
     viewport_.Height = height_;
     viewport_.MinDepth = 0.0f;
     viewport_.MaxDepth = 1.0f;
+
+		valid_ = true;
   }
 }

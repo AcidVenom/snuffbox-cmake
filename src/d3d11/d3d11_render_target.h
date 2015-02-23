@@ -67,6 +67,9 @@ namespace snuffbox
 		*/
 		void Set(ID3D11DeviceContext* context);
 
+		/// Releases all referenced D3D11 com objects
+		void Release();
+
 		/**
 		* @return const std::string& The name of this render target
 		*/

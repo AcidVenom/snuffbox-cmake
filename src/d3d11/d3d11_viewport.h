@@ -23,6 +23,15 @@ namespace snuffbox
     * @param[in] h (float) The height of the viewport
     */
     void Create(float x, float y, float w, float h);
+	
+		/**
+		* @brief Makes sure this viewport maintains a certain aspect ratio
+		* @param[in] width (float) The width of the underlying window
+		* @param[in] height (float) The height of the underlying window
+		* @param[in] r_width (float) The width of the underlying renderer
+		* @param[in] r_height (float) The height of the underlying renderer
+		*/
+		void SetToAspectRatio(float width, float height, float r_width, float r_height);
 
     /// Sets this viewport for rendering
     void Set();

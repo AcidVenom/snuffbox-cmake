@@ -6,6 +6,8 @@
 #include "../input/keyboard.h"
 #include "../input/mouse.h"
 
+#include "../platform/platform_render_device.h"
+
 #define SNUFF_WINDOW_CLASS "WIN32_WIN_CLASS"
 
 namespace snuffbox
@@ -41,6 +43,10 @@ namespace snuffbox
 
 		switch (message)
 		{
+		case WM_SIZE:
+			window->OnResize(lParam);
+			break;
+
 		case WM_SETFOCUS:
 			window->OnSetFocus();
 			break;
@@ -186,6 +192,16 @@ namespace snuffbox
 	void Win32Window::SendQuitMessage()
 	{
 		Game::Instance()->Notify(Game::GameNotifications::kQuit);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Win32Window::OnResize(LPARAM lParam)
+	{
+		width_ = LOWORD(lParam);
+		height_ = HIWORD(lParam);
+
+		PlatformRenderDevice::Instance()->ResizeBuffers(width_, height_);
+		SNUFF_LOG_INFO("The window was resized to " + std::to_string(width_) + "x" + std::to_string(height_));
 	}
 
 	//-------------------------------------------------------------------------------------------

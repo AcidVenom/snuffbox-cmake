@@ -104,20 +104,6 @@ namespace snuffbox
 	}
 
   //---------------------------------------------------------------------------------------------------------
-  Content* ContentManager::Get(std::string path)
-  {
-    std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
-
-    if (it != loaded_content_.end())
-    {
-      return it->second.get();
-    }
-
-    SNUFF_LOG_ERROR("Could not find content '" + path + "', are you sure it's been loaded correctly?");
-    return nullptr;
-  }
-
-  //---------------------------------------------------------------------------------------------------------
   ContentTypes ContentManager::StringToType(std::string type)
   {
     if (type == "texture")

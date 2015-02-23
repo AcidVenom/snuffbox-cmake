@@ -1,0 +1,57 @@
+#pragma once
+
+#include "../js/js_object.h"
+#include "../d3d11/d3d11_render_device.h"
+
+namespace snuffbox
+{
+	class D3D11RenderSettings : public JSObject
+	{
+	public:
+		/// Default constructor
+		D3D11RenderSettings();
+
+		/**
+		* @brief Retrieves the singleton instance of this class
+		* @return snuffbox::D3D11RenderSettings* The pointer to the singleton
+		*/
+		static D3D11RenderSettings* Instance();
+
+		/**
+		* @return const bool& Is vertical sync enabled?
+		*/
+		const bool& vsync() const;
+
+		/**
+		* @return const XMFLOAT2& The resolution of the renderer
+		*/
+		const XMFLOAT2& resolution() const;
+
+		/**
+		* @brief Sets if vsync is enabled or not
+		* @param[in] vsync (bool) The boolean value
+		*/
+		void set_vsync(bool vsync);
+
+		/**
+		* @brief Sets the resolution of the renderer
+		* @param[in] width (float) The new width
+		* @param[in] height (float) The new height
+		*/
+		void set_resolution(float width, float height);
+
+		/// Default destructor
+		~D3D11RenderSettings();
+
+	private:
+		bool vsync_; //!< Is vertical sync enabled?
+		XMFLOAT2 resolution_; //!< The resolution of the renderer
+
+	public:
+		static void RegisterJS(JS_SINGLETON obj);
+		static void JSSetVsync(JS_ARGS args);
+		static void JSVsync(JS_ARGS args);
+		static void JSSetResolution(JS_ARGS args);
+		static void JSResolution(JS_ARGS args);
+	};
+}

@@ -18,6 +18,13 @@ namespace snuffbox
 		/// Render to the window
 		virtual void Draw() = 0;
 
+		/**
+		* @brief Resize buffers when window is resized
+		* @param[in] w (int) The new width
+		* @param[in] h (int) The new height
+		*/
+		virtual void ResizeBuffers(int w, int h) = 0;
+
 		/// Disposes the render device, releasing all resources
 		virtual void Dispose() = 0;
 	};
