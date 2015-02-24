@@ -88,9 +88,9 @@ int main(int argc, char** argv)
 
 	IOManager* io_manager = IOManager::Instance();
 
-	render_device->Initialise();
-
 	js_state_wrapper->Initialise();
+  render_device->Initialise();
+
 	js_state_wrapper->CompileAndRun("main.js");
 
 	game->Verify();

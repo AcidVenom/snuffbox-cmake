@@ -178,27 +178,6 @@ namespace snuffbox
 	void D3D11Camera::RotateBy(float x, float y, float z)
 	{
 		rotation_ += XMVectorSet(x, y, z, 0.0f);
-
-    auto clamp = [](float v){ 
-      if (v > XM_PI)
-      { 
-        v = 0; 
-      }
-      else if (v < 0)
-      {
-        v = XM_PI;
-      }
-    };
-
-    float xx = XMVectorGetX(rotation_);
-    float yy = XMVectorGetY(rotation_);
-    float zz = XMVectorGetZ(rotation_);
-
-    clamp(xx);
-    clamp(yy);
-    clamp(zz);
-
-    rotation_ = XMVectorSet(xx, yy, zz, 0.0f);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "../d3d11/d3d11_sampler_state.h"
 #include "../d3d11/d3d11_constant_buffer.h"
 #include "../d3d11/d3d11_camera.h"
+#include "../d3d11/d3d11_blend_state.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -47,9 +48,9 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-	bool D3D11RenderDevice::Initialise()
-	{
-		CreateDevice();
+  bool D3D11RenderDevice::Initialise()
+  {
+    CreateDevice();
     CreateBackBuffer();
     CreateScreenQuad();
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
@@ -62,8 +63,26 @@ namespace snuffbox
 
     sampler_linear_->Set();
 
-		global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-		per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+    global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+    per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+
+    default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+
+    D3D11_BLEND_DESC blend_desc;
+
+    blend_desc.AlphaToCoverageEnable = false;
+    blend_desc.IndependentBlendEnable = false;
+    blend_desc.RenderTarget[0].BlendEnable = true;
+    blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+    default_blend_state_->Create(blend_desc);
+    default_blend_state_->Set();
 
 		global_buffer_->Create();
 		per_object_buffer_->Create();
@@ -282,6 +301,7 @@ namespace snuffbox
 
     ID3D11ShaderResourceView* resource = target->resource();
     context_->PSSetShaderResources(0, 1, &resource);
+    default_blend_state_->Set();
 
     screen_quad_->Draw();
   }

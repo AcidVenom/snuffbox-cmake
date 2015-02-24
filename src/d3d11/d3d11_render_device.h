@@ -24,6 +24,7 @@ namespace snuffbox
   class D3D11SamplerState;
 	class D3D11ConstantBuffer;
 	class D3D11Camera;
+  class D3D11BlendState;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -173,5 +174,7 @@ namespace snuffbox
 
 		SharedPtr<D3D11ConstantBuffer> global_buffer_; //!< The global constant buffer
 		SharedPtr<D3D11ConstantBuffer> per_object_buffer_; //!< The per-object constant buffer
+
+    SharedPtr<D3D11BlendState> default_blend_state_; //!< The default blend state
 	};
 }

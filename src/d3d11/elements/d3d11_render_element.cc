@@ -14,7 +14,7 @@ namespace snuffbox
     size_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
     world_matrix_(XMMatrixIdentity()),
     spawned_(false),
-		alpha_(0.5f),
+		alpha_(1.0f),
 		blend_(1.0f, 1.0f, 1.0f)
   {
 
@@ -34,6 +34,18 @@ namespace snuffbox
   void D3D11RenderElement::Destroy()
   {
     spawned_ = false;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::TranslateBy(float x, float y, float z)
+  {
+    translation_ += XMVectorSet(x, y, z, 0.0f);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::RotateBy(float x, float y, float z)
+  {
+    rotation_ += XMVectorSet(x, y, z, 0.0f);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -127,6 +139,20 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::set_alpha(float a)
+  {
+    alpha_ = a;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::set_blend(float r, float g, float b)
+  {
+    blend_.x = r;
+    blend_.y = g;
+    blend_.z = b;
+  }
+
+  //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
   {
 
@@ -137,8 +163,10 @@ namespace snuffbox
   {
     JSFunctionRegister funcs[] = {
       { "setTranslation", JSSetTranslation },
+      { "translateBy", JSTranslateBy },
       { "translation", JSTranslation },
       { "setRotation", JSSetRotation },
+      { "rotateBy", JSRotateBy },
       { "rotation", JSRotation },
       { "setScale", JSSetScale },
       { "scale", JSScale },
@@ -146,6 +174,10 @@ namespace snuffbox
       { "offset", JSOffset },
       { "setSize", JSSetSize },
       { "size", JSSize },
+      { "setAlpha", JSSetAlpha },
+      { "alpha", JSAlpha },
+      { "setBlend", JSSetBlend },
+      { "blend", JSBlend },
       { "spawn", JSSpawn },
       { "destroy", JSDestroy }
     };
@@ -162,6 +194,18 @@ namespace snuffbox
     if (wrapper.Check("NNN") == true)
     {
       self->set_translation(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSTranslateBy(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    if (wrapper.Check("NNN") == true)
+    {
+      self->TranslateBy(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
     }
   }
 
@@ -194,6 +238,18 @@ namespace snuffbox
     if (wrapper.Check("NNN") == true)
     {
       self->set_rotation(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSRotateBy(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    if (wrapper.Check("NNN") == true)
+    {
+      self->RotateBy(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
     }
   }
 
@@ -309,6 +365,56 @@ namespace snuffbox
     JSWrapper::SetObjectValue(obj, "x", x);
     JSWrapper::SetObjectValue(obj, "y", y);
     JSWrapper::SetObjectValue(obj, "z", z);
+
+    wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSAlpha(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    wrapper.ReturnValue<double>(self->alpha());
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSSetAlpha(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    if (wrapper.Check("N"))
+    {
+      self->set_alpha(wrapper.GetValue<float>(0, 1.0));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSSetBlend(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    if (wrapper.Check("NNN") == true)
+    {
+      self->set_blend(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSBlend(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    const XMFLOAT3& v = self->blend();
+
+    v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+
+    JSWrapper::SetObjectValue(obj, "r", v.x);
+    JSWrapper::SetObjectValue(obj, "g", v.y);
+    JSWrapper::SetObjectValue(obj, "b", v.z);
 
     wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
   }

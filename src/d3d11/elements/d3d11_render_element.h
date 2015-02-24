@@ -31,6 +31,22 @@ namespace snuffbox
     void Destroy();
 
     /**
+    * @brief Translate this render element by given values
+    * @param[in] x (float) The translation on the x-axis to add
+    * @param[in] y (float) The translation on the y-axis to add
+    * @param[in] z (float) The translation on the z-axis to add
+    */
+    void TranslateBy(float x, float y, float z);
+
+    /**
+    * @brief Rotate this render element by given values
+    * @param[in] x (float) The rotation on the x-axis to add
+    * @param[in] y (float) The rotation on the y-axis to add
+    * @param[in] z (float) The rotation on the z-axis to add
+    */
+    void RotateBy(float x, float y, float z);
+
+    /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
     */
     virtual D3D11VertexBuffer* vertex_buffer() = 0;
@@ -120,6 +136,20 @@ namespace snuffbox
     */
     void set_size(float x, float y, float z);
 
+    /**
+    * @brief Sets the alpha of this render element
+    * @param[in] a (float) The new alpha value
+    */
+    void set_alpha(float a);
+
+    /**
+    * @brief Sets the blend of this render element
+    * @param[in] r (float) The new r colour
+    * @param[in] g (float) The new g colour
+    * @param[in] b (float) The new b colour
+    */
+    void set_blend(float r, float g, float b);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -134,8 +164,10 @@ namespace snuffbox
   public:
     static void Register(JS_CONSTRUCTABLE obj);
     static void JSSetTranslation(JS_ARGS args);
+    static void JSTranslateBy(JS_ARGS args);
     static void JSTranslation(JS_ARGS args);
     static void JSSetRotation(JS_ARGS args);
+    static void JSRotateBy(JS_ARGS args);
     static void JSRotation(JS_ARGS args);
     static void JSSetScale(JS_ARGS args);
     static void JSScale(JS_ARGS args);
@@ -143,6 +175,10 @@ namespace snuffbox
     static void JSOffset(JS_ARGS args);
     static void JSSetSize(JS_ARGS args);
     static void JSSize(JS_ARGS args);
+    static void JSSetAlpha(JS_ARGS args);
+    static void JSAlpha(JS_ARGS args);
+    static void JSSetBlend(JS_ARGS args);
+    static void JSBlend(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
     static void JSDestroy(JS_ARGS args);
   };

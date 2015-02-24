@@ -142,7 +142,7 @@ namespace snuffbox
     }
 
     history_.push_back(plain);
-    ++history_index_;
+    history_index_ = history_.size();
 
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
 

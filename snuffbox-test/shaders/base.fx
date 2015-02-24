@@ -39,6 +39,7 @@ SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
+	input.colour.rgb *= Blend;
 	input.colour.a *= Alpha;
 	return input.colour;
 }

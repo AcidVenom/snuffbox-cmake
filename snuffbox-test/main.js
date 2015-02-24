@@ -48,7 +48,7 @@ Game.Update = function(dt)
 		Game.camera.rotateBy(movement.y / 100, -movement.x / 100, 0);
 	}
 
-	timer += dt*3;
+	timer += dt*0.75;
 	Game.quad2.setRotation(Math.cos(timer), 0, Math.sin(timer));
 	Game.quad2.setTranslation(Math.sin(timer) * 2, Math.cos(timer) * 3, 0);
 }
