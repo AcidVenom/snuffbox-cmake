@@ -6,6 +6,8 @@
 #include "../d3d11/d3d11_viewport.h"
 #include "../d3d11/d3d11_render_settings.h"
 #include "../d3d11/d3d11_sampler_state.h"
+#include "../d3d11/d3d11_constant_buffer.h"
+#include "../d3d11/d3d11_camera.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -24,7 +26,8 @@ namespace snuffbox
 		swap_chain_(nullptr),
 		device_(nullptr),
 		context_(nullptr),
-    vertex_buffer_type_(-1)
+    vertex_buffer_type_(-1),
+		camera_(nullptr)
 	{
 
 	}
@@ -58,6 +61,12 @@ namespace snuffbox
     sampler_point_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kPoint);
 
     sampler_linear_->Set();
+
+		global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+		per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+
+		global_buffer_->Create();
+		per_object_buffer_->Create();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -229,11 +238,18 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::Draw()
 	{
-    if (input_layout_ == nullptr)
+    if (input_layout_ == nullptr || camera_ == nullptr)
     {
       return;
     }
 
+		global_buffer_->Map({ 
+			0.0f,
+			camera_->view(),
+			camera_->projection()
+		});
+		global_buffer_->Set(0);
+		
 		back_buffer_->Clear(context_);
 
     for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
@@ -245,15 +261,21 @@ namespace snuffbox
     context_->PSSetShaderResources(0, 1, null_resource);
 
 		swap_chain_->Present(0, 0);
+
+		camera_ = nullptr;
 	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::DrawRenderTarget(D3D11RenderTarget* target)
   {
+		D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
+		shader->Set();
     target->Clear(context_);
     target->Set(context_);
     target->Draw(context_);
 
+		shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/post_processing.fx");
+		shader->Set();
     back_buffer_->Set(context_);
 
     screen_quad_->Set();
@@ -359,11 +381,29 @@ namespace snuffbox
     return vertex_buffer_type_;
   }
 
+	//-------------------------------------------------------------------------------------------
+	D3D11ConstantBuffer* D3D11RenderDevice::per_object_buffer()
+	{
+		return per_object_buffer_.get();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Camera* D3D11RenderDevice::camera()
+	{
+		return camera_;
+	}
+
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(int type)
   {
     vertex_buffer_type_ = type;
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::set_camera(D3D11Camera* camera)
+	{
+		camera_ = camera;
+	}
 
   //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()

@@ -36,7 +36,7 @@ namespace snuffbox
     ID3D10Blob* ps_buffer();
 
     /// Default destructor
-    ~D3D11Shader();
+    virtual ~D3D11Shader();
 
   private:
     ID3D10Blob* vs_buffer_; //!< The vertex shader buffer

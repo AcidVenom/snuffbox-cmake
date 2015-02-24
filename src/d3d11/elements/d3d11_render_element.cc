@@ -9,11 +9,13 @@ namespace snuffbox
   D3D11RenderElement::D3D11RenderElement() :
     translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
     rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
-    scale_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+    scale_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
     offset_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
     size_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
     world_matrix_(XMMatrixIdentity()),
-    spawned_(false)
+    spawned_(false),
+		alpha_(0.5f),
+		blend_(1.0f, 1.0f, 1.0f)
   {
 
   }
@@ -21,8 +23,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::Spawn(const std::string& target)
   {
-    D3D11RenderDevice::Instance()->GetTarget(target)->queue()->Add(this);
-    spawned_ = true;
+		if (spawned_ == false)
+		{
+			D3D11RenderDevice::Instance()->GetTarget(target)->queue()->Add(this);
+			spawned_ = true;
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -78,6 +83,18 @@ namespace snuffbox
   {
     return spawned_;
   }
+
+	//-------------------------------------------------------------------------------------------
+	const float& D3D11RenderElement::alpha() const
+	{
+		return alpha_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const XMFLOAT3& D3D11RenderElement::blend() const
+	{
+		return blend_;
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::set_translation(float x, float y, float z)

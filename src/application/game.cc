@@ -68,6 +68,7 @@ namespace snuffbox
     js_init_.Set("Game", "Initialise");
     js_update_.Set("Game", "Update");
 		js_fixed_update_.Set("Game", "FixedUpdate");
+		js_draw_.Set("Game", "Draw");
 		js_shutdown_.Set("Game", "Shutdown");
 		js_on_reload_.Set("Game", "OnReload");
 	}
@@ -144,24 +145,32 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void Game::SetTimePoint()
+	{
+		last_time_ = high_resolution_clock::now();
+		current_time_ = high_resolution_clock::now();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void Game::Run()
 	{
 		if (started_ == false)
 		{
 			return;
 		}
-
-		high_resolution_clock::time_point last_time = high_resolution_clock::now();
-
+		CalculateDeltaTime();
 		UpdateInput();
 		Update();
 		UpdateConsole();
 		Draw();
+	}
 
-		high_resolution_clock::time_point now = high_resolution_clock::now();
-
-		duration<double, std::milli> dt_duration = duration_cast<duration<double, std::milli>>(now - last_time);
-		delta_time_ = dt_duration.count() * 1e-3f;
+	//-------------------------------------------------------------------------------------------
+	void Game::CalculateDeltaTime()
+	{
+		current_time_ = high_resolution_clock::now();
+		delta_time_ = duration_cast<duration<double, std::milli>>(current_time_ - last_time_).count() * 1e-3f;
+		last_time_ = current_time_;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -175,6 +184,7 @@ namespace snuffbox
 		js_init_.Set("Game", "Initialise");
 		js_update_.Set("Game", "Update");
 		js_fixed_update_.Set("Game", "FixedUpdate");
+		js_draw_.Set("Game", "Draw");
 		js_shutdown_.Set("Game", "Shutdown");
 		js_on_reload_.Set("Game", "OnReload");
 
@@ -184,11 +194,23 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Draw()
 	{
+		js_draw_.Call(delta_time_);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::Render(D3D11Camera* camera)
+	{
 		if (started_ == false)
 		{
 			return;
 		}
 
+		if (camera == nullptr)
+		{
+			SNUFF_LOG_WARNING("No camera was set from rendering, rendering non-ui elements will fail");
+		}
+
+		render_device_->set_camera(camera);
 		render_device_->Draw();
 	}
 
@@ -318,7 +340,8 @@ namespace snuffbox
 			{ "time", JSTime },
 			{ "setTime", JSSetTime },
 			{ "fixedStep", JSFixedStep },
-			{ "setFixedStep", JSSetFixedStep }
+			{ "setFixedStep", JSSetFixedStep },
+			{ "render", JSRender }
 		};
 		
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -358,5 +381,14 @@ namespace snuffbox
 		JSWrapper wrapper(args);
 		wrapper.Check("N");
 		Game::Instance()->set_fixed_step(wrapper.GetValue<double>(0, 0.0));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Game::JSRender(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		wrapper.Check("O");
+
+		Game::Instance()->Render(wrapper.GetPointer<D3D11Camera>(0));
 	}
 }

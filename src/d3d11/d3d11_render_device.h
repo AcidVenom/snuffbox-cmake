@@ -22,6 +22,8 @@ namespace snuffbox
   class D3D11InputLayout;
   class D3D11Viewport;
   class D3D11SamplerState;
+	class D3D11ConstantBuffer;
+	class D3D11Camera;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -121,11 +123,27 @@ namespace snuffbox
     */
     const int& vertex_buffer_type() const;
 
+		/**
+		* @return snuffbox::D3D11ConstantBuffer* The per-object constant buffer
+		*/
+		D3D11ConstantBuffer* per_object_buffer();
+
+		/**
+		* @return snuffbox::D3D11Camera* The camera currently in use
+		*/
+		D3D11Camera* camera();
+
     /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (int) The type to set
     */
     void set_vertex_buffer_type(int type);
+
+		/**
+		* @brief Sets the camera to render with
+		* @param[in] camera snuffbox::D3D11Camera* The pointer to the camera
+		*/
+		void set_camera(D3D11Camera* camera);
 
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
@@ -150,5 +168,10 @@ namespace snuffbox
 
     SharedPtr<D3D11SamplerState> sampler_linear_; //!< The linear sampler state
     SharedPtr<D3D11SamplerState> sampler_point_; //!< The point sampler state
+
+		D3D11Camera* camera_; //!< The current camera
+
+		SharedPtr<D3D11ConstantBuffer> global_buffer_; //!< The global constant buffer
+		SharedPtr<D3D11ConstantBuffer> per_object_buffer_; //!< The per-object constant buffer
 	};
 }

@@ -1,3 +1,10 @@
+cbuffer Global : register(b0)
+{
+	float Time;
+	float4x4 View;
+	float4x4 Projection;
+}
+
 struct VOut
 {
 	float4 position : SV_POSITION;

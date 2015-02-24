@@ -77,10 +77,9 @@ namespace snuffbox
     ID3D11PixelShader* ps;
 
     ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
-    ID3D11ClassInstance** instance = nullptr;
 
     UINT num = 0;
-    ctx->VSGetShader(&vs, instance, &num);
+    ctx->VSGetShader(&vs, nullptr, &num);
 
     if (vs != vs_)
     {
@@ -88,12 +87,22 @@ namespace snuffbox
     }
 
     num = 0;
-    ctx->PSGetShader(&ps, instance, &num);
+		ctx->PSGetShader(&ps, nullptr, &num);
 
     if (ps != ps_)
     {
       ctx->PSSetShader(ps_, NULL, 0);
     }
+
+		if (ps != nullptr)
+		{
+			ps->Release();
+		}
+		
+		if (vs != nullptr)
+		{
+			vs->Release();
+		}
   }
 
   //-------------------------------------------------------------------------------------------

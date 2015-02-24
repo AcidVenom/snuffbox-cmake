@@ -72,6 +72,18 @@ SET (D3DSources
 	d3d11/d3d11_sampler_state.cc
 	d3d11/d3d11_camera.h
 	d3d11/d3d11_camera.cc
+	d3d11/d3d11_constant_buffer.h
+	d3d11/d3d11_constant_buffer.cc
+	d3d11/d3d11_blend_state.h
+	d3d11/d3d11_blend_state.cc
+	d3d11/d3d11_depth_state.h
+	d3d11/d3d11_depth_state.cc
+	d3d11/d3d11_effect.h
+	d3d11/d3d11_effect.cc
+	d3d11/d3d11_material.h
+	d3d11/d3d11_material.cc
+	d3d11/d3d11_texture.h
+	d3d11/d3d11_texture.cc
 )
 
 SET (D3DElements

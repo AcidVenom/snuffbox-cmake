@@ -54,14 +54,26 @@ namespace snuffbox
 		/// Updates the console
 		void UpdateConsole();
 
+		/// Sets the time point
+		void SetTimePoint();
+
 		/// Runs this instance of the engine
 		void Run();
+
+		/// Calculates the delta time
+		void CalculateDeltaTime();
 
 		/// Reloads the game
 		void Reload();
 
-		/// Draws to the window
+		/// Draws the game
 		void Draw();
+
+		/**
+		* @brief Renders to the window from a specified camera
+		* @param[in] camera snuffbox::D3D11Camera* The camera to render from
+		*/
+		void Render(D3D11Camera* camera = nullptr);
 
 		/**
 		* @brief Sends a notification to the game instance
@@ -160,6 +172,7 @@ namespace snuffbox
 		bool started_; //!< Is the game started?
 		double delta_time_; //!< The delta time since the previous frame
 		std::chrono::high_resolution_clock::time_point last_time_; //!< What was the time the last time?
+		std::chrono::high_resolution_clock::time_point current_time_; //!< What was the time the last time?
 		double fixed_step_; //!< The current fixed time step
 		double left_over_delta_; //!< The unused delta time since last frame
 		double accumulated_time_; //!< The total accumulated time since last frame
@@ -168,6 +181,7 @@ namespace snuffbox
     JSCallback<> js_init_; //!< The initialisation callback
     JSCallback<double> js_update_;  //!< The update callback
 		JSCallback<int, double> js_fixed_update_; //!< The fixed update callback
+		JSCallback<double> js_draw_; //!< The draw callback
 		JSCallback<> js_shutdown_; //!< The shutdown callback
 		JSCallback<std::string> js_on_reload_; //!< The on-reload callback
 
@@ -179,5 +193,6 @@ namespace snuffbox
 		static void JSSetTime(JS_ARGS args);
 		static void JSFixedStep(JS_ARGS args);
 		static void JSSetFixedStep(JS_ARGS args);
+		static void JSRender(JS_ARGS args);
 	};
 }

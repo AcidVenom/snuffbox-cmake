@@ -50,6 +50,9 @@ namespace snuffbox
 	{
 		ResetStates();
 
+		dx_ = 0;
+		dy_ = 0;
+
 		while (queue_.empty() == false)
 		{
 			const MouseData& top = queue_.front();

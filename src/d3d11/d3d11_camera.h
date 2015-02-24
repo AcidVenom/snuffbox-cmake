@@ -86,6 +86,11 @@ namespace snuffbox
 		const float& fov() const;
 
 		/**
+		* @return const snuffbox::D3D11Camera::CameraTypes& The type of the camera
+		*/
+		const CameraTypes& type() const;
+
+		/**
 		* @brief Sets the translation of the camera
 		* @param[in] x (float) The new x position
 		* @param[in] y (float) The new y position
@@ -137,7 +142,7 @@ namespace snuffbox
 		void RotateBy(float x, float y, float z);
 
 		/// Default destructor
-		~D3D11Camera();
+		virtual ~D3D11Camera();
 
 	private:
 		CameraTypes type_; //!< The type of the camera
@@ -155,6 +160,8 @@ namespace snuffbox
 		float near_plane_; //!< The camera near plane
 		float far_plane_; //!< The camera far plane
 		float fov_; //!< The field of view of the camera
+		const XMVECTOR cam_forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		const XMVECTOR cam_right_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
 	public:
 		JS_NAME("Camera");

@@ -70,6 +70,16 @@ namespace snuffbox
     */
     const bool& spawned() const;
 
+		/**
+		* @return const float& The alpha of this render element
+		*/
+		const float& alpha() const;
+
+		/**
+		* @return const XMFLOAT3& The blend of this render element
+		*/
+		const XMFLOAT3& blend() const;
+
     /**
     * @brief Sets the translation of this render element
     * @param[in] x (float) The new x position
@@ -118,6 +128,8 @@ namespace snuffbox
     XMVECTOR size_; //!< The size vector of this render element
     XMMATRIX world_matrix_; //!< The world matrix of this render element
     bool spawned_; //!< Is this render element spawned?
+		float alpha_; //!< The alpha of this render element
+		XMFLOAT3 blend_; //!< The blend of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);

@@ -7,6 +7,16 @@ namespace snuffbox
 {
   class D3D11RenderElement;
 
+	struct RenderSorterZ
+	{
+		bool operator()(D3D11RenderElement* a, D3D11RenderElement* b);
+	};
+
+	struct RenderSorterDistance
+	{
+		bool operator()(D3D11RenderElement* a, D3D11RenderElement* b);
+	};
+
   /**
   * @class snuffbox::D3D11RenderQueue
   * @brief Handles all sorting of render elements, also used to draw elements in the queue

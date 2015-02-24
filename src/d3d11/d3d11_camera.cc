@@ -9,14 +9,14 @@ namespace snuffbox
 	D3D11Camera::D3D11Camera(D3D11Camera::CameraTypes type) :
 		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
-		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)),
+		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
 		near_plane_(1.0f),
 		far_plane_(1000.0f),
 		type_(type),
-		fov_(XM_PI * 2),
-		right_(XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f)),
-		forward_(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)),
-		target_(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)),
+		fov_(XM_PI / 2),
+		right_(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f)),
+		forward_(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
+		target_(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 		move_left_right_(0.0f),
 		move_back_forward_(0.0f),
 		move_up_down_(0.0f)
@@ -31,7 +31,7 @@ namespace snuffbox
 		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)),
 		near_plane_(1.0f),
 		far_plane_(1000.0f),
-		fov_(XM_PI * 2),
+		fov_(XM_PI / 2),
 		right_(XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f)),
 		forward_(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)),
 		target_(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)),
@@ -82,11 +82,11 @@ namespace snuffbox
 	const XMMATRIX& D3D11Camera::view()
 	{
 		XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(rotation_);
-		target_ = XMVector3TransformCoord(forward_, rot);
+		target_ = XMVector3TransformCoord(cam_forward_, rot);
 		target_ = XMVector3Normalize(target_);
 
-		right_ = XMVector3TransformCoord(right_, rot);
-		forward_ = XMVector3TransformCoord(forward_, rot);
+		right_ = XMVector3TransformCoord(cam_right_, rot);
+		forward_ = XMVector3TransformCoord(cam_forward_, rot);
 		up_ = XMVector3Cross(forward_, right_);
 
 		translation_ += move_left_right_ * right_;
@@ -119,6 +119,12 @@ namespace snuffbox
 	const float& D3D11Camera::fov() const
 	{
 		return fov_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const D3D11Camera::CameraTypes& D3D11Camera::type() const
+	{
+		return type_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

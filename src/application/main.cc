@@ -103,18 +103,15 @@ int main(int argc, char** argv)
 	CVar::Value* reload = cvar->Get("reload", &found);
 	bool should_reload = found != false && reload->IsBool() && reload->As<CVar::Boolean>()->value() == true;
 
+	game->SetTimePoint();
 	while (game->started())
 	{
-		if (should_reload)
-		{
-			file_watch->Update();
-		}
-
 		game->Run();
     js_state_wrapper->isolate()->IdleNotification(32);
 
 		if (should_reload)
 		{
+			file_watch->Update();
 			file_watch->Process();
 		}
 	}

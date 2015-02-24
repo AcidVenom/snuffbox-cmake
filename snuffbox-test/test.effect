@@ -1,0 +1,22 @@
+{
+	"techniques" : {
+		"Default" : {
+			"passes" : [
+				{
+					"shader" : "shaders/base.fx",
+				}
+			]
+		},
+		
+		"Custom" : {
+			"passes" : [
+				{
+					"shader" : "shaders/pass_1.fx",
+				},
+				{
+					"shader" : "shaders/pass_2.fx",
+				}
+			]
+		}
+	}
+}
