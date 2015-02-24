@@ -70,6 +70,8 @@ SET (D3DSources
 	d3d11/d3d11_render_queue.cc
 	d3d11/d3d11_sampler_state.h
 	d3d11/d3d11_sampler_state.cc
+	d3d11/d3d11_camera.h
+	d3d11/d3d11_camera.cc
 )
 
 SET (D3DElements

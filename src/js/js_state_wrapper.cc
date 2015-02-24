@@ -203,7 +203,7 @@ namespace snuffbox
 		Local<Object> g = global();
 		for (unsigned int i = 0; i < g->GetPropertyNames()->Length(); ++i)
 		{
-			g->Delete(g->GetPropertyNames()->Get(i));
+			g->Set(g->GetPropertyNames()->Get(i), v8::Undefined(isolate_));
 		}
 
 		global_.Reset();
