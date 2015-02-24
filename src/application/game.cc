@@ -169,7 +169,7 @@ namespace snuffbox
 	void Game::CalculateDeltaTime()
 	{
 		current_time_ = high_resolution_clock::now();
-		delta_time_ = duration_cast<duration<double, std::milli>>(current_time_ - last_time_).count() * 1e-3f;
+		delta_time_ = duration_cast<duration<float, std::milli>>(current_time_ - last_time_).count() * 1e-3f;
 		last_time_ = current_time_;
 	}
 

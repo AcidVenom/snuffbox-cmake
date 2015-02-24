@@ -45,9 +45,8 @@ Game.Update = function(dt)
 	if (Mouse.isDown(MouseButton.Left))
 	{
 		var movement = Mouse.movement();
-		Game.camera.rotateBy(movement.y * dt * 10, -movement.x * dt * 10, 0);
+		Game.camera.rotateBy(movement.y / 100, -movement.x / 100, 0);
 	}
-	timer = timer || 0;
 
 	timer += dt*3;
 	Game.quad2.setRotation(Math.cos(timer), 0, Math.sin(timer));

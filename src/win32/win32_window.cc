@@ -104,8 +104,12 @@ namespace snuffbox
 		case WM_KEYUP:
 			window->OnKeyUp(lParam, wParam);
 			break;
+
+    default:
+      return DefWindowProcA(hWnd, message, wParam, lParam);
 		}
-		return DefWindowProcA(hWnd, message, wParam, lParam);
+
+		return 0;
 	}
 
 	//-------------------------------------------------------------------------------------------

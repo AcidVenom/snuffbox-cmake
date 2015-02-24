@@ -260,7 +260,7 @@ namespace snuffbox
     ID3D11ShaderResourceView *const null_resource[1] = { NULL };
     context_->PSSetShaderResources(0, 1, null_resource);
 
-		swap_chain_->Present(0, 0);
+		swap_chain_->Present(D3D11RenderSettings::Instance()->vsync(), 0);
 
 		camera_ = nullptr;
 	}

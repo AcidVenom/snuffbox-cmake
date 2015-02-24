@@ -59,13 +59,16 @@ namespace snuffbox
 
 			switch (top.evt)
 			{
-			case MouseEvent::kPressed:
-				if (!states_[top.button].down)
-				{
-					states_[top.button].pressed = true;
-				}
+      case MouseEvent::kMove:
+        x_ = top.x;
+        y_ = top.y;
+        break;
 
+			case MouseEvent::kPressed:
 				states_[top.button].down = true;
+        states_[top.button].pressed = true;
+        x_ = top.x;
+        y_ = top.y;
 				break;
 
 			case MouseEvent::kReleased:
@@ -76,6 +79,8 @@ namespace snuffbox
 			case MouseEvent::kDblClk:
 				states_[top.button].down = true;
 				states_[top.button].double_clicked = true;
+        x_ = top.x;
+        y_ = top.y;
 				break;
 
 			case MouseEvent::kWheelDown:
@@ -85,13 +90,7 @@ namespace snuffbox
 			case MouseEvent::kWheelUp:
 				wheel_up_ = true;
 				break;
-
-			case MouseEvent::kMove:
-				break;
 			}
-
-			x_ = top.x;
-			y_ = top.y;
 
 			queue_.pop();
 		}
