@@ -19,13 +19,13 @@ namespace snuffbox
 	public:
 		/**
 		* @brief Constructs a Windows window
-		* @param[in] x (int) The window x position
-		* @param[in] y (int) The window y position
-		* @param[in] w (int) The window width
-		* @param[in] h (int) The window height
-		* @param[in] name (std::string) The window name
+		* @param[in] x (const int&) The window x position
+		* @param[in] y (const int&) The window y position
+		* @param[in] w (const int&) The window width
+		* @param[in] h (const int&) The window height
+		* @param[in] name (const std::string&) The window name
 		*/
-		Win32Window(int x, int y, int w, int h, std::string name);
+		Win32Window(const int& x, const int& y, const int& w, const int& h, const std::string& name);
 
 		/// Default destructor
 		virtual ~Win32Window();
@@ -44,9 +44,9 @@ namespace snuffbox
 
 		/**
 		* @brief Called when the window is being resized
-		* @param[in] lParam (LPARAM) The LOWORD of contains the new width, the HIWORD the new height
+		* @param[in] lParam (const LPARAM&) The LOWORD of contains the new width, the HIWORD the new height
 		*/
-		void OnResize(LPARAM lParam);
+		void OnResize(const LPARAM& lParam);
 
 		/// When the window retrieves focus execute this function
 		void OnSetFocus();
@@ -56,60 +56,60 @@ namespace snuffbox
 
 		/**
 		* @brief When a key has been pressed execute this function
-		* @param[in] lParam (LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam (WPARAM) The WPARAM from the Windows message loop
+		* @param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnKeyDown(LPARAM lParam, WPARAM wParam);
+		void OnKeyDown(const LPARAM& lParam, const WPARAM& wParam);
 
 		/**
 		* @brief When a key has been released execute this function
-		* @param[in] lParam (LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam (WPARAM) The WPARAM from the Windows message loop
+		* @param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnKeyUp(LPARAM lParam, WPARAM wParam);
+		void OnKeyUp(const LPARAM& lParam, const WPARAM& wParam);
 
 		/**
 		* @brief When a mouse button has been pressed execute this function
-		* @param[in] button (int) The button that was pressed
-		* @param[in] lParam (LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam (WPARAM) The WPARAM from the Windows message loop
+		* @param[in] button (const int&) The button that was pressed
+		* @param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnMouseDown(int button, LPARAM lParam, WPARAM wParam);
+		void OnMouseDown(const int& button, const LPARAM& lParam, const WPARAM& wParam);
 
 		/**
 		* @brief When a mouse button has been released execute this function
-		* @param[in] button (int) The button that was pressed
-		* @param[in] lParam (LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam (WPARAM) The WPARAM from the Windows message loop
+		* @param[in] button (const int&) The button that was pressed
+		* @param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnMouseUp(int button, LPARAM lParam, WPARAM wParam);
+		void OnMouseUp(const int& button, const LPARAM& lParam, const WPARAM& wParam);
 
 		/**
 		* @brief When a mouse button has been double clicked execute this function
-		* @param[in] button (int) The button that was pressed
-		* @param[in] lParam (LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam (WPARAM) The WPARAM from the Windows message loop
+		* @param[in] button (const int&) The button that was pressed
+		* @param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnMouseDbl(int button, LPARAM lParam, WPARAM wParam);
+		void OnMouseDbl(const int& button, const LPARAM& lParam, const WPARAM& wParam);
 
 		/** When the mouse was moved execute this function
-		*	@param[in] lParam(LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam(WPARAM) The WPARAM from the Windows message loop
+		*	@param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnMouseMove(LPARAM lParam, WPARAM wParam);
+		void OnMouseMove(const LPARAM& lParam, const WPARAM& wParam);
 
 		/** When the mouse wheel was used execute this function
-		*	@param[in] lParam(LPARAM) The LPARAM from the Windows message loop
-		* @param[in] wParam(WPARAM) The WPARAM from the Windows message loop
+		*	@param[in] lParam (const LPARAM&) The LPARAM from the Windows message loop
+		* @param[in] wParam (const WPARAM&) The WPARAM from the Windows message loop
 		*/
-		void OnMouseWheel(LPARAM lParam, WPARAM wParam);
+		void OnMouseWheel(const LPARAM& lParam, const WPARAM& wParam);
 
 		/**
 		* @brief Sets the mouse position
-		* @param[in] x (int) The x position of the mouse
-		* @param[in] y (int) The y position of the mouse
+		* @param[in] x (const int&) The x position of the mouse
+		* @param[in] y (const int&) The y position of the mouse
 		*/
-		void SetMousePosition(int x, int y);
+		void SetMousePosition(const int& x, const int& y);
 
 		/**
 		* @return const int& The x position of this window
@@ -143,15 +143,15 @@ namespace snuffbox
 
 		/**
 		* @brief Sets the width of this window
-		* @param[in] w (int) The width to set
+		* @param[in] w (const int&) The width to set
 		*/
-		void set_width(int w);
+		void set_width(const int& w);
 
 		/**
 		* @brief Sets the height of this window
-		* @param[in] h (int) The height to set
+		* @param[in] h (const int&) The height to set
 		*/
-		void set_height(int h);
+		void set_height(const int& h);
 
 	private:
 		int x_; //!< The x position of this window

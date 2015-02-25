@@ -17,7 +17,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11Shader::Load(std::string path)
+	void D3D11Shader::Load(const std::string& path)
   {
     if (vs_buffer_ != nullptr)
     {
@@ -73,36 +73,10 @@ namespace snuffbox
   {
     SNUFF_XASSERT(valid_ == true, "Tried to set invalid shaders", "D3D11Shader::Set");
 
-    ID3D11VertexShader* vs;
-    ID3D11PixelShader* ps;
-
     ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
 
-    UINT num = 0;
-    ctx->VSGetShader(&vs, nullptr, &num);
-
-    if (vs != vs_)
-    {
-      ctx->VSSetShader(vs_, NULL, 0);
-    }
-
-    num = 0;
-		ctx->PSGetShader(&ps, nullptr, &num);
-
-    if (ps != ps_)
-    {
-      ctx->PSSetShader(ps_, NULL, 0);
-    }
-
-		if (ps != nullptr)
-		{
-			ps->Release();
-		}
-		
-		if (vs != nullptr)
-		{
-			vs->Release();
-		}
+    ctx->VSSetShader(vs_, NULL, 0);
+    ctx->PSSetShader(ps_, NULL, 0);
   }
 
   //-------------------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Win32TextFile::Open(std::string path)
+	bool Win32TextFile::Open(const std::string& path)
 	{
 		path_ = path;
 		std::fstream fin(path);
@@ -47,7 +47,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool Win32TextFile::Write(std::string path, std::string src)
+	bool Win32TextFile::Write(const std::string& path, const std::string& src)
 	{
 		std::ofstream out(path);
 

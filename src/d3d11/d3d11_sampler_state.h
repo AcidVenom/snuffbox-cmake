@@ -25,8 +25,11 @@ namespace snuffbox
     };
 
   public:
-    /// Default constructor
-    D3D11SamplerState(SamplerTypes type);
+    /**
+		* @brief Construct a sampler state by type
+		* @param[in] type (const SamplerTypes&) The type of sampler to construct
+		*/
+    D3D11SamplerState(const SamplerTypes& type);
 
     /// Sets this sampler state as the current sampler
     void Set();

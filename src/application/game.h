@@ -77,9 +77,9 @@ namespace snuffbox
 
 		/**
 		* @brief Sends a notification to the game instance
-		* @param[in] evt (snuffbox::Game::GameNotifications) The notification to send
+		* @param[in] evt (const snuffbox::Game::GameNotifications&) The notification to send
 		*/
-		void Notify(GameNotifications evt);
+		void Notify(const GameNotifications& evt);
 
 		/// Quits the engine
 		void Quit();
@@ -150,15 +150,15 @@ namespace snuffbox
 
 		/**
 		* @brief Sets the fixed time step
-		* @param[in] step (double) The fixed time step to set
+		* @param[in] step (const double&) The fixed time step to set
 		*/
-		void set_fixed_step(double step);
+		void set_fixed_step(const double& step);
 
 		/**
 		* @brief Sets the current game time
-		* @param[in] time (double) The time to set
+		* @param[in] time (const double&) The time to set
 		*/
-		void set_time(double time);
+		void set_time(const double& time);
 
 		/// Default destructor
 		~Game();

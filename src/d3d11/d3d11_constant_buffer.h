@@ -46,21 +46,21 @@ namespace snuffbox
 		
 		/**
 		* @brief Maps the constant buffer with global information
-		* @param[in] snuffbox::CbGlobal The global constant buffer
+		* @param[in] const snuffbox::CbGlobal& The global constant buffer
 		*/
-		void Map(CbGlobal cb);
+		void Map(const CbGlobal& cb);
 
 		/**
 		* @brief Maps the constant buffer with per-object information
-		* @param[in] snuffbox::CbPerObject The per-object buffer
+		* @param[in] const snuffbox::CbPerObject& The per-object buffer
 		*/
-		void Map(CbPerObject cb);
+		void Map(const CbPerObject& cb);
 
 		/**
 		* @brief Sets the constant buffer at a given index
-		* @param[in] index (int) The index to map the buffer to
+		* @param[in] index (const int&) The index to map the buffer to
 		*/
-		void Set(int index);
+		void Set(const int& index);
 
 		/// Default denstructor
 		~D3D11ConstantBuffer();

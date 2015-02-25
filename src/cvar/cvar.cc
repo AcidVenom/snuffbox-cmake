@@ -21,21 +21,21 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::Register(std::string name, bool value)
+	void CVar::Register(const std::string& name, const bool& value)
 	{
 		CVar::Boolean* cvar = AllocatedMemory::Instance().Construct<CVar::Boolean>(value);
 		Map(name, cvar);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::Register(std::string name, double value)
+	void CVar::Register(const std::string& name, const double& value)
 	{
 		CVar::Number* cvar = AllocatedMemory::Instance().Construct<CVar::Number>(value);
 		Map(name, cvar);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::Register(std::string name, std::string value)
+	void CVar::Register(const std::string& name, const std::string& value)
 	{
 		CVar::String* cvar = AllocatedMemory::Instance().Construct<CVar::String>(value);
 		Map(name, cvar);
@@ -57,7 +57,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	CVar::Value* CVar::Get(std::string name, bool* found)
+	CVar::Value* CVar::Get(const std::string& name, bool* found)
 	{
 		CVarMap::const_iterator it = vars_.find(name);
 	
@@ -72,13 +72,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool CVar::Exists(std::string name)
+	bool CVar::Exists(const std::string& name)
 	{
 		return vars_.find(name) != vars_.end();
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::ParseCommandLine(int argc, char** argv)
+	void CVar::ParseCommandLine(const int& argc, char** argv)
 	{
 		std::string arguments = "";
 
@@ -151,7 +151,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::RegisterCommandLine(int argc, char** argv)
+	void CVar::RegisterCommandLine(const int& argc, char** argv)
 	{
 		ParseCommandLine(argc, argv);
 	}
@@ -190,7 +190,7 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::SkipWhiteSpaces(std::string& str, int& i)
+	void CVar::SkipWhiteSpaces(const std::string& str, int& i)
 	{
 		char ch = str.at(i);
 		while ((ch == L'\n' || ch == L'\t' || ch == L'\r' || ch == L' ') && i == str.size())
@@ -201,7 +201,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool CVar::Consume(std::string consumer, std::string& str, int& i)
+	bool CVar::Consume(const std::string& consumer, const std::string& str, int& i)
 	{
 		char ch = str.at(i);
 		int count = 0;
@@ -221,7 +221,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	std::string CVar::RepeatUntil(std::vector<std::string> consumer, std::string& str, int& i)
+	std::string CVar::RepeatUntil(const std::vector<std::string>& consumer, const std::string& str, int& i)
 	{
 		std::string to_return = "";
 		bool consumed = false;
@@ -251,7 +251,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	CVar::Value::Value(ValueTypes type) :
+	CVar::Value::Value(const ValueTypes& type) :
 		type_(type)
 	{
 
@@ -282,7 +282,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	CVar::Boolean::Boolean(bool value) :
+	CVar::Boolean::Boolean(const bool& value) :
 		CVar::Value(CVar::ValueTypes::kBoolean),
 		value_(value)
 	{
@@ -296,7 +296,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::Boolean::set_value(bool value)
+	void CVar::Boolean::set_value(const bool& value)
 	{
 		value_ = value;
 	}
@@ -308,7 +308,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	CVar::Number::Number(double value) :
+	CVar::Number::Number(const double& value) :
 		CVar::Value(CVar::ValueTypes::kNumber),
 		value_(value)
 	{
@@ -322,7 +322,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::Number::set_value(double value)
+	void CVar::Number::set_value(const double& value)
 	{
 		value_ = value;
 	}
@@ -334,7 +334,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	CVar::String::String(std::string value) :
+	CVar::String::String(const std::string& value) :
 		CVar::Value(CVar::ValueTypes::kString),
 		value_(value)
 	{
@@ -348,7 +348,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void CVar::String::set_value(std::string value)
+	void CVar::String::set_value(const std::string& value)
 	{
 		value_ = value;
 	}

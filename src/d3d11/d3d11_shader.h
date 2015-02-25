@@ -18,9 +18,9 @@ namespace snuffbox
 
     /**
     * @brief Loads a shader from a path
-    * @param[in] path (std::string) The path to load from
+    * @param[in] path (const std::string&) The path to load from
     */
-    void Load(std::string path);
+    void Load(const std::string& path);
 
     /// Sets the vertex/pixel shader
     void Set();

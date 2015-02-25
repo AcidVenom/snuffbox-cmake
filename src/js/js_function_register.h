@@ -18,17 +18,17 @@ namespace snuffbox
     /**
     * @brief Registers the given functions to an object template
     * @param[in] funcs (JSFunctionRegister*) The listed functions
-    * @param[in] num (int) The number of entries
-    * @param[in] obj (v8::Handle<v8::ObjectTemplate>) The object template to register the functions to
+    * @param[in] num (const int&) The number of entries
+    * @param[in] obj (const v8::Handle<v8::ObjectTemplate>&) The object template to register the functions to
     */
-    static void Register(JSFunctionRegister* funcs, int num, v8::Handle<v8::ObjectTemplate> obj);
+    static void Register(JSFunctionRegister* funcs, const int& num, const v8::Handle<v8::ObjectTemplate>& obj);
 
     /**
     * @brief Registers the given functions to an object
     * @param[in] funcs (JSFunctionRegister*) The listed functions
-    * @param[in] num (int) The number of entries
-    * @param[in] obj (v8::Handle<v8::Object>) The object to register the functions to
+    * @param[in] num (const int&) The number of entries
+    * @param[in] obj (const v8::Handle<v8::Object>&) The object to register the functions to
     */
-    static void Register(JSFunctionRegister* funcs, int num, v8::Handle<v8::Object> obj);
+    static void Register(JSFunctionRegister* funcs, const int& num, const v8::Handle<v8::Object>& obj);
   };
 }

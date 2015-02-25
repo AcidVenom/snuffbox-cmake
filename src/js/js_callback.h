@@ -21,25 +21,25 @@ namespace snuffbox
 
     /**
     * @brief Sets the callback to a field in the global object
-    * @param[in] cb (std::string) The name of the field to assign to the callback
+    * @param[in] cb (const std::string&) The name of the field to assign to the callback
     * @return bool Was setting the callback a success? Fails if; undefined or not of a function type
     */
-    bool Set(std::string cb);
+    bool Set(const std::string& cb);
 
     /**
     * @brief Sets the callback to a field of an object in the global object
-    * @param[in] obj (std::string) The name of the object to retrieve from the global object
-    * @param[in] field (std::string) The name of the field in the object to assign to the callback
+    * @param[in] obj (const std::string&) The name of the object to retrieve from the global object
+    * @param[in] field (const std::string&) The name of the field in the object to assign to the callback
     * @return bool Was setting the callback a success? Fails if; object/field is undefined or field is not of a function type
     */
-    bool Set(std::string obj, std::string field);
+		bool Set(const std::string& obj, const std::string& field);
 
     /**
     * @brief Pushes a value into the value array, to pass to the call of the callback
-    * @param[in] arg (T) The argument to push
+    * @param[in] arg (const T&) The argument to push
     */
     template <typename T>
-    void push(T arg);
+    void push(const T& arg);
 
     /**
     * @brief The last function to break recursion of argument pushing
@@ -49,26 +49,26 @@ namespace snuffbox
 
     /**
     * @brief Pushes an argument when there is only one argument left
-    * @param[in] first (T) The argument that's left to be pushed
+    * @param[in] first (const T&) The argument that's left to be pushed
     * @return int 1 Still arguments on the stack
     */
     template <typename T>
-    int push_arg(T first);
+		int push_arg(const T& first);
 
     /**
     * @brief Pushes an argument when there are 2 or more arguments left
-    * @param[in] first (T) The argument that's next to be pushed
-    * @param[in] args (Others...) The rest of the arguments that are left to be pushed
+    * @param[in] first (const T&) The argument that's next to be pushed
+    * @param[in] args (const Others&...) The rest of the arguments that are left to be pushed
     * @return int 1 + previous argument count, Still arguments on the stack
     */
     template <typename T, typename ... Others>
-    int push_arg(T first, Others...args);
+		int push_arg(const T& first, const Others&...args);
 
     /**
     * @brief Calls the function JavaScript sided
-    * @param[in] args (Args...) The arguments to forward to JavaScript
+    * @param[in] args (const Args&...) The arguments to forward to JavaScript
     */
-    void Call(Args ...args);
+    void Call(const Args& ...args);
 
     /// Default destructor
     ~JSCallback();
@@ -88,7 +88,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<typename ... Args>
-  inline bool JSCallback<Args...>::Set(std::string cb)
+  inline bool JSCallback<Args...>::Set(const std::string& cb)
   {
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
     v8::Isolate* isolate = wrapper->isolate();
@@ -117,7 +117,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<typename ... Args>
-  inline bool JSCallback<Args...>::Set(std::string obj, std::string field)
+	inline bool JSCallback<Args...>::Set(const std::string& obj, const std::string& field)
   {
 		callback_.Reset();
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
@@ -161,7 +161,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<typename ... Args> template<typename T>
-  inline void JSCallback<Args...>::push(T arg)
+  inline void JSCallback<Args...>::push(const T& arg)
   {
     values_.push_back(JSWrapper::CastValue<T>(arg));
   }
@@ -175,7 +175,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template <typename ... Args> template <typename T>
-  inline int JSCallback<Args...>::push_arg(T first)
+  inline int JSCallback<Args...>::push_arg(const T& first)
   {
     push(first);
     return 1;
@@ -183,7 +183,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template <typename ... Args> template <typename T, typename ... Others>
-  inline int JSCallback<Args...>::push_arg(T first, Others...args)
+  inline int JSCallback<Args...>::push_arg(const T& first, const Others&...args)
   {
     push(first);
     return push_arg(args...) + 1;
@@ -191,7 +191,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template <typename ...Args>
-  inline void JSCallback<Args...>::Call(Args ...args)
+  inline void JSCallback<Args...>::Call(const Args& ...args)
   {
     if (valid_ == false)
     {

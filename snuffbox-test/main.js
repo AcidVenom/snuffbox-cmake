@@ -7,9 +7,12 @@ Game.Initialise = function()
 {
 	Game.quad1 = new Quad();
 	Game.quad1.spawn("Default");
+	Game.quad1.setEffect("test.effect");
+	Game.quad1.setTechnique("Custom");
 
 	Game.quad2 = new Quad();
 	Game.quad2.spawn("Default");
+	Game.quad2.setEffect("test.effect");
 
 	Game.quad2.setTranslation(2, 0, 0);
 	Game.camera = new Camera(CameraType.Perspective);

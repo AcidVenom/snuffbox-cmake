@@ -70,33 +70,33 @@ namespace snuffbox
 
 		/**
 		* @brief Notify the keyboard about a change in input
-		* @param[in] data (snuffbox::Keyboard::Keydata) The data sent from the window
+		* @param[in] data (const snuffbox::Keyboard::Keydata&) The data sent from the window
 		*/
-		void Notify(KeyData data);
+		void Notify(const KeyData& data);
 
 		/// Updates the keyboard
 		void Update();
 
 		/**
 		* @brief Is a given key pressed?
-		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
+		* @param[in] keycode (const snuffbox::Key::Keys&) The keycode of the key to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsPressed(Key::Keys keycode) const;
+		const bool& IsPressed(const Key::Keys& keycode) const;
 
 		/**
 		* @brief Is a given key down?
-		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
+		* @param[in] keycode (const snuffbox::Key::Keys&) The keycode of the key to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsDown(Key::Keys keycode) const;
+		const bool& IsDown(const Key::Keys& keycode) const;
 
 		/**
 		* @brief Is a given key released?
-		* @param[in] keycode (snuffbox::Key::Keys) The keycode of the key to be checked
+		* @param[in] keycode (const snuffbox::Key::Keys&) The keycode of the key to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsReleased(Key::Keys keycode) const;
+		const bool& IsReleased(const Key::Keys& keycode) const;
 
 	private:
 		std::queue<KeyData> queue_; //!< The message queue that still needs processing

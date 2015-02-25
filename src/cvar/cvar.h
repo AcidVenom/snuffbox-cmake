@@ -37,8 +37,11 @@ namespace snuffbox
 		class Value
 		{
 		public:
-			/// Default constructor
-			Value(ValueTypes type);
+			/**
+			* @brief Construct by type
+			* @param[in] type (const snuffbox::ValueTypes&) The type
+			*/
+			Value(const ValueTypes& type);
 
 			/// Default destructor
 			virtual ~Value();
@@ -80,9 +83,9 @@ namespace snuffbox
 		public:
 			/**
 			* @brief Construct through value
-			* @param[in] value (bool) The boolean value to be associated with this CVar
+			* @param[in] value (const bool&) The boolean value to be associated with this CVar
 			*/
-			Boolean(bool value);
+			Boolean(const bool& value);
 
 			/// Default destructor
 			virtual ~Boolean();
@@ -94,9 +97,9 @@ namespace snuffbox
 
 			/**
 			* @brief Sets the value
-			* @param[in] value (bool) The value to set
+			* @param[in] value (const bool&) The value to set
 			*/
-			void set_value(bool value);
+			void set_value(const bool& value);
 
 		private:
 			bool value_; //!< The boolean value
@@ -107,9 +110,9 @@ namespace snuffbox
 		public:
 			/**
 			* @brief Construct through value
-			* @param[in] value (double) The double value to be associated with this CVar
+			* @param[in] value (const double&) The double value to be associated with this CVar
 			*/
-			Number(double value);
+			Number(const double& value);
 
 			/// Default destructor
 			virtual ~Number();
@@ -121,9 +124,9 @@ namespace snuffbox
 
 			/**
 			* @brief Sets the value
-			* @param[in] value (double) The value to set
+			* @param[in] value (const double&) The value to set
 			*/
-			void set_value(double value);
+			void set_value(const double& value);
 
 		private:
 			double value_; //!< The double value
@@ -134,9 +137,9 @@ namespace snuffbox
 		public:
 			/**
 			* @brief Construct through value
-			* @param[in] value (std::string) The string value to be associated with this CVar
+			* @param[in] value (const std::string&) The string value to be associated with this CVar
 			*/
-			String(std::string value);
+			String(const std::string& value);
 
 			/// Default constructor
 			virtual ~String();
@@ -148,9 +151,9 @@ namespace snuffbox
 
 			/**
 			* @brief Sets the value
-			* @param[in] value (std::string) The value to set
+			* @param[in] value (const std::string&) The value to set
 			*/
-			void set_value(std::string value);
+			void set_value(const std::string& value);
 
 		private:
 			std::string value_; //!< The string value
@@ -170,24 +173,24 @@ namespace snuffbox
 
 		/**
 		* @brief Registers a boolean CVar value for a given name
-		* @param[in] name (std::string) The name of the CVar
-		* @param[in] value (bool) The boolean value
+		* @param[in] name (const std::string&) The name of the CVar
+		* @param[in] value (const bool&) The boolean value
 		*/
-		void Register(std::string name, bool value);
+		void Register(const std::string& name, const bool& value);
 
 		/**
 		* @brief Registers a number CVar value for a given name
-		* @param[in] name (std::string) The name of the CVar
-		* @param[in] value (double) The boolean value
+		* @param[in] name (const std::string&) The name of the CVar
+		* @param[in] value (const double&) The boolean value
 		*/
-		void Register(std::string name, double value);
+		void Register(const std::string& name, const double& value);
 
 		/**
 		* @brief Registers a string CVar value for a given name
-		* @param[in] name (std::string) The name of the CVar
-		* @param[in] value (std::string) The string value
+		* @param[in] name (const std::string&) The name of the CVar
+		* @param[in] value (const std::string&) The string value
 		*/
-		void Register(std::string name, std::string value);
+		void Register(const std::string& name, const std::string& value);
 
 		/**
 		* @brief Maps a CVar to its corresponding map index
@@ -198,32 +201,32 @@ namespace snuffbox
 
 		/**
 		* @brief Retrieves a CVar from the registered CVars
-		* @param[in] name (std::string) The name of the CVar to retrieve
-		* @param[in] found (bool*) Will be false if not found
+		* @param[in] name (const std::string&) The name of the CVar to retrieve
+		* @param[out] found (bool*) Will be false if not found
 		* @return (snuffbox::CVar::Value*) The corresponding value
 		*/
-		CVar::Value* Get(std::string name, bool* found);
+		CVar::Value* Get(const std::string& name, bool* found);
 
 		/**
 		* @brief Checks if a CVar value was registered
-		* @param[in] name (std::string) The CVar name to search for
+		* @param[in] name (const std::string&) The CVar name to search for
 		* @return bool Does it exist?
 		*/
-		bool Exists(std::string name);
+		bool Exists(const std::string& name);
 
 		/**
 		* @brief Parses the command line passed by the executable
-		* @param[in] argc (int) The argument count
+		* @param[in] argc (const int&) The argument count
 		* @param[in] argv (char**) The actual arguments
 		*/
-		void ParseCommandLine(int argc, char** argv);
+		void ParseCommandLine(const int& argc, char** argv);
 
 		/**
 		* @brief Registers command line arguments as CVars
-		* @param[in] argc (int) The argument count
+		* @param[in] argc (const int&) The argument count
 		* @param[in] argv (char**) The actual arguments
 		*/
-		void RegisterCommandLine(int argc, char** argv);
+		void RegisterCommandLine(const int& argc, char** argv);
 
     /// Logs all currently registered CVars
     void LogCVars();
@@ -234,26 +237,26 @@ namespace snuffbox
 
 		/** 
 		* @brief Skip the whitespaces of a string, incrementing the current index
-		* @param[in] str (std::string&) The string to skip on
+		* @param[in] str (const std::string&) The string to skip on
 		* @param[in] i (int&) The current index to be incremented
 		*/ 
-		void SkipWhiteSpaces(std::string& str, int& i);
+		void SkipWhiteSpaces(const std::string& str, int& i);
 
 		/**
 		* @brief Consumes for a given value, incrementing the i if there was a match
-		* @param[in] consumer (std::string) The to be consumed string
-		* @param[in] str (std::string&) The string to consume on
+		* @param[in] consumer (const std::string&) The to be consumed string
+		* @param[in] str (const std::string&) The string to consume on
 		* @param[in] i (int&) The current index to be incremented
 		*/
-		bool Consume(std::string consumer, std::string& str, int& i);
+		bool Consume(const std::string& consumer, const std::string& str, int& i);
 
 		/**
 		* @brief Repeat until we found a consumer, incrementing the i
-		* @param[in] consumer (std::vector<std::string>) The to be consumed strings, if either of the consumer match we can return the value
-		* @param[in] str (std::string&) The string to repeat on
+		* @param[in] consumer (const std::vector<std::string>&) The to be consumed strings, if either of the consumer match we can return the value
+		* @param[in] str (const std::string&) The string to repeat on
 		* @param[in] i (int&) The current index to be incremented
 		*/
-		std::string RepeatUntil(std::vector<std::string> consumer, std::string& str, int& i);
+		std::string RepeatUntil(const std::vector<std::string>& consumer, const std::string& str, int& i);
 
   public:
     JS_NAME("CVar");
@@ -264,6 +267,7 @@ namespace snuffbox
 		static void JSLog(JS_ARGS args);
 	};
 
+	//---------------------------------------------------------------------------------------------------------
 	template<typename T>
 	T* CVar::Value::As()
 	{

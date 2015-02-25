@@ -3,7 +3,7 @@
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
-  D3D11SamplerState::D3D11SamplerState(D3D11SamplerState::SamplerTypes type) :
+  D3D11SamplerState::D3D11SamplerState(const D3D11SamplerState::SamplerTypes& type) :
     sampler_state_(nullptr)
   {
     D3D11_SAMPLER_DESC desc;

@@ -24,7 +24,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void ContentManager::Notify(ContentManager::Events evt, ContentTypes type, std::string path)
+	void ContentManager::Notify(const ContentManager::Events& evt, const ContentTypes& type, const std::string& path)
 	{
 		switch (evt)
 		{
@@ -93,7 +93,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void ContentManager::Watch(std::string path)
+	void ContentManager::Watch(const std::string& path)
 	{
 		bool success = FileWatch::Instance()->Add(path, ContentTypes::kCustom);
 
@@ -107,7 +107,7 @@ namespace snuffbox
 	}
 
   //---------------------------------------------------------------------------------------------------------
-  ContentTypes ContentManager::StringToType(std::string type)
+  ContentTypes ContentManager::StringToType(const std::string& type)
   {
     if (type == "texture")
     {

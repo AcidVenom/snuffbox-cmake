@@ -21,7 +21,7 @@ namespace snuffbox
   }
 
 	//------------------------------------------------------------------------------
-	JSWrapper::Types JSWrapper::TypeOf(Local<Value> value)
+	JSWrapper::Types JSWrapper::TypeOf(const Local<Value>& value)
 	{
 		if (value->IsFunction())
 		{
@@ -62,7 +62,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	std::string JSWrapper::TypeToString(Types type)
+	std::string JSWrapper::TypeToString(const Types& type)
 	{
 		switch (type)
 		{
@@ -81,7 +81,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool JSWrapper::Check(std::string format)
+	bool JSWrapper::Check(const std::string& format)
 	{
 		if (format.size() == 0)
 		{
@@ -136,7 +136,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void JSWrapper::Error(JSWrapper::Types expected, JSWrapper::Types got, int arg)
+	void JSWrapper::Error(const JSWrapper::Types& expected, const JSWrapper::Types& got, const int& arg)
 	{
 		if (error_checks_ == false)
 		{
@@ -169,7 +169,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void JSWrapper::set_error_checks(bool value)
+	void JSWrapper::set_error_checks(const bool& value)
 	{
 		error_checks_ = value;
 	}

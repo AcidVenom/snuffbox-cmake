@@ -17,21 +17,21 @@ namespace snuffbox
 
     /**
     * @brief Creates the actual blend state
-    * @param[in] desc D3D11_BLEND_DESC The description of the blend state
+    * @param[in] desc const D3D11_BLEND_DESC& The description of the blend state
     */
-    void Create(D3D11_BLEND_DESC desc);
+    void Create(const D3D11_BLEND_DESC& desc);
 
 		/**
 		* @brief Creates the blend state from a JSON
-		* @param[in] json (v8::Local<v8::Object>) The JSON value
+		* @param[in] json (const v8::Local<v8::Object>&) The JSON value
 		*/
-		void CreateFromJson(v8::Local<v8::Object> json);
+		void CreateFromJson(const v8::Local<v8::Object>& json);
 
     /**
     * @brief Creates the blend state from a JSON
-    * @param[in] str (std::string) The JSON stringified
+    * @param[in] str (const std::string&) The JSON stringified
     */
-    void CreateFromJson(std::string str);
+    void CreateFromJson(const std::string& str);
 
     /// Sets this blend state
     void Set();
@@ -41,17 +41,17 @@ namespace snuffbox
 
     /**
     * @brief Converts a string to a blend enumerator
-    * @param[in] str (std::string) The string to convert
+    * @param[in] str (const std::string&) The string to convert
     * @return D3D11_BLEND The converted value
     */
-    static D3D11_BLEND StringToBlend(std::string str);
+		static D3D11_BLEND StringToBlend(const std::string& str);
 
     /**
     * @brief Converts a string to a blend operation enumerator
-    * @param[in] str (std::string) The string to convert
+    * @param[in] str (const std::string&) The string to convert
     * @return D3D11_BLEND_OP The converted value
     */
-    static D3D11_BLEND_OP StringToBlendOp(std::string str);
+		static D3D11_BLEND_OP StringToBlendOp(const std::string& str);
 
   private:
     bool valid_; //!< Is this blend state valid?

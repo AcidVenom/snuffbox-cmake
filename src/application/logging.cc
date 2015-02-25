@@ -12,7 +12,7 @@
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	void DebugLogging::Log(DebugLogging::LogType type, std::string message)
+	void DebugLogging::Log(const DebugLogging::LogType& type, const std::string& message)
 	{
     std::string msg = TypeToString(type) + " " + message + "\n";
 
@@ -29,7 +29,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-  void DebugLogging::Log(std::string message, int rf, int gf, int bf, int rb, int gb, int bb, int a)
+	void DebugLogging::Log(const std::string& message, const int& rf, const int& gf, const int& bf, const int& rb, const int& gb, const int& bb, const int& a)
 	{
     std::string msg = message + "\n";
 		
@@ -62,7 +62,7 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------------------------------
-	std::string DebugLogging::TypeToString(LogType type)
+	std::string DebugLogging::TypeToString(const LogType& type)
 	{
 		switch (type)
 		{
@@ -77,7 +77,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	DebugLogging::LogColour DebugLogging::TypeToColour(LogType type)
+	DebugLogging::LogColour DebugLogging::TypeToColour(const LogType& type)
 	{
 		switch (type)
 		{

@@ -11,7 +11,7 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------------------------------------
-  void D3D11InputLayout::Create(std::vector<D3D11_INPUT_ELEMENT_DESC> layout, ID3D10Blob* vs_buffer)
+  void D3D11InputLayout::Create(const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, ID3D10Blob* vs_buffer)
   {
     HRESULT result = S_OK;
 

@@ -3,17 +3,7 @@
 		"Default" : {
 			"passes" : [
 				{
-					"shader" : "shaders/base.fx",
-					"blend" : {
-						"BlendOp" : "Add",
-						"BlendOpAlpha" : "Add"
-					}
-				},
-				{
-					"shader" : "shaders/post_processing.fx",
-					"depth" : {
-						"DepthEnable" : "false"
-					}
+					"shader" : "shaders/base.fx"
 				}
 			]
 		},
@@ -21,10 +11,10 @@
 		"Custom" : {
 			"passes" : [
 				{
-					"shader" : "shaders/pass_1.fx"
+					"shader" : "shaders/base.fx"
 				},
 				{
-					"shader" : "shaders/pass_2.fx"
+					"shader" : "shaders/base2.fx"
 				}
 			]
 		}

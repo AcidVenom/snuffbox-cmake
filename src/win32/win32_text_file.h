@@ -19,13 +19,13 @@ namespace snuffbox
 		virtual ~Win32TextFile();
 
 		/// @see snuffbox::ITextFileBase
-		bool Open(std::string path);
+		bool Open(const std::string& path);
 
 		/// @see snuffbox::ITextFileBase
 		std::string Read();
 
 		/// @see snuffbox::ITextFileBase
-		bool Write(std::string path, std::string src);
+		bool Write(const std::string& path, const std::string& src);
 
 	private:
 		std::string path_; //!< The current path in use

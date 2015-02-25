@@ -37,8 +37,11 @@ namespace snuffbox
 		};
 
 	public:
-		/// Default constructor
-		D3D11Camera(D3D11Camera::CameraTypes type);
+		/**
+		* @brief Constructs a camera by type
+		* @param[in] type const snuffbox::D3D11Camera::CameraTypes& The type to construct the camera with
+		*/ 
+		D3D11Camera(const D3D11Camera::CameraTypes& type);
 
 		/// JavaScript constructor
 		D3D11Camera(JS_ARGS args);
@@ -92,54 +95,54 @@ namespace snuffbox
 
 		/**
 		* @brief Sets the translation of the camera
-		* @param[in] x (float) The new x position
-		* @param[in] y (float) The new y position
-		* @param[in] z (float) The new z position
+		* @param[in] x (const float&) The new x position
+		* @param[in] y (const float&) The new y position
+		* @param[in] z (const float&) The new z position
 		*/
-		void set_translation(float x, float y, float z);
+		void set_translation(const float& x, const float& y, const float& z);
 
 		/**
 		* @brief Sets the rotation of the camera
-		* @param[in] x (float) The new x rotation
-		* @param[in] y (float) The new y rotation
-		* @param[in] z (float) The new z rotation
+		* @param[in] x (const float&) The new x rotation
+		* @param[in] y (const float&) The new y rotation
+		* @param[in] z (const float&) The new z rotation
 		*/
-		void set_rotation(float x, float y, float z);
+		void set_rotation(const float& x, const float& y, const float& z);
 
 		/**
 		* @brief Sets the near plane of the camera
-		* @param[in] plane (float) The new near plane
+		* @param[in] plane (const float&) The new near plane
 		*/
-		void set_near_plane(float plane);
+		void set_near_plane(const float& plane);
 
 		/**
 		* @brief Sets the far plane of the camera
-		* @param[in] plane (float) The new far plane
+		* @param[in] plane (const float&) The new far plane
 		*/
-		void set_far_plane(float plane);
+		void set_far_plane(const float& plane);
 
 		/**
 		* @brief Sets the field of view of the camera
-		* @param[in] fov (float) The new field of view
+		* @param[in] fov (const float&) The new field of view
 		*/
-		void set_fov(float fov);
+		void set_fov(const float& fov);
 
 		/**
 		* @brief Translate by given values
-		* @param[in] x (float) The translation on the x-axis to add
-		* @param[in] y (float) The translation on the y-axis to add
-		* @param[in] z (float) The translation on the z-axis to add
-		* @param[in] trans (snuffbox::Camera::CameraTransformation) The transformation type
+		* @param[in] x (const float&) The translation on the x-axis to add
+		* @param[in] y (const float&) The translation on the y-axis to add
+		* @param[in] z (const float&) The translation on the z-axis to add
+		* @param[in] trans (const snuffbox::Camera::CameraTransformation&) The transformation type
 		*/
-		void TranslateBy(float x, float y, float z, CameraTransformation trans);
+		void TranslateBy(const float& x, const float& y, const float& z, const CameraTransformation& trans);
 
 		/**
 		* @brief Rotate by given values
-		* @param[in] x (float) The rotation on the x-axis to add
-		* @param[in] y (float) The rotation on the y-axis to add
-		* @param[in] z (float) The rotation on the z-axis to add
+		* @param[in] x (const float&) The rotation on the x-axis to add
+		* @param[in] y (const float&) The rotation on the y-axis to add
+		* @param[in] z (const float&) The rotation on the z-axis to add
 		*/
-		void RotateBy(float x, float y, float z);
+		void RotateBy(const float& x, const float& y, const float& z);
 
 		/// Default destructor
 		virtual ~D3D11Camera();

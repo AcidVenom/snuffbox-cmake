@@ -41,18 +41,26 @@ namespace snuffbox
 
 		/**
 		* @brief Loads this effect from a given JSON
-		* @param[in] path (std::string) The path to the JSON
+		* @param[in] path (const std::string&) The path to the JSON
 		*/
-		void Load(std::string path);
+		void Load(const std::string& path);
 
 		/**
 		* @brief Applies this effect
-		* @param[in] tech std::string The name of the technique to apply
+		* @param[in] tech (const std::string&) The name of the technique to apply
+		* @param[in] p (const unsigned int&) The pass to apply
 		*/
-		void Apply(std::string tech);
+		void Apply(const std::string& tech, const unsigned int& p);
+
+		/**
+		* @brief Retrieves the number of passes of this effect by a given technique
+		* @param[in] tech (const std::string&) The technique to check for
+		* @return unsigned int The number of passes of this effect by technique
+		*/
+		unsigned int NumPasses(const std::string& tech);
 
 		/// Default destructor
-		~D3D11Effect();
+		virtual ~D3D11Effect();
 
 	private:
 		bool valid_; //!< Is this effect valid?

@@ -20,10 +20,10 @@ namespace snuffbox
 
 		/**
 		* @brief Resize buffers when window is resized
-		* @param[in] w (int) The new width
-		* @param[in] h (int) The new height
+		* @param[in] w (const int&) The new width
+		* @param[in] h (const int&) The new height
 		*/
-		virtual void ResizeBuffers(int w, int h) = 0;
+		virtual void ResizeBuffers(const int& w, const int& h) = 0;
 
 		/// Disposes the render device, releasing all resources
 		virtual void Dispose() = 0;

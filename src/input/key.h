@@ -187,9 +187,9 @@ namespace snuffbox
 
 		/**
 		* @brief Converts a key to a string
-		* @param[in] key (snuffbox::Key::Keys) The keycode to convert
+		* @param[in] key (const snuffbox::Key::Keys&) The keycode to convert
 		* @return std::string The converted string
 		*/
-		static std::string KeyToString(Keys key);
+		static std::string KeyToString(const Keys& key);
 	};
 }

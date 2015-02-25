@@ -15,10 +15,10 @@ namespace snuffbox
 
 		/**
 		* @brief Opens a text file given a specific path
-		* @param[in] path (std::string) The path to the text file
+		* @param[in] path (const std::string&) The path to the text file
 		* @return bool Was it a success or not?
 		*/
-		virtual bool Open(std::string path) = 0;
+		virtual bool Open(const std::string& path) = 0;
 
 		/*
 		* @return std::string All data contained in the text file as a string
@@ -27,10 +27,10 @@ namespace snuffbox
 
 		/**
 		* @brief Writes to a file from a given path
-		* @param[in] path (std::string) The path to write to
-		* @param[in] src (std::string) The source text to write
+		* @param[in] path (const std::string&) The path to write to
+		* @param[in] src (const std::string&) The source text to write
 		* @return bool Was it a success or not?
 		*/
-		virtual bool Write(std::string path, std::string src) = 0;
+		virtual bool Write(const std::string& path, const std::string& src) = 0;
 	};
 }

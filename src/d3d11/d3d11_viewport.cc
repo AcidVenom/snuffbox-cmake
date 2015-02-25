@@ -14,7 +14,7 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------------------------------------
-  void D3D11Viewport::Create(float x, float y, float w, float h)
+	void D3D11Viewport::Create(const float& x, const float& y, const float& w, const float& h)
   {
     x_ = x;
     y_ = y;
@@ -25,7 +25,7 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Viewport::SetToAspectRatio(float width, float height, float r_width, float r_height)
+	void D3D11Viewport::SetToAspectRatio(const float& width, const float& height, const float& r_width, const float& r_height)
 	{
 		float target_aspect = r_width / r_height;
 		float current_aspect = width / height;

@@ -21,25 +21,26 @@ namespace snuffbox
 
 		/**
 		* @brief Reads the contents of a file
-		* @param[in] path (std::string) The path to the file
-		* @param[in] buffer (std::string*) The buffer to write to
+		* @param[in] path (const std::string& path) The path to the file
+		* @param[out] buffer (std::string*) The buffer to write to
 		* @return bool Was it a success or not?
 		*/
-		bool Read(std::string path, std::string* buffer);
+		bool Read(const std::string& path, std::string* buffer);
 
 		/**
 		* @brief Checks if a file exists
-		* @param[in] path (std::string) The path to the file
+		* @param[in] path (const std::string&) The path to the file
 		* @return bool Was the file found?
 		*/
-		bool Exists(std::string path);
+		bool Exists(const std::string& path);
 
 		/**
 		* @brief Writes to a given location
-		* @param[in] path (std::string) The path to write to
+		* @param[in] path (const std::string&) The path to write to
+		* @param[in] src (const std::string&) The data to write
 		* @return bool Was it a success?
 		*/
-		bool Write(std::string path, std::string src);
+		bool Write(const std::string& path, const std::string& src);
 
 	public:
 		JS_NAME("IO");

@@ -66,40 +66,40 @@ namespace snuffbox
 	public:
 		/**
 		* @brief Logs with a given logging type and a message
-		* @param[in] type (snuffbox::DebugLogging::LogType) The type of the log message
-		* @param[in] msg (std::string) The message to log
+		* @param[in] type (const snuffbox::DebugLogging::LogType&) The type of the log message
+		* @param[in] msg (const std::string&) The message to log
 		*/
-		static void Log(LogType type, std::string msg);
+		static void Log(const LogType& type, const std::string& msg);
 
 		/**
 		* @brief Logs with a given RGB value and a message
-		* @param[in] msg (std::string) The message to log
-		* @param[in] rf (int) The R value of the foreground colour
-		* @param[in] gf (int) The G value of the foreground colour
-		* @param[in] bf (int) The B value of the foreground colour
-    * @param[in] rb (int) The R value of the background colour
-    * @param[in] gb (int) The G value of the background colour
-    * @param[in] bb (int) The B value of the background colour
-    * @param[in] a  (int) The alpha value of the background colour
+		* @param[in] msg (const std::string&) The message to log
+		* @param[in] rf (const int&) The R value of the foreground colour
+		* @param[in] gf (const int&) The G value of the foreground colour
+		* @param[in] bf (const int&) The B value of the foreground colour
+    * @param[in] rb (const int&) The R value of the background colour
+    * @param[in] gb (const int&) The G value of the background colour
+    * @param[in] bb (const int&) The B value of the background colour
+    * @param[in] a  (const int&) The alpha value of the background colour
 		*/
-    static void Log(std::string msg, int rf, int gf, int bf, int rb, int gb, int bb, int a);
+		static void Log(const std::string& msg, const int& rf, const int& gf, const int& bf, const int& rb, const int& gb, const int& bb, const int& a);
 
     /// Halts the runtime
     static void Break();
 
 		/**
 		* @brief Converts a logging type to a string
-		* @param[in] type (snuffbox::DebugLogging::LogType) The type to convert
+		* @param[in] type (const snuffbox::DebugLogging::LogType&) The type to convert
 		* @return std::string The converted string
 		*/
-		static std::string TypeToString(LogType type);
+		static std::string TypeToString(const LogType& type);
 
 		/**
 		* @brief Converts a logging type to a colour
-		* @param[in] type (snuffbox::DebugLogging::LogType) The type to convert
+		* @param[in] type (const snuffbox::DebugLogging::LogType&) The type to convert
 		* @return snuffbox::DebugLogging::LogColour The converted colour
 		*/
-		static LogColour TypeToColour(LogType type);
+		static LogColour TypeToColour(const LogType& type);
 
   public:
     JS_NAME("Log");

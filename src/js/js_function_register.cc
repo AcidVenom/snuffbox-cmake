@@ -6,7 +6,7 @@
 namespace snuffbox
 {
   //---------------------------------------------------------------------------------------------------------
-  void JSFunctionRegister::Register(JSFunctionRegister* funcs, int num, v8::Handle<v8::ObjectTemplate> obj)
+  void JSFunctionRegister::Register(JSFunctionRegister* funcs, const int& num, const v8::Handle<v8::ObjectTemplate>& obj)
   {
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
     v8::Isolate* isolate = wrapper->isolate();
@@ -19,7 +19,7 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------------------------------------
-  void JSFunctionRegister::Register(JSFunctionRegister* funcs, int num, v8::Handle<v8::Object> obj)
+  void JSFunctionRegister::Register(JSFunctionRegister* funcs, const int& num, const v8::Handle<v8::Object>& obj)
   {
     JSStateWrapper* wrapper = JSStateWrapper::Instance();
     v8::Isolate* isolate = wrapper->isolate();

@@ -103,25 +103,25 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Mouse::IsPressed(Mouse::MouseButton button) const
+	const bool& Mouse::IsPressed(const Mouse::MouseButton& button) const
 	{
 		return states_[button].pressed;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Mouse::IsDown(Mouse::MouseButton button) const
+	const bool& Mouse::IsDown(const Mouse::MouseButton& button) const
 	{
 		return states_[button].down;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Mouse::IsReleased(Mouse::MouseButton button) const
+	const bool& Mouse::IsReleased(const Mouse::MouseButton& button) const
 	{
 		return states_[button].released;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Mouse::IsDoubleClicked(Mouse::MouseButton button) const
+	const bool& Mouse::IsDoubleClicked(const Mouse::MouseButton& button) const
 	{
 		return states_[button].double_clicked;
 	}

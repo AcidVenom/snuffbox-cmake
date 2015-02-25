@@ -85,7 +85,7 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------------------------------------
-  void Console::Log(DebugLogging::LogColour colour, std::string message)
+  void Console::Log(const DebugLogging::LogColour& colour, const std::string& message)
   {
     if (enabled_ == false || ui_ == nullptr || parent_ == nullptr)
     {

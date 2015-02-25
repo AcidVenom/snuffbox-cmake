@@ -13,7 +13,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11BlendState::Create(D3D11_BLEND_DESC desc)
+  void D3D11BlendState::Create(const D3D11_BLEND_DESC& desc)
   {
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     ID3D11Device* device = render_device->device();
@@ -26,7 +26,7 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11BlendState::CreateFromJson(std::string str)
+	void D3D11BlendState::CreateFromJson(const std::string& str)
 	{
 		JSStateWrapper* wrapper = JSStateWrapper::Instance();
 		HandleScope scope(wrapper->isolate());
@@ -53,10 +53,11 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-  void D3D11BlendState::CreateFromJson(Local<Object> obj)
+  void D3D11BlendState::CreateFromJson(const Local<Object>& obj)
   {
 		if (obj.IsEmpty())
 		{
+			CreateFromJson(std::string("{}"));
 			return;
 		}
     Local<Array> properties = obj->GetPropertyNames();
@@ -151,7 +152,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  D3D11_BLEND D3D11BlendState::StringToBlend(std::string str)
+  D3D11_BLEND D3D11BlendState::StringToBlend(const std::string& str)
   {
     if (str == "Zero")
     {
@@ -233,7 +234,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  D3D11_BLEND_OP D3D11BlendState::StringToBlendOp(std::string str)
+  D3D11_BLEND_OP D3D11BlendState::StringToBlendOp(const std::string& str)
   {
     if (str == "Add")
     {

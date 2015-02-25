@@ -97,31 +97,31 @@ namespace snuffbox
 
 		/**
 		* @brief Is a given button pressed?
-		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
+		* @param[in] button (const snuffbox::Mouse::MouseButton&) The button ID of the button to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsPressed(MouseButton button) const;
+		const bool& IsPressed(const MouseButton& button) const;
 
 		/**
 		* @brief Is a given button down?
-		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
+		* @param[in] button (const snuffbox::Mouse::MouseButton&) The button ID of the button to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsDown(MouseButton button) const;
+		const bool& IsDown(const MouseButton& button) const;
 
 		/**
 		* @brief Is a given button released?
-		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
+		* @param[in] button (const snuffbox::Mouse::MouseButton&) The button ID of the button to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsReleased(MouseButton button) const;
+		const bool& IsReleased(const MouseButton& button) const;
 
 		/**
 		* @brief Is a given button double clicked?
-		* @param[in] button (snuffbox::Mouse::MouseButton) The button ID of the button to be checked
+		* @param[in] button (const snuffbox::Mouse::MouseButton&) The button ID of the button to be checked
 		* @return const bool& The boolean value
 		*/
-		const bool& IsDoubleClicked(MouseButton button) const;
+		const bool& IsDoubleClicked(const MouseButton& button) const;
 
 		/**
 		* @brief Was there a mouse wheel down?

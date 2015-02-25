@@ -19,10 +19,10 @@ namespace snuffbox
 
     /**
     * @brief Creates the input layout
-    * @param[in] layout (std::vector<D3D11_INPUT_ELEMENT_DESC>) The list of input elements
+    * @param[in] layout (const std::vector<D3D11_INPUT_ELEMENT_DESC>&) The list of input elements
     * @param[in] vs_buffer (ID3D10Blob*) The associated vertex shader blob
     */
-    void Create(std::vector<D3D11_INPUT_ELEMENT_DESC> layout, ID3D10Blob* vs_buffer);
+    void Create(const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, ID3D10Blob* vs_buffer);
 
     /// Sets the input layout
     void Set();

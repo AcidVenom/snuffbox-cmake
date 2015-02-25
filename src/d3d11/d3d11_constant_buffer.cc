@@ -46,7 +46,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ConstantBuffer::Map(CbGlobal cb)
+	void D3D11ConstantBuffer::Map(const CbGlobal& cb)
 	{
 		CbGlobal* mapped = nullptr;
 
@@ -64,7 +64,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ConstantBuffer::Map(CbPerObject cb)
+	void D3D11ConstantBuffer::Map(const CbPerObject& cb)
 	{
 		CbPerObject* mapped = nullptr;
 
@@ -84,7 +84,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ConstantBuffer::Set(int index)
+	void D3D11ConstantBuffer::Set(const int& index)
 	{
 		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
 

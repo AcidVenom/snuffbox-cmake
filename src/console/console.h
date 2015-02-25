@@ -43,10 +43,10 @@ namespace snuffbox
     
     /**
     * @brief Logs to the console
-    * @param[in] colour (snuffbox::DebugLogging::LogColour) The colour scheme to log this message with
-    * @param[in] message (std::string) The message to log
+    * @param[in] colour (const snuffbox::DebugLogging::LogColour&) The colour scheme to log this message with
+    * @param[in] message (const std::string&) The message to log
     */
-    void Log(DebugLogging::LogColour colour, std::string message);
+    void Log(const DebugLogging::LogColour& colour, const std::string& message);
 
     /// Handles the current command in the input field
     void HandleCommand();

@@ -29,16 +29,16 @@ namespace snuffbox
 
 		/**
 		* @brief Sets if vsync is enabled or not
-		* @param[in] vsync (bool) The boolean value
+		* @param[in] vsync (const bool&) The boolean value
 		*/
-		void set_vsync(bool vsync);
+		void set_vsync(const bool& vsync);
 
 		/**
 		* @brief Sets the resolution of the renderer
-		* @param[in] width (float) The new width
-		* @param[in] height (float) The new height
+		* @param[in] width (const float&) The new width
+		* @param[in] height (const float&) The new height
 		*/
-		void set_resolution(float width, float height);
+		void set_resolution(const float& width, const float& height);
 
 		/// Default destructor
 		~D3D11RenderSettings();

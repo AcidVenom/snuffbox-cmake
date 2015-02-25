@@ -41,12 +41,12 @@ namespace snuffbox
 		/**
 		* @see snuffbox::IFileWatchBase::Add
 		*/
-		bool Add(std::string path, ContentTypes type);
+		bool Add(const std::string& path, const ContentTypes& type);
 
 		/**
 		* @see snuffbox::IFileWatchBase::Remove
 		*/
-		void Remove(std::string path);
+		void Remove(const std::string& path);
 
 		/**
 		* @see snuffbox::IFileWatchBase::Update
@@ -56,10 +56,10 @@ namespace snuffbox
 		/**
 		* @brief Retrieves the time a file was last edited
 		* @param[in] path (std::string) The path to the corresponding file
-		* @param[in] time (FILETIME*) The time buffer to store the resulting data in
+		* @param[out] time (FILETIME*) The time buffer to store the resulting data in
 		* @return bool Was it a success or not?
 		*/
-		bool GetLastEditedTime(std::string path, FILETIME* time);
+		bool GetLastEditedTime(const std::string& path, FILETIME* time);
 
 		/// Processes the queue and adds new files into the map
 		void Process();

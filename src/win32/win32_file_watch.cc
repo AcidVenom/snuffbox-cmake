@@ -21,7 +21,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	bool Win32FileWatch::Add(std::string path, ContentTypes type)
+	bool Win32FileWatch::Add(const std::string& path, const ContentTypes& type)
 	{
 		WatchedFile file;
 
@@ -48,7 +48,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void Win32FileWatch::Remove(std::string path)
+	void Win32FileWatch::Remove(const std::string& path)
 	{
 		FileMap::iterator it = watched_files_.find(path);
 
@@ -91,7 +91,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	bool Win32FileWatch::GetLastEditedTime(std::string path, FILETIME* time)
+	bool Win32FileWatch::GetLastEditedTime(const std::string& path, FILETIME* time)
 	{
 		FILETIME creation_time;
 		FILETIME last_access_time;

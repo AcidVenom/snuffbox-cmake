@@ -17,21 +17,21 @@ namespace snuffbox
 
     /**
     * @brief Creates the viewport
-    * @param[in] x (float) The x position of the viewport
-    * @param[in] y (float) The y position of the viewport
-    * @param[in] w (float) The width of the viewport
-    * @param[in] h (float) The height of the viewport
+    * @param[in] x (const float&) The x position of the viewport
+    * @param[in] y (const float&) The y position of the viewport
+    * @param[in] w (const float&) The width of the viewport
+    * @param[in] h (const float&) The height of the viewport
     */
-    void Create(float x, float y, float w, float h);
+		void Create(const float& x, const float& y, const float& w, const float& h);
 	
 		/**
 		* @brief Makes sure this viewport maintains a certain aspect ratio
-		* @param[in] width (float) The width of the underlying window
-		* @param[in] height (float) The height of the underlying window
-		* @param[in] r_width (float) The width of the underlying renderer
-		* @param[in] r_height (float) The height of the underlying renderer
+		* @param[in] width (const float&) The width of the underlying window
+		* @param[in] height (const float&) The height of the underlying window
+		* @param[in] r_width (const float&) The width of the underlying renderer
+		* @param[in] r_height (const float&) The height of the underlying renderer
 		*/
-		void SetToAspectRatio(float width, float height, float r_width, float r_height);
+		void SetToAspectRatio(const float& width, const float& height, const float& r_width, const float& r_height);
 
     /// Sets this viewport for rendering
     void Set();

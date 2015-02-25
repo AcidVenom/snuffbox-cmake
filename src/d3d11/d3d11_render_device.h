@@ -46,11 +46,11 @@ namespace snuffbox
 
 		/**
 		* @brief Converts a HRESULT to a C string
-		* @param[in] hr (HRESULT) The HRESULT to convert
-		* @param[in] context (std::string) The context this error occured in
-		* @return (std::string) The converted string
+		* @param[in] hr (const HRESULT&) The HRESULT to convert
+		* @param[in] context (const std::string&) The context this error occured in
+		* @return std::string The converted string
 		*/
-		std::string HRToString(HRESULT hr, std::string context);
+		std::string HRToString(const HRESULT& hr, const std::string& context);
 
 		/// @see snuffbox::IRenderDeviceBase::Initialise
 		bool Initialise();
@@ -85,7 +85,7 @@ namespace snuffbox
     void DrawRenderTarget(D3D11RenderTarget* target);
 
 		/// @see snuffbox::IRenderDeviceBase::ResizeBuffers
-		void ResizeBuffers(int w, int h);
+		void ResizeBuffers(const int& w, const int& h);
 
 		/// @see snuffbox::IRenderDeviceBase::Dispose
 		void Dispose();
@@ -139,9 +139,9 @@ namespace snuffbox
 
     /**
     * @brief Sets the current vertex buffer type
-    * @param[in] type (int) The type to set
+    * @param[in] type (const int&) The type to set
     */
-    void set_vertex_buffer_type(int type);
+    void set_vertex_buffer_type(const int& type);
 
 		/**
 		* @brief Sets the camera to render with

@@ -51,9 +51,9 @@ namespace snuffbox
 
     /**
     * @brief Sorts the render elements
-    * @param[in] method (snuffbox::D3D11RenderQueue::SortMethods) The method to sort with
+    * @param[in] method (const snuffbox::D3D11RenderQueue::SortMethods&) The method to sort with
     */
-    void Sort(SortMethods method);
+    void Sort(const SortMethods& method);
 
     /**
     * @brief Draws an element to the current render target

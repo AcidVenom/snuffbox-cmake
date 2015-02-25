@@ -215,7 +215,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Game::Notify(Game::GameNotifications evt)
+	void Game::Notify(const Game::GameNotifications& evt)
 	{
 		switch (evt)
 		{
@@ -315,13 +315,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Game::set_fixed_step(double step)
+	void Game::set_fixed_step(const double& step)
 	{
 		fixed_step_ = step;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Game::set_time(double time)
+	void Game::set_time(const double& time)
 	{
 		time_ = time;
 	}

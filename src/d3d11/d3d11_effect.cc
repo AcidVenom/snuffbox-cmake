@@ -21,8 +21,10 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Effect::Load(std::string path)
+	void D3D11Effect::Load(const std::string& path)
 	{
+		techniques_.clear();
+
 		std::string full_path = Game::Instance()->path() + "/" + path;
 		TextFile file;
 		bool valid = file.Open(full_path);
@@ -112,7 +114,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Effect::Apply(std::string tech)
+	void D3D11Effect::Apply(const std::string& tech, const unsigned int& p)
 	{
 		std::map<std::string, Technique>::iterator it = techniques_.find(tech);
 
@@ -121,17 +123,32 @@ namespace snuffbox
 			Technique& technique = it->second;
 			std::vector<Pass>& passes = technique.passes;
 
-			for (Pass& pass : passes)
+			Pass& pass = passes.at(p);
+			if (pass.shader != nullptr)
 			{
 				pass.shader->Set();
-				pass.blend_state->Set();
-				pass.depth_state->Set();
 			}
+			pass.blend_state->Set();
+			pass.depth_state->Set();
 
 			return;
 		}
 		
 		SNUFF_LOG_WARNING("Technique with name '" + tech + "' does not exist in the effect");
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	unsigned int D3D11Effect::NumPasses(const std::string& tech)
+	{
+		std::map<std::string, Technique>::iterator it = techniques_.find(tech);
+
+		if (it != techniques_.end())
+		{
+			return static_cast<unsigned int>(it->second.passes.size());
+		}
+
+		SNUFF_LOG_WARNING("Technique with name '" + tech + "' does not exist in the effect");
+		return 0;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

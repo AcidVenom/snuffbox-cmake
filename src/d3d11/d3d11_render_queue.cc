@@ -47,7 +47,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11RenderQueue::Sort(D3D11RenderQueue::SortMethods method)
+  void D3D11RenderQueue::Sort(const D3D11RenderQueue::SortMethods& method)
   {
 		switch (method)
 		{
@@ -77,7 +77,22 @@ namespace snuffbox
 
     D3D11VertexBuffer* buffer = element->vertex_buffer();
     buffer->Set();
-    buffer->Draw();
+
+		unsigned int n_pass = element->NumPasses();
+
+		if (n_pass > 0)
+		{
+			for (unsigned int i = 0; i < n_pass; ++i)
+			{
+				element->ApplyEffect(i);
+
+				buffer->Draw();
+			}
+		}
+		else
+		{
+			buffer->Draw();
+		}
   }
 
   //-------------------------------------------------------------------------------------------

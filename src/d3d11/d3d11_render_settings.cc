@@ -32,13 +32,13 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11RenderSettings::set_vsync(bool vsync)
+	void D3D11RenderSettings::set_vsync(const bool& vsync)
 	{
 		vsync_ = vsync;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11RenderSettings::set_resolution(float width, float height)
+	void D3D11RenderSettings::set_resolution(const float& width, const float& height)
 	{
 		resolution_.x = width;
 		resolution_.y = height;

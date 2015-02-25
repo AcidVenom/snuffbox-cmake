@@ -166,7 +166,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	std::string Key::KeyToString(Key::Keys key)
+	std::string Key::KeyToString(const Key::Keys& key)
 	{
 		switch (key)
 		{

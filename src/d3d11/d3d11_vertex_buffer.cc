@@ -3,7 +3,7 @@
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
-  D3D11VertexBuffer::D3D11VertexBuffer(D3D11VertexBuffer::VertexBufferType type) :
+  D3D11VertexBuffer::D3D11VertexBuffer(const D3D11VertexBuffer::VertexBufferType& type) :
     type_(type),
     vertex_buffer_(nullptr),
     index_buffer_(nullptr),
@@ -14,7 +14,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11VertexBuffer::Create(std::vector<Vertex> verts, std::vector<int> indices)
+  void D3D11VertexBuffer::Create(const std::vector<Vertex>& verts, const std::vector<int>& indices)
   {
     if (valid_ == true)
     {
@@ -123,7 +123,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11VertexBuffer::set_topology(D3D11_PRIMITIVE_TOPOLOGY topology)
+  void D3D11VertexBuffer::set_topology(const D3D11_PRIMITIVE_TOPOLOGY& topology)
   {
     topology_ = topology;
   }

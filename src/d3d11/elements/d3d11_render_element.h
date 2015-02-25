@@ -6,6 +6,7 @@
 namespace snuffbox
 {
   class D3D11VertexBuffer;
+	class D3D11Effect;
 
   /**
   * @class snuffbox::D3D11RenderElement
@@ -32,19 +33,30 @@ namespace snuffbox
 
     /**
     * @brief Translate this render element by given values
-    * @param[in] x (float) The translation on the x-axis to add
-    * @param[in] y (float) The translation on the y-axis to add
-    * @param[in] z (float) The translation on the z-axis to add
+    * @param[in] x (const float&) The translation on the x-axis to add
+    * @param[in] y (const float&) The translation on the y-axis to add
+    * @param[in] z (const float&) The translation on the z-axis to add
     */
-    void TranslateBy(float x, float y, float z);
+		void TranslateBy(const float& x, const float& y, const float& z);
 
     /**
     * @brief Rotate this render element by given values
-    * @param[in] x (float) The rotation on the x-axis to add
-    * @param[in] y (float) The rotation on the y-axis to add
-    * @param[in] z (float) The rotation on the z-axis to add
+    * @param[in] x (const float&) The rotation on the x-axis to add
+    * @param[in] y (const float&) The rotation on the y-axis to add
+    * @param[in] z (const float&) The rotation on the z-axis to add
     */
-    void RotateBy(float x, float y, float z);
+		void RotateBy(const float& x, const float& y, const float& z);
+
+		/** 
+		* @brief Applies the current effect with the current technique by pass
+		* @param[in] pass (const unsigned int&) The pass to apply
+		*/
+		void ApplyEffect(const unsigned int& pass);
+
+		/**
+		* @return unsigned int The number of passes for the current effect with the current technique
+		*/
+		unsigned int NumPasses();
 
     /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
@@ -98,57 +110,69 @@ namespace snuffbox
 
     /**
     * @brief Sets the translation of this render element
-    * @param[in] x (float) The new x position
-    * @param[in] y (float) The new y position
-    * @param[in] z (float) The new z position
+    * @param[in] x (const float&) The new x position
+    * @param[in] y (const float&) The new y position
+    * @param[in] z (const float&) The new z position
     */
-    void set_translation(float x, float y, float z);
+		void set_translation(const float& x, const float& y, const float& z);
 
     /**
     * @brief Sets the rotation of this render element
-    * @param[in] x (float) The new x rotation
-    * @param[in] y (float) The new y rotation
-    * @param[in] z (float) The new z rotation
+    * @param[in] x (const float&) The new x rotation
+    * @param[in] y (const float&) The new y rotation
+    * @param[in] z (const float&) The new z rotation
     */
-    void set_rotation(float x, float y, float z);
+		void set_rotation(const float& x, const float& y, const float& z);
 
     /**
     * @brief Sets the scaling of this render element
-    * @param[in] x (float) The new x scaling
-    * @param[in] y (float) The new y scaling
-    * @param[in] z (float) The new z scaling
+    * @param[in] x (const float&) The new x scaling
+    * @param[in] y (const float&) The new y scaling
+    * @param[in] z (const float&) The new z scaling
     */
-    void set_scale(float x, float y, float z);
+		void set_scale(const float& x, const float& y, const float& z);
 
     /**
     * @brief Sets the offset of this render element
-    * @param[in] x (float) The new x offset
-    * @param[in] y (float) The new y offset
-    * @param[in] z (float) The new z offset
+    * @param[in] x (const float&) The new x offset
+    * @param[in] y (const float&) The new y offset
+    * @param[in] z (const float&) The new z offset
     */
-    void set_offset(float x, float y, float z);
+		void set_offset(const float& x, const float& y, const float& z);
 
     /**
     * @brief Sets the sizing of this render element
-    * @param[in] x (float) The new x sizing
-    * @param[in] y (float) The new y sizing
-    * @param[in] z (float) The new z sizing
+    * @param[in] x (const float&) The new x sizing
+    * @param[in] y (const float&) The new y sizing
+    * @param[in] z (const float&) The new z sizing
     */
-    void set_size(float x, float y, float z);
+		void set_size(const float& x, const float& y, const float& z);
 
     /**
     * @brief Sets the alpha of this render element
-    * @param[in] a (float) The new alpha value
+    * @param[in] a (const float&) The new alpha value
     */
-    void set_alpha(float a);
+		void set_alpha(const float& a);
 
     /**
     * @brief Sets the blend of this render element
-    * @param[in] r (float) The new r colour
-    * @param[in] g (float) The new g colour
-    * @param[in] b (float) The new b colour
+    * @param[in] r (const float&) The new r colour
+    * @param[in] g (const float&) The new g colour
+    * @param[in] b (const float&) The new b colour
     */
-    void set_blend(float r, float g, float b);
+		void set_blend(const float& r, const float& g, const float& b);
+
+		/**
+		* @brief Sets the effect of this render element
+		* @param[in] path (const std::string&) The path to the effect file
+		*/
+		void set_effect(const std::string& path);
+
+		/**
+		* @brief Sets the technique of this render element
+		* @param[in] technique (std::string) The name of the technique
+		*/
+		void set_technique(const std::string& technique);
 
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
@@ -160,6 +184,8 @@ namespace snuffbox
     bool spawned_; //!< Is this render element spawned?
 		float alpha_; //!< The alpha of this render element
 		XMFLOAT3 blend_; //!< The blend of this render element
+		D3D11Effect* effect_; //!< The effect of this render element
+		std::string technique_; //!< The technique of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -179,6 +205,8 @@ namespace snuffbox
     static void JSAlpha(JS_ARGS args);
     static void JSSetBlend(JS_ARGS args);
     static void JSBlend(JS_ARGS args);
+		static void JSSetEffect(JS_ARGS args);
+		static void JSSetTechnique(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
     static void JSDestroy(JS_ARGS args);
   };

@@ -6,7 +6,7 @@
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	D3D11Camera::D3D11Camera(D3D11Camera::CameraTypes type) :
+	D3D11Camera::D3D11Camera(const D3D11Camera::CameraTypes& type) :
 		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
@@ -128,37 +128,37 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::set_translation(float x, float y, float z)
+	void D3D11Camera::set_translation(const float& x, const float& y, const float& z)
 	{
 		translation_ = XMVectorSet(x, y, z, 1.0f);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::set_rotation(float x, float y, float z)
+	void D3D11Camera::set_rotation(const float& x, const float& y, const float& z)
 	{
 		rotation_ = XMVectorSet(x, y, z, 1.0f);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::set_near_plane(float plane)
+	void D3D11Camera::set_near_plane(const float& plane)
 	{
 		near_plane_ = plane;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::set_far_plane(float plane)
+	void D3D11Camera::set_far_plane(const float& plane)
 	{
 		far_plane_ = plane;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::set_fov(float fov)
+	void D3D11Camera::set_fov(const float& fov)
 	{
 		fov_ = fov;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::TranslateBy(float x, float y, float z, CameraTransformation trans)
+	void D3D11Camera::TranslateBy(const float& x, const float& y, const float& z, const CameraTransformation& trans)
 	{
 		switch (trans)
 		{
@@ -175,7 +175,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Camera::RotateBy(float x, float y, float z)
+	void D3D11Camera::RotateBy(const float& x, const float& y, const float& z)
 	{
 		rotation_ += XMVectorSet(x, y, z, 0.0f);
 	}

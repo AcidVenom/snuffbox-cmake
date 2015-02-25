@@ -43,19 +43,19 @@ namespace snuffbox
   public:
     /**
     * @brief Constructs a vertex buffer with a type
-    * @param[in] type (snuffbox::D3D11VertexBuffer::VertexBufferType) The type of this vertex buffer
+    * @param[in] type (const snuffbox::D3D11VertexBuffer::VertexBufferType&) The type of this vertex buffer
     */
-    D3D11VertexBuffer(VertexBufferType type);
+    D3D11VertexBuffer(const VertexBufferType& type);
 
     /// Default destructor
     ~D3D11VertexBuffer();
 
     /**
     * @brief Creates the vertex/index buffers for use
-    * @param[in] verts (std::vector<snuffbox::Vertex>) The vertices to add
-    * @param[in] indices (std::vector<int>) The indices to add
+    * @param[in] verts (const std::vector<snuffbox::Vertex>&) The vertices to add
+    * @param[in] indices (const std::vector<int>&) The indices to add
     */
-    void Create(std::vector<Vertex> verts, std::vector<int> indices);
+    void Create(const std::vector<Vertex>& verts, const std::vector<int>& indices);
 
     /// Sets the vertex/index buffer
     void Set();
@@ -75,9 +75,9 @@ namespace snuffbox
 
     /**
     * @brief Sets the primitive topology this vertex buffer uses
-    * @param[in] topology (D3D11_PRIMITIVE_TOPOLOGY) The topology to use
+    * @param[in] topology (const D3D11_PRIMITIVE_TOPOLOGY&) The topology to use
     */
-    void set_topology(D3D11_PRIMITIVE_TOPOLOGY topology);
+    void set_topology(const D3D11_PRIMITIVE_TOPOLOGY& topology);
 
   private:
     std::vector<Vertex> vertices_; //!< The vertices of this vertex buffer

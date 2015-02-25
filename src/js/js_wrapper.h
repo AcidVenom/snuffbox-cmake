@@ -44,42 +44,42 @@ namespace snuffbox
 
     /**
     * @brief Gets a value off of the argument stack
-    * @param[in] arg (int) The argument to retrieve the value of
-    * @param[in] def (T) The default value if no value was found
+    * @param[in] arg (const int&) The argument to retrieve the value of
+    * @param[in] def (const T&) The default value if no value was found
     */
 		template<typename T>
-		T GetValue(int arg, T def);
+		T GetValue(const int& arg, const T& def);
 
     /**
     * @brief Gets a C++ pointer from a value with an external __ptr field
-    * @param[in] val (v8::Handle<v8::Value>) The value to retrieve the pointer from
+    * @param[in] val (const v8::Handle<v8::Value>&) The value to retrieve the pointer from
     * @return T* The returned pointer, nullptr if none was found
     */
     template<typename T>
-    T* GetPointer(v8::Handle<v8::Value> val);
+    T* GetPointer(const v8::Handle<v8::Value>& val);
 
     /**
     * @brief Gets a C++ pointer from a value with an external __ptr field
-    * @param[in] arg (int) The argument to retrieve the pointer from
+    * @param[in] arg (const int&) The argument to retrieve the pointer from
     * @return T* The returned pointer, nullptr if none was found
     */
     template<typename T>
-    T* GetPointer(int arg);
+    T* GetPointer(const int& arg);
 
     /**
     * @brief Casts a value to a JavaScript handle
-    * @param[in] val (T) The value to cast
+    * @param[in] val (const T&) The value to cast
     * @return v8::Handle<v8::Value> The casted value
     */
     template<typename T>
-    static v8::Handle<v8::Value> CastValue(T val);
+    static v8::Handle<v8::Value> CastValue(const T& val);
 
     /**
     * @brief Returns a value to JavaScript
-    * @param[in] val (T) The value to return
+    * @param[in] val (const T&) The value to return
     */
     template<typename T>
-    void ReturnValue(T val);
+    void ReturnValue(const T& val);
 
     /**
     * @brief Creates a JavaScript object handle and returns it
@@ -89,47 +89,47 @@ namespace snuffbox
 
     /**
     * @brief Returns a value to JavaScript
-    * @param[in] obj (v8::Handle<v8::Object>) The object to assign the value to
-    * @param[in] field (std::string) The field to set
-    * @param[in] val (T) The value to set
+    * @param[in] obj (const v8::Handle<v8::Object>&) The object to assign the value to
+    * @param[in] field (const std::string&) The field to set
+    * @param[in] val (const T&) The value to set
     */
     template<typename T>
-    static void SetObjectValue(v8::Handle<v8::Object> obj, std::string field, T val);
+    static void SetObjectValue(const v8::Handle<v8::Object>& obj, const std::string& field, const T& val);
 
 		/**
 		* @brief Returns the type of a local value
-		* @param[in] value (v8::Local<v8::Value>) The value to check the type of
+		* @param[in] value (const v8::Local<v8::Value>&) The value to check the type of
 		* @return snuffbox::JSWrapper::Types The type of the value
 		*/
-		static Types TypeOf(v8::Local<v8::Value> value);
+		static Types TypeOf(const v8::Local<v8::Value>& value);
 
 		/**
 		* @brief Converts a JavaScript type to a string value
-		* @param[in] type (snuffbox::JSWrapper::Types) The type to convert
+		* @param[in] type (const snuffbox::JSWrapper::Types&) The type to convert
 		* @return std::string The converted string value
 		*/
-		static std::string TypeToString(Types type);
+		static std::string TypeToString(const Types& type);
 
 		/**
 		* @brief Constructs an argument error and logs it
-		* @param[in] expected (snuffbox::JSWrapper::Types) The expected type
-		* @param[in] got (snuffbox::JSWrapper::Types) The type that was actually received
-		* @param[in] arg (int) The current argument
+		* @param[in] expected (const snuffbox::JSWrapper::Types&) The expected type
+		* @param[in] got (const snuffbox::JSWrapper::Types&) The type that was actually received
+		* @param[in] arg (const int&) The current argument
 		*/
-		void Error(Types expected, Types got, int arg);
+		void Error(const Types& expected, const Types& got, const int& arg);
 
 		/**
 		* @brief Checks the argument scope if the format is as it should be
-		* @param[in] format (std::string) The format to check
+		* @param[in] format (const std::string&) The format to check
 		* @return bool Was the format check completed succesfully?
 		*/ 
-		bool Check(std::string format);
+		bool Check(const std::string& format);
 
 		/**
 		* @brief Disables error checking in snuffbox::JSWrapper::Check
-		* @param[in] value (bool) On/off value for error checking
+		* @param[in] value (const bool&) On/off value for error checking
 		*/
-		void set_error_checks(bool value);
+		void set_error_checks(const bool& value);
 
 	private:
 		JS_ARGS args_; //!< The cached argument scope
@@ -138,7 +138,7 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	inline bool JSWrapper::GetValue<bool>(int arg, bool def)
+	inline bool JSWrapper::GetValue<bool>(const int& arg, const bool& def)
 	{
 		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
 		{
@@ -154,7 +154,7 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	inline int JSWrapper::GetValue<int>(int arg, int def)
+	inline int JSWrapper::GetValue<int>(const int& arg, const int& def)
 	{
 		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
 		{
@@ -170,7 +170,7 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	inline float JSWrapper::GetValue<float>(int arg, float def)
+	inline float JSWrapper::GetValue<float>(const int& arg, const float& def)
 	{
 		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
 		{
@@ -186,7 +186,7 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	inline double JSWrapper::GetValue<double>(int arg, double def)
+	inline double JSWrapper::GetValue<double>(const int& arg, const double& def)
 	{
 		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
 		{
@@ -202,19 +202,7 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	inline const char* JSWrapper::GetValue<const char*>(int arg, const char* def)
-	{
-		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
-		{
-			return def;
-		}
-
-    return *v8::String::Utf8Value(args_[arg]->ToString());
-	}
-
-	//-------------------------------------------------------------------------------------------
-	template<>
-	inline std::string JSWrapper::GetValue<std::string>(int arg, std::string def)
+	inline std::string JSWrapper::GetValue<std::string>(const int& arg, const std::string& def)
 	{
 		if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
 		{
@@ -226,7 +214,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::GetValue<v8::Handle<v8::Value>>(int arg, v8::Handle<v8::Value> def)
+  inline v8::Handle<v8::Value> JSWrapper::GetValue<v8::Handle<v8::Value>>(const int& arg, const v8::Handle<v8::Value>& def)
   {
     if (args_[arg]->IsNull() || args_[arg]->IsUndefined())
     {
@@ -242,7 +230,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<typename T>
-  inline T* JSWrapper::GetPointer(v8::Handle<v8::Value> val)
+  inline T* JSWrapper::GetPointer(const v8::Handle<v8::Value>& val)
   {
     v8::Local<v8::Object> obj = val->ToObject();
     v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
@@ -259,7 +247,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<typename T>
-  inline T* JSWrapper::GetPointer(int arg)
+  inline T* JSWrapper::GetPointer(const int& arg)
   {
     v8::Local<v8::Object> obj = args_[arg]->ToObject();
     v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
@@ -276,7 +264,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<double>(double val)
+  inline v8::Handle<v8::Value> JSWrapper::CastValue<double>(const double& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     return v8::Number::New(isolate, val);
@@ -284,7 +272,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<int>(int val)
+  inline v8::Handle<v8::Value> JSWrapper::CastValue<int>(const int& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     return v8::Number::New(isolate, val);
@@ -292,7 +280,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<float>(float val)
+  inline v8::Handle<v8::Value> JSWrapper::CastValue<float>(const float& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     return v8::Number::New(isolate, val);
@@ -300,7 +288,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<bool>(bool val)
+  inline v8::Handle<v8::Value> JSWrapper::CastValue<bool>(const bool& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     return v8::Boolean::New(isolate, val);
@@ -308,30 +296,22 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<std::string>(std::string val)
+  inline v8::Handle<v8::Value> JSWrapper::CastValue<std::string>(const std::string& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     return v8::String::NewFromUtf8(isolate, val.c_str());
   }
 
   //-------------------------------------------------------------------------------------------
-  template<>
-  inline v8::Handle<v8::Value> JSWrapper::CastValue<const char*>(const char* val)
-  {
-    v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
-    return v8::String::NewFromUtf8(isolate, val);
-  }
-
-  //-------------------------------------------------------------------------------------------
   template<typename T>
-  inline void JSWrapper::ReturnValue(T val)
+  inline void JSWrapper::ReturnValue(const T& val)
   {
     args_.GetReturnValue().Set<v8::Value>(JSWrapper::CastValue<T>(val));
   }
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::ReturnValue<v8::Handle<v8::Object>>(v8::Handle<v8::Object> val)
+  inline void JSWrapper::ReturnValue<v8::Handle<v8::Object>>(const v8::Handle<v8::Object>& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     args_.GetReturnValue().Set<v8::Object>(val);
@@ -339,7 +319,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<double>(v8::Handle<v8::Object> obj, std::string field, double val)
+  inline void JSWrapper::SetObjectValue<double>(const v8::Handle<v8::Object>& obj, const std::string& field, const double& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), v8::Number::New(isolate, val));
@@ -347,21 +327,21 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<float>(v8::Handle<v8::Object> obj, std::string field, float val)
+  inline void JSWrapper::SetObjectValue<float>(const v8::Handle<v8::Object>& obj, const std::string& field, const float& val)
   {
     JSWrapper::SetObjectValue<double>(obj, field, val);
   }
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<int>(v8::Handle<v8::Object> obj, std::string field, int val)
+  inline void JSWrapper::SetObjectValue<int>(const v8::Handle<v8::Object>& obj, const std::string& field, const int& val)
   {
     JSWrapper::SetObjectValue<double>(obj, field, val);
   }
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<bool>(v8::Handle<v8::Object> obj, std::string field, bool val)
+  inline void JSWrapper::SetObjectValue<bool>(const v8::Handle<v8::Object>& obj, const std::string& field, const bool& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), v8::Boolean::New(isolate, val));
@@ -369,7 +349,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<std::string>(v8::Handle<v8::Object> obj, std::string field, std::string val)
+  inline void JSWrapper::SetObjectValue<std::string>(const v8::Handle<v8::Object>& obj, const std::string& field, const std::string& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), v8::String::NewFromUtf8(isolate, val.c_str()));
@@ -377,15 +357,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<const char*>(v8::Handle<v8::Object> obj, std::string field, const char* val)
-  {
-    v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
-    obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), v8::String::NewFromUtf8(isolate, val));
-  }
-
-  //-------------------------------------------------------------------------------------------
-  template<>
-  inline void JSWrapper::SetObjectValue<v8::Handle<v8::Value>>(v8::Handle<v8::Object> obj, std::string field, v8::Handle<v8::Value> val)
+  inline void JSWrapper::SetObjectValue<v8::Handle<v8::Value>>(const v8::Handle<v8::Object>& obj, const std::string& field, const v8::Handle<v8::Value>& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), val);

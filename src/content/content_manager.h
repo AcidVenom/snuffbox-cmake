@@ -57,11 +57,11 @@ namespace snuffbox
 
 		/**
 		* @brief Notifies the content manager about a change in content
-		* @param[in] evt (snuffbox::ContentManager::Events) The type of event to be received
-		* @param[in] type (snuffbox::ContentTypes) The type of the file event
-		* @param[in] path (std::string) The path to the file that was changed
+		* @param[in] evt (const ContentManager::Events&) The type of event to be received
+		* @param[in] type (const snuffbox::ContentTypes&) The type of the file event
+		* @param[in] path (const std::string&) The path to the file that was changed
 		*/
-		void Notify(Events evt, ContentTypes type, std::string path);
+		void Notify(const Events& evt, const ContentTypes& type, const std::string& path);
 
 		/**
 		* @brief Loads a given file
@@ -86,24 +86,24 @@ namespace snuffbox
 
 		/**
 		* @brief Watches any file for file changes
-		* @param[in] path (std::string) The path to the file to watch
+		* @param[in] path (const std::string&) The path to the file to watch
 		*/
-		void Watch(std::string path);
+		void Watch(const std::string& path);
 
     /**
     * @brief Retrieves content by name
-    * @param[in] std::string The path to the content to be retrieved
+    * @param[in] path (const std::string&) The path to the content to be retrieved
     * @return T* A pointer to the actual content, or nullptr if not found
     */
 		template<typename T>
-    T* Get(std::string path);
+    T* Get(const std::string& path);
 
     /**
     * @brief Converts a string to a content type
-    * @param[in] type (std::string) The type to convert
+    * @param[in] type (const std::string&) The type to convert
     * @return snuffbox::ContentTypes The converted value
     */
-    static ContentTypes StringToType(std::string type);
+    static ContentTypes StringToType(const std::string& type);
 
 		/// Default destructor
 		~ContentManager();
@@ -119,7 +119,7 @@ namespace snuffbox
 
 	//---------------------------------------------------------------------------------------------------------
 	template<typename T>
-	inline T* ContentManager::Get(std::string path)
+	inline T* ContentManager::Get(const std::string& path)
 	{
 		std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
 

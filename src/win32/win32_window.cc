@@ -113,7 +113,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Win32Window::Win32Window(int x, int y, int w, int h, std::string name) :
+	Win32Window::Win32Window(const int& x, const int& y, const int& w, const int& h, const std::string& name) :
 		x_(x),
 		y_(y),
 		width_(w),
@@ -193,7 +193,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnResize(LPARAM lParam)
+	void Win32Window::OnResize(const LPARAM& lParam)
 	{
 		width_ = LOWORD(lParam);
 		height_ = HIWORD(lParam);
@@ -217,7 +217,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnKeyDown(LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnKeyDown(const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Keyboard::KeyData data;
 		data.evt = Keyboard::KeyEvent::kPressed;
@@ -227,7 +227,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnKeyUp(LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnKeyUp(const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Keyboard::KeyData data;
 		data.evt = Keyboard::KeyEvent::kReleased;
@@ -237,7 +237,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnMouseDown(int button, LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseDown(const int& button, const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Mouse::MouseData data;
 
@@ -250,7 +250,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnMouseUp(int button, LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseUp(const int& button, const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Mouse::MouseData data;
 
@@ -263,7 +263,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnMouseDbl(int button, LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseDbl(const int& button, const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Mouse::MouseData data;
 
@@ -276,7 +276,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnMouseMove(LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseMove(const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Mouse::MouseData data;
 
@@ -288,7 +288,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::OnMouseWheel(LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseWheel(const LPARAM& lParam, const WPARAM& wParam)
 	{
 		Mouse::MouseData data;
 
@@ -300,7 +300,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::SetMousePosition(int x, int y)
+	void Win32Window::SetMousePosition(const int& x, const int& y)
 	{
 		mouse_position_.x = x;
 		mouse_position_.y = y;
@@ -343,13 +343,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::set_width(int w)
+	void Win32Window::set_width(const int& w)
 	{
 		width_ = w;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Win32Window::set_height(int h)
+	void Win32Window::set_height(const int& h)
 	{
 		height_ = h;
 	}

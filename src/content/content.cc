@@ -4,20 +4,20 @@
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	Content::Content(ContentTypes type)
+	Content::Content(const ContentTypes& type)
 		: type_(type)
 	{
 
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void Content::Load(std::string path)
+	void Content::Load(const std::string& path)
 	{
 		SNUFF_LOG_WARNING("Attempted to load '" + path + "', but no load functionality was provided");
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	ContentTypes Content::type()
+	const ContentTypes& Content::type() const
 	{
 		return type_;
 	}

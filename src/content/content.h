@@ -14,19 +14,22 @@ namespace snuffbox
 	class Content
 	{
 	public:
-		/// Default constructor
-		Content(ContentTypes type);
+		/**
+		* @brief Construct by type
+		* @param[in] type (const snuffbox::ContentTypes&) The type to construct with
+		*/
+		Content(const ContentTypes& type);
 
 		/**
 		* @brief Loads this piece of content from a given path
-		* @param[in] path (std::string) The path to the content to load
+		* @param[in] path (const std::string&) The path to the content to load
 		*/
-		virtual void Load(std::string path);
+		virtual void Load(const std::string& path);
 
 		/**
-		* @return snuffbox::ContentTypes The type of this content
+		* @return const snuffbox::ContentTypes& The type of this content
 		*/
-		ContentTypes type();
+		const ContentTypes& type() const;
 
 		/// Default destructor
 		virtual ~Content();

@@ -19,7 +19,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool IOManager::Read(std::string path, std::string* buffer)
+	bool IOManager::Read(const std::string& path, std::string* buffer)
 	{
 		TextFile file;
 		bool success = file.Open(Game::Instance()->path() + "/" + path);
@@ -35,14 +35,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool IOManager::Exists(std::string path)
+	bool IOManager::Exists(const std::string& path)
 	{
 		TextFile file;
 		return file.Open(Game::Instance()->path() + "/" + path);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	bool IOManager::Write(std::string path, std::string src)
+	bool IOManager::Write(const std::string& path, const std::string& src)
 	{
 		TextFile file;
 		return file.Write(Game::Instance()->path() + "/" + path, src);

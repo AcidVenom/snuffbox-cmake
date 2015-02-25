@@ -43,48 +43,48 @@ namespace snuffbox
 
 		/**
 		* @brief Creates the actual context
-		* @param[in] global (v8::Handle<v8::ObjectTemplate>) A handle to the global scope object template
+		* @param[in] global (const v8::Handle<v8::ObjectTemplate>&) A handle to the global scope object template
 		* @return v8::Handle<v8::Context> The created context handle
 		*/
-		v8::Handle<v8::Context> CreateContext(v8::Handle<v8::ObjectTemplate> global);
+		v8::Handle<v8::Context> CreateContext(const v8::Handle<v8::ObjectTemplate>& global);
 
     /**
     * @brief Executes a string within the current JavaScript context
-    * @param[in] src (std::string) The string to execute
-    * @param[in] file (std::string) The file context the snippet will run in
-    * @param[in] log (bool) Should the result be logged to the console?
+    * @param[in] src (const std::string&) The string to execute
+    * @param[in] file (const std::string&) The file context the snippet will run in
+    * @param[in] log (const bool&) Should the result be logged to the console?
     */
-    void Run(std::string src, std::string file, bool log = false);
+		void Run(const std::string& src, const std::string& file, const bool& log = false);
 
 		/**
 		* @brief Compiles JavaScript source code from a file and executes it
-		* @param[in] path (std::string) The source code file to compile and run
-		* @param[in] reloading (bool) Are we reloading? Default = false
+		* @param[in] path (const std::string&) The source code file to compile and run
+		* @param[in] reloading (const bool&) Are we reloading? Default = false
 		*/
-		void CompileAndRun(std::string path, bool reloading = false);
+		void CompileAndRun(const std::string& path, const bool& reloading = false);
 
 		/**
 		* @brief Retrieves the last error from the JavaScript stack
 		* @param[in] try_catch (v8::TryCatch*) The try catch object of V8 that contains the error
-		* @param[in] buffer (std::string*) A buffer to allocate the error message in
+		* @param[out] buffer (std::string*) A buffer to allocate the error message in
 		* @return bool If there was an actual error or not
 		*/
 		bool GetException(v8::TryCatch* try_catch, std::string* buffer);
 
 		/**
 		* @brief Registers a global JavaScript value
-		* @param[in] name (std::string) The name of the value to register
-		* @param[in] value (v8::Handle<v8::Value>) The value to register
+		* @param[in] name (const std::string&) The name of the value to register
+		* @param[in] value (const v8::Handle<v8::Value>&) The value to register
 		*/
-		void RegisterGlobal(std::string name, v8::Handle<v8::Value> value);
+		void RegisterGlobal(const std::string& name, const v8::Handle<v8::Value>& value);
 
 		/**
 		* @brief Registers a JavaScript value to an object
-		* @param[in] obj (v8::Handle<v8::Object>) The object to register to
-		* @param[in] name (std::string) The name of the value to register
-		* @param[in] value (v8::Handle<v8::Value>) The value to register
+		* @param[in] obj (const v8::Handle<v8::Object>&) The object to register to
+		* @param[in] name (const std::string&) The name of the value to register
+		* @param[in] value (const v8::Handle<v8::Value>&) The value to register
 		*/
-		void RegisterToObject(v8::Handle<v8::Object> obj, std::string name, v8::Handle<v8::Value> value);
+		void RegisterToObject(const v8::Handle<v8::Object>& obj, const std::string& name, const v8::Handle<v8::Value>& value);
 
 		/// Destroys the state wrapper and disposes V8
 		void Destroy();

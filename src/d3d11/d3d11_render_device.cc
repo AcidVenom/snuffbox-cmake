@@ -43,7 +43,7 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-	std::string D3D11RenderDevice::HRToString(HRESULT hr, std::string context)
+	std::string D3D11RenderDevice::HRToString(const HRESULT& hr, const std::string& context)
 	{
 		_com_error error(hr);
 		return "(" + context + ") " + error.ErrorMessage();
@@ -56,6 +56,7 @@ namespace snuffbox
     CreateBackBuffer();
     CreateScreenQuad();
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
+		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base2.fx");
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
 		ContentManager::Instance()->Load(ContentTypes::kEffect, "test.effect");
     CreateInputLayout();
@@ -160,6 +161,9 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateScreenQuad()
   {
+		std::vector<int> indices = {
+			0, 1, 2, 3
+		};
     screen_quad_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kScreen);
 		screen_quad_->Create({
 			{ XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
@@ -167,9 +171,7 @@ namespace snuffbox
 			{ XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
 			{ XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
 		}, 
-		{
-			0, 1, 2, 3
-		});
+		indices);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -334,7 +336,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-	void D3D11RenderDevice::ResizeBuffers(int w, int h)
+	void D3D11RenderDevice::ResizeBuffers(const int& w, const int& h)
 	{
 		if (ready_ == false)
 		{
@@ -446,7 +448,7 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-  void D3D11RenderDevice::set_vertex_buffer_type(int type)
+  void D3D11RenderDevice::set_vertex_buffer_type(const int& type)
   {
     vertex_buffer_type_ = type;
   }

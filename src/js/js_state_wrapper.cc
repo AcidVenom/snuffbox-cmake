@@ -75,13 +75,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Handle<Context> JSStateWrapper::CreateContext(Handle<ObjectTemplate> global)
+	Handle<Context> JSStateWrapper::CreateContext(const Handle<ObjectTemplate>& global)
 	{
 		return Context::New(isolate_, NULL, global);
 	}
 
   //-------------------------------------------------------------------------------------------
-  void JSStateWrapper::Run(std::string src, std::string file, bool log)
+  void JSStateWrapper::Run(const std::string& src, const std::string& file, const bool& log)
   {
     HandleScope scope(isolate_);
 
@@ -114,7 +114,7 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void JSStateWrapper::CompileAndRun(std::string path, bool reloading)
+	void JSStateWrapper::CompileAndRun(const std::string& path, const bool& reloading)
 	{
 		HandleScope handle_scope(isolate_);
 
@@ -182,14 +182,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void JSStateWrapper::RegisterGlobal(std::string name, Handle<Value> value)
+	void JSStateWrapper::RegisterGlobal(const std::string& name, const Handle<Value>& value)
 	{
 		Local<Object> global = Local<Context>::New(isolate_, context_)->Global();
 		global->Set(String::NewFromUtf8(isolate_, name.c_str()), value);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void JSStateWrapper::RegisterToObject(Handle<Object> obj, std::string name, Handle<Value> value)
+	void JSStateWrapper::RegisterToObject(const Handle<Object>& obj, const std::string& name, const Handle<Value>& value)
 	{
 		obj->Set(String::NewFromUtf8(isolate_, name.c_str()), value);
 	}

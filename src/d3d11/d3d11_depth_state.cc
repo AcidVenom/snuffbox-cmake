@@ -11,7 +11,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11DepthState::Create(D3D11_DEPTH_STENCIL_DESC desc)
+	void D3D11DepthState::Create(const D3D11_DEPTH_STENCIL_DESC& desc)
 	{
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		ID3D11Device* device = render_device->device();
@@ -23,7 +23,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11DepthState::CreateFromJson(std::string str)
+	void D3D11DepthState::CreateFromJson(const std::string& str)
 	{
 		JSStateWrapper* wrapper = JSStateWrapper::Instance();
 		HandleScope scope(wrapper->isolate());
@@ -52,10 +52,11 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11DepthState::CreateFromJson(Local<Object> obj)
+	void D3D11DepthState::CreateFromJson(const Local<Object>& obj)
 	{
 		if (obj.IsEmpty())
 		{
+			CreateFromJson(std::string("{}"));
 			return;
 		}
 		Local<Array> properties = obj->GetPropertyNames();
@@ -168,7 +169,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	D3D11_STENCIL_OP D3D11DepthState::StringToOp(std::string str)
+	D3D11_STENCIL_OP D3D11DepthState::StringToOp(const std::string& str)
 	{
 		if (str == "Keep")
 		{
@@ -210,7 +211,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	D3D11_DEPTH_WRITE_MASK D3D11DepthState::StringToWriteMask(std::string str)
+	D3D11_DEPTH_WRITE_MASK D3D11DepthState::StringToWriteMask(const std::string& str)
 	{
 		if (str == "All")
 		{
@@ -228,7 +229,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	D3D11_COMPARISON_FUNC D3D11DepthState::StringToComparison(std::string str)
+	D3D11_COMPARISON_FUNC D3D11DepthState::StringToComparison(const std::string& str)
 	{
 		if (str == "Never")
 		{

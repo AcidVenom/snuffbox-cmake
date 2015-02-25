@@ -32,7 +32,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Keyboard::Notify(KeyData data)
+	void Keyboard::Notify(const KeyData& data)
 	{
 		queue_.push(data);
 	}
@@ -70,19 +70,19 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Keyboard::IsPressed(Key::Keys key) const
+	const bool& Keyboard::IsPressed(const Key::Keys& key) const
 	{
 		return states_[key].pressed;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Keyboard::IsDown(Key::Keys key) const
+	const bool& Keyboard::IsDown(const Key::Keys& key) const
 	{
 		return states_[key].down;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const bool& Keyboard::IsReleased(Key::Keys key) const
+	const bool& Keyboard::IsReleased(const Key::Keys& key) const
 	{
 		return states_[key].released;
 	}

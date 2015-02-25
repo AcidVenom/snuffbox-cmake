@@ -3,8 +3,8 @@
 #include <v8.h>
 #include "../js/js_wrapper.h"
 
-#define JS_SINGLETON v8::Handle<v8::Object>
-#define JS_CONSTRUCTABLE v8::Handle<v8::ObjectTemplate>
+#define JS_SINGLETON const v8::Handle<v8::Object>&
+#define JS_CONSTRUCTABLE const v8::Handle<v8::ObjectTemplate>&
 #define JS_NAME(name) static const char* js_name(){ return ##name; }
 
 namespace snuffbox

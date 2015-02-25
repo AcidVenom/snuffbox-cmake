@@ -18,13 +18,13 @@ namespace snuffbox
 	public:
 		/**
 		* @brief Construct with given parameters
-		* @param[in] x (int) The x position of the window
-		* @param[in] y (int) The y position of the window
-		* @param[in] w (int) The width of the window
-		* @param[in] h (int) The height of the window
-		* @param[in] name (std::string) The name of the window
+		* @param[in] x (const int&) The x position of the window
+		* @param[in] y (const int&) The y position of the window
+		* @param[in] w (const int&) The width of the window
+		* @param[in] h (const int&) The height of the window
+		* @param[in] name (const std::string&) The name of the window
 		*/
-		Window(int x, int y, int w, int h, std::string name) :
+		Window(const int& x, const int& y, const int& w, const int& h, const std::string& name) :
 			PlatformWindow(x, y, w, h, name)
 		{
 
