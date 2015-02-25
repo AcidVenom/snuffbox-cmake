@@ -45,6 +45,12 @@ namespace snuffbox
 		*/
 		void Load(std::string path);
 
+		/**
+		* @brief Applies this effect
+		* @param[in] tech std::string The name of the technique to apply
+		*/
+		void Apply(std::string tech);
+
 		/// Default destructor
 		~D3D11Effect();
 

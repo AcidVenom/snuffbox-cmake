@@ -112,6 +112,29 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11Effect::Apply(std::string tech)
+	{
+		std::map<std::string, Technique>::iterator it = techniques_.find(tech);
+
+		if (it != techniques_.end())
+		{
+			Technique& technique = it->second;
+			std::vector<Pass>& passes = technique.passes;
+
+			for (Pass& pass : passes)
+			{
+				pass.shader->Set();
+				pass.blend_state->Set();
+				pass.depth_state->Set();
+			}
+
+			return;
+		}
+		
+		SNUFF_LOG_WARNING("Technique with name '" + tech + "' does not exist in the effect");
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11Effect::~D3D11Effect()
 	{
 
