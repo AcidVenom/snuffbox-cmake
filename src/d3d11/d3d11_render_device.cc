@@ -9,6 +9,7 @@
 #include "../d3d11/d3d11_constant_buffer.h"
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_blend_state.h"
+#include "../d3d11/d3d11_depth_state.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -28,7 +29,8 @@ namespace snuffbox
 		device_(nullptr),
 		context_(nullptr),
     vertex_buffer_type_(-1),
-		camera_(nullptr)
+		camera_(nullptr),
+		depth_stencil_view_(nullptr)
 	{
 
 	}
@@ -55,6 +57,7 @@ namespace snuffbox
     CreateScreenQuad();
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
+		ContentManager::Instance()->Load(ContentTypes::kEffect, "test.effect");
     CreateInputLayout();
     CreateBaseViewport();
 
@@ -68,24 +71,18 @@ namespace snuffbox
 
     default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 
-    D3D11_BLEND_DESC blend_desc;
-
-    blend_desc.AlphaToCoverageEnable = false;
-    blend_desc.IndependentBlendEnable = false;
-    blend_desc.RenderTarget[0].BlendEnable = true;
-    blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-    blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-    blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-    default_blend_state_->Create(blend_desc);
+		default_blend_state_->CreateFromJson(std::string("{}"));
     default_blend_state_->Set();
+
+		default_depth_state_ = AllocatedMemory::Instance().Construct<D3D11DepthState>();
+
+		default_depth_state_->CreateFromJson(std::string("{}"));
+		default_depth_state_->Set();
 
 		global_buffer_->Create();
 		per_object_buffer_->Create();
+
+		CreateDepthStencilView();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -212,6 +209,33 @@ namespace snuffbox
     viewport_->Set();
   }
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::CreateDepthStencilView()
+	{
+		HRESULT result = S_OK;
+
+		D3D11_TEXTURE2D_DESC tex_desc;
+		DXGI_SWAP_CHAIN_DESC sc_desc;
+		swap_chain_->GetDesc(&sc_desc);
+
+		tex_desc.Width = sc_desc.BufferDesc.Width;
+		tex_desc.Height = sc_desc.BufferDesc.Height;
+		tex_desc.MipLevels = 1;
+		tex_desc.ArraySize = 1;
+		tex_desc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		tex_desc.SampleDesc.Count = 1;
+		tex_desc.SampleDesc.Quality = 0;
+		tex_desc.Usage = D3D11_USAGE_DEFAULT;
+		tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		tex_desc.CPUAccessFlags = 0;
+		tex_desc.MiscFlags = 0;
+
+		result = device_->CreateTexture2D(&tex_desc, NULL, &depth_stencil_buffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result, "CreateTexture2D"), "D3D11RenderDevice::CreateDepthStencilView");
+		result = device_->CreateDepthStencilView(depth_stencil_buffer_, NULL, &depth_stencil_view_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result, "CreateDepthStencilView"), "D3D11RenderDevice::CreateDepthStencilView");
+	}
+
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::FindAdapter()
 	{
@@ -270,6 +294,7 @@ namespace snuffbox
 		global_buffer_->Set(0);
 		
 		back_buffer_->Clear(context_);
+		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
     {
@@ -290,7 +315,8 @@ namespace snuffbox
 		D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
 		shader->Set();
     target->Clear(context_);
-    target->Set(context_);
+		default_depth_state_->Set();
+    target->Set(context_, camera_->type() == D3D11Camera::CameraTypes::kPerspective ? depth_stencil_view_ : nullptr);
     target->Draw(context_);
 
 		shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/post_processing.fx");
@@ -302,6 +328,7 @@ namespace snuffbox
     ID3D11ShaderResourceView* resource = target->resource();
     context_->PSSetShaderResources(0, 1, &resource);
     default_blend_state_->Set();
+		context_->OMSetDepthStencilState(NULL, 1);
 
     screen_quad_->Draw();
   }
@@ -317,12 +344,15 @@ namespace snuffbox
 		ready_ = false;
 
 		back_buffer_->Release();
+		depth_stencil_view_->Release();
+		depth_stencil_buffer_->Release();
 
 		HRESULT result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "ResizeBuffers"), "D3D11RenderDevice::ResizeBuffers");
 
 		CreateBackBuffer();
 		CreateBaseViewport();
+		CreateDepthStencilView();
 
 		ready_ = true;
 	}
@@ -336,6 +366,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(swap_chain_, "D3D11RenderDevice::Dispose::swap_chain_");
 		SNUFF_SAFE_RELEASE(device_, "D3D11RenderDevice::Dispose::device_");
 		SNUFF_SAFE_RELEASE(context_, "D3D11RenderDevice::Dispose::context_");
+		SNUFF_SAFE_RELEASE(depth_stencil_view_, "D3D11RenderDevice::Dispose::depth_stencil_view_");
+		SNUFF_SAFE_RELEASE(depth_stencil_buffer_, "D3D11RenderDevice::Dispose::depth_stencil_buffer_");
 
 		SNUFF_LOG_INFO("Disposed the Direct3D 11 render device");
 	}

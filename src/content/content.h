@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace snuffbox
 {
 	enum ContentTypes;
@@ -14,6 +16,12 @@ namespace snuffbox
 	public:
 		/// Default constructor
 		Content(ContentTypes type);
+
+		/**
+		* @brief Loads this piece of content from a given path
+		* @param[in] path (std::string) The path to the content to load
+		*/
+		virtual void Load(std::string path);
 
 		/**
 		* @return snuffbox::ContentTypes The type of this content

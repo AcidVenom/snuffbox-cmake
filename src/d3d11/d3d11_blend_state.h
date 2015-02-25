@@ -21,11 +21,17 @@ namespace snuffbox
     */
     void Create(D3D11_BLEND_DESC desc);
 
+		/**
+		* @brief Creates the blend state from a JSON
+		* @param[in] json (v8::Local<v8::Object>) The JSON value
+		*/
+		void CreateFromJson(v8::Local<v8::Object> json);
+
     /**
     * @brief Creates the blend state from a JSON
-    * @param[in] json_string (std::string) The JSON string
+    * @param[in] str (std::string) The JSON stringified
     */
-    void CreateFromJson(std::string json_string);
+    void CreateFromJson(std::string str);
 
     /// Sets this blend state
     void Set();

@@ -25,6 +25,7 @@ namespace snuffbox
 	class D3D11ConstantBuffer;
 	class D3D11Camera;
   class D3D11BlendState;
+	class D3D11DepthState;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -68,6 +69,8 @@ namespace snuffbox
 
     /// Creates the base viewport
     void CreateBaseViewport();
+
+		void CreateDepthStencilView();
 
 		/// Finds the default adapter to use
 		void FindAdapter();
@@ -176,5 +179,9 @@ namespace snuffbox
 		SharedPtr<D3D11ConstantBuffer> per_object_buffer_; //!< The per-object constant buffer
 
     SharedPtr<D3D11BlendState> default_blend_state_; //!< The default blend state
+
+		SharedPtr<D3D11DepthState> default_depth_state_; //!< The default depth state
+		ID3D11DepthStencilView* depth_stencil_view_; //!< The depth stencil view
+		ID3D11Texture2D* depth_stencil_buffer_; //!< The actual depth stencil texture
 	};
 }

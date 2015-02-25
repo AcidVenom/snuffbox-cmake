@@ -25,27 +25,40 @@ namespace snuffbox
     valid_ = true;
   }
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11BlendState::CreateFromJson(std::string str)
+	{
+		JSStateWrapper* wrapper = JSStateWrapper::Instance();
+		HandleScope scope(wrapper->isolate());
+
+		TryCatch try_catch;
+		Local<Value> json = JSON::Parse(String::NewFromUtf8(wrapper->isolate(), str.c_str()));
+
+		if (json.IsEmpty())
+		{
+			std::string buffer;
+			JSStateWrapper::Instance()->GetException(&try_catch, &buffer);
+
+			SNUFF_LOG_ERROR(buffer);
+			SNUFF_LOG_ERROR("Invalid JSON for blend state");
+			return;
+		}
+		if (json->IsObject() == false)
+		{
+			SNUFF_LOG_ERROR("Input JSON is not of an object type for a blend state");
+			return;
+		}
+
+		CreateFromJson(json->ToObject());
+	}
+
   //-------------------------------------------------------------------------------------------
-  void D3D11BlendState::CreateFromJson(std::string json_string)
+  void D3D11BlendState::CreateFromJson(Local<Object> obj)
   {
-    JSStateWrapper* wrapper = JSStateWrapper::Instance();
-    HandleScope scope(wrapper->isolate());
-    Local<Value> json = JSON::Parse(String::NewFromUtf8(wrapper->isolate(), json_string.c_str()));
-
-    if (json.IsEmpty())
-    {
-      
-      SNUFF_LOG_ERROR("Invalid JSON");
-      return;
-    }
-    if (json->IsObject() == false)
-    {
-      SNUFF_LOG_ERROR("Input JSON is not of an object type for a blend state");
-      return;
-    }
-
-    Local<Object> obj = json->ToObject();
-
+		if (obj.IsEmpty())
+		{
+			return;
+		}
     Local<Array> properties = obj->GetPropertyNames();
 
     std::string field;
@@ -55,6 +68,7 @@ namespace snuffbox
 
     desc.AlphaToCoverageEnable = false;
     desc.IndependentBlendEnable = false;
+		desc.RenderTarget[0].BlendEnable = true;
     desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
     desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
     desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;

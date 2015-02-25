@@ -18,6 +18,7 @@ namespace snuffbox
 		kScript,
 		kTexture,
 		kShader,
+		kEffect,
 		kMaterial,
 		kModel,
 		kSound,

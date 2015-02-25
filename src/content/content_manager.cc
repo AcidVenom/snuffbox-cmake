@@ -4,6 +4,9 @@
 #include "../platform/platform_file_watch.h"
 
 #include "../d3d11/d3d11_shader.h"
+#include "../d3d11/d3d11_effect.h"
+#include "../d3d11/d3d11_blend_state.h"
+#include "../d3d11/d3d11_depth_state.h"
 
 namespace snuffbox
 {
@@ -45,19 +48,24 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::Load(const ContentTypes& type, const std::string& path)
 	{
-		if (type == ContentTypes::kScript)
+		if (type != ContentTypes::kScript)
 		{
-			SNUFF_LOG_INFO("Loaded JavaScript file '" + path + "'");
-		}
-    else if (type == ContentTypes::kShader)
-    {
-      SharedPtr<Content> shader = AllocatedMemory::Instance().Construct<D3D11Shader>();
-      static_cast<D3D11Shader*>(shader.get())->Load(path);
+			SharedPtr<Content> content;
+			
+			if (type == ContentTypes::kShader)
+			{
+				content = AllocatedMemory::Instance().Construct<D3D11Shader>();
+			}
+			else if (type == ContentTypes::kEffect)
+			{
+				content = AllocatedMemory::Instance().Construct<D3D11Effect>();
+			}
 
-      loaded_content_.emplace(path, shader);
-      SNUFF_LOG_INFO("Loaded shader file '" + path + "'");
+			content->Load(path);
+      loaded_content_.emplace(path, content);
     }
 
+		SNUFF_LOG_INFO("Loaded file '" + path + "'");
 		FileWatch::Instance()->Add(path, type);
 	}
 
@@ -66,21 +74,16 @@ namespace snuffbox
 	{
 		if (type == ContentTypes::kScript)
 		{
-			SNUFF_LOG_INFO("Hot reloaded JavaScript file '" + path + "'");
+			SNUFF_LOG_INFO("Hot reloaded script '" + path + "'");
 			JSStateWrapper::Instance()->CompileAndRun(path, true);
-			return;
 		}
-    else if (type == ContentTypes::kShader)
-    {
-      static_cast<D3D11Shader*>(loaded_content_.find(path)->second.get())->Load(path);
-      SNUFF_LOG_INFO("Hot reloaded shader file '" + path + "'");
-      return;
-    }
 		else if (type == ContentTypes::kCustom)
 		{
 			SNUFF_LOG_INFO("Hot reloaded custom file '" + path + "'");
-			return;
 		}
+
+		loaded_content_.find(path)->second->Load(path);
+		SNUFF_LOG_INFO("Hot reloaded file '" + path + "'");
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -114,6 +117,10 @@ namespace snuffbox
     {
       return ContentTypes::kShader;
     }
+		else if (type == "effect")
+		{
+			return ContentTypes::kEffect;
+		}
     else if (type == "material")
     {
       return ContentTypes::kMaterial;
