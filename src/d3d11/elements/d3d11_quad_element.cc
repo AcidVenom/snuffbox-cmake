@@ -10,7 +10,8 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  D3D11Quad::D3D11Quad(JS_ARGS args)
+  D3D11Quad::D3D11Quad(JS_ARGS args) :
+		D3D11RenderElement(args)
   {
     Create();
   }

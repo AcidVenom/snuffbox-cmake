@@ -10,6 +10,7 @@
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_blend_state.h"
 #include "../d3d11/d3d11_depth_state.h"
+#include "../d3d11/d3d11_effect.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -55,13 +56,20 @@ namespace snuffbox
     CreateDevice();
     CreateBackBuffer();
     CreateScreenQuad();
-    ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
-    ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
+
+		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
+		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
+
     CreateInputLayout();
     CreateBaseViewport();
 
     sampler_linear_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kLinear);
-    sampler_point_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kPoint);
+		sampler_anisotropic_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kAnisotropic);
+		sampler_point_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kPoint);
+
+		set_textures_[0] = nullptr;
+		set_textures_[1] = nullptr;
+		set_textures_[2] = nullptr;
 
     sampler_linear_->Set();
 
@@ -330,7 +338,37 @@ namespace snuffbox
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
-    screen_quad_->Draw();
+		D3D11Effect* effect = target->post_processing();
+
+		if (effect != nullptr && effect->is_valid())
+		{
+			const std::string& technique = target->technique();
+			unsigned int n_pass = effect->NumPasses(technique);
+
+			if (n_pass > 0)
+			{
+				for (unsigned int i = 0; i < n_pass; ++i)
+				{
+					effect->Apply(technique, i);
+					screen_quad_->Draw();
+				}
+			}
+			else
+			{
+				screen_quad_->Draw();
+			}
+		}
+		else
+		{
+			target->set_post_processing(nullptr);
+			screen_quad_->Draw();
+		}
+
+		set_textures_[0] = nullptr;
+		set_textures_[1] = nullptr;
+		set_textures_[2] = nullptr;
+
+		current_shader_ = nullptr;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -353,6 +391,11 @@ namespace snuffbox
 		CreateBackBuffer();
 		CreateBaseViewport();
 		CreateDepthStencilView();
+
+		for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+		{
+			it->second->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, swap_chain_, device_);
+		}
 
 		ready_ = true;
 	}
@@ -445,6 +488,18 @@ namespace snuffbox
 		return camera_;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Texture** D3D11RenderDevice::set_textures()
+	{
+		return set_textures_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Shader* D3D11RenderDevice::current_shader()
+	{
+		return current_shader_;
+	}
+
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(const int& type)
   {
@@ -455,6 +510,12 @@ namespace snuffbox
 	void D3D11RenderDevice::set_camera(D3D11Camera* camera)
 	{
 		camera_ = camera;
+	}
+	
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::set_current_shader(D3D11Shader* shader)
+	{
+		current_shader_ = shader;
 	}
 
   //-------------------------------------------------------------------------------------------

@@ -7,6 +7,8 @@
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_blend_state.h"
 #include "../d3d11/d3d11_depth_state.h"
+#include "../d3d11/d3d11_texture.h"
+#include "../d3d11/d3d11_material.h"
 
 namespace snuffbox
 {
@@ -69,7 +71,19 @@ namespace snuffbox
 			{
 				content = AllocatedMemory::Instance().Construct<D3D11Effect>();
 			}
-
+			else if (type == ContentTypes::kTexture)
+			{
+				content = AllocatedMemory::Instance().Construct<D3D11Texture>();
+			}
+			else if (type == ContentTypes::kMaterial)
+			{
+				content = AllocatedMemory::Instance().Construct<D3D11Material>();
+			}
+			else
+			{
+				SNUFF_LOG_WARNING("No content loader was specified for the content type of '" + path + "'");
+				return;
+			}
 			content->Load(path);
 			content->Validate();
       loaded_content_.emplace(path, content);

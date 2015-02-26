@@ -95,7 +95,7 @@ namespace snuffbox
 
     if (topology != topology_)
     {
-      ctx->IASetPrimitiveTopology(topology);
+      ctx->IASetPrimitiveTopology(topology_);
     }
   }
 

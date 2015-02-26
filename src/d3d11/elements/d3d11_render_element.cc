@@ -3,6 +3,7 @@
 #include "../../d3d11/d3d11_render_target.h"
 #include "../../d3d11/d3d11_render_queue.h"
 #include "../../d3d11/d3d11_effect.h"
+#include "../../d3d11/d3d11_material.h"
 
 #include "../../content/content_manager.h"
 
@@ -19,11 +20,42 @@ namespace snuffbox
 		spawned_(false),
 		alpha_(1.0f),
 		blend_(1.0f, 1.0f, 1.0f),
-		effect_(nullptr),
+		material_(nullptr),
 		technique_("Default")
   {
 
   }
+
+	//-------------------------------------------------------------------------------------------
+	D3D11RenderElement::D3D11RenderElement(JS_ARGS args) :
+		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		scale_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
+		offset_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		size_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		world_matrix_(XMMatrixIdentity()),
+		spawned_(false),
+		alpha_(1.0f),
+		blend_(1.0f, 1.0f, 1.0f),
+		material_(nullptr),
+		technique_("Default")
+	{
+		JSWrapper wrapper(args);
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("O") == false)
+		{
+			set_parent(nullptr);
+			return;
+		}
+
+		wrapper.set_error_checks(true);
+
+		if (wrapper.Check("O"))
+		{
+			set_parent(wrapper.GetPointer<D3D11RenderElement>(0));
+		}
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::Spawn(const std::string& target)
@@ -52,26 +84,6 @@ namespace snuffbox
   {
     rotation_ += XMVectorSet(x, y, z, 0.0f);
   }
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::ApplyEffect(const unsigned int& pass)
-	{
-		if (effect_ != nullptr)
-		{
-			effect_->Apply(technique_, pass);
-		}
-	}
-
-	//-------------------------------------------------------------------------------------------
-	unsigned int D3D11RenderElement::NumPasses()
-	{
-		if (effect_ != nullptr)
-		{
-			return effect_->NumPasses(technique_);
-		}
-
-		return 0;
-	}
 
   //-------------------------------------------------------------------------------------------
   const XMVECTOR& D3D11RenderElement::translation() const
@@ -106,11 +118,39 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   const XMMATRIX& D3D11RenderElement::world_matrix()
   {
-    world_matrix_ =
-    XMMatrixScalingFromVector(scale_) * 
-    XMMatrixTranslationFromVector(offset_) * 
-    XMMatrixRotationRollPitchYawFromVector(rotation_) * 
-    XMMatrixTranslationFromVector(translation_);
+		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
+		world_matrix_ =
+			XMMatrixScalingFromVector(scale_) *
+			XMMatrixTranslationFromVector(offset_ * scale_) *
+			XMMatrixRotationRollPitchYawFromVector(rotation_) *
+			trans;
+
+		if (parent_ != nullptr)
+		{
+			D3D11RenderElement* parent = parent_;
+			XMVECTOR t = XMVectorSet(0, 0, 0, 0);
+			XMMATRIX rot = XMMatrixIdentity();
+			XMMATRIX s = XMMatrixIdentity();
+
+			while (parent->parent() != nullptr)
+			{
+				t += parent->translation();
+				rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
+				s *= XMMatrixScalingFromVector(parent->scale());
+				parent = parent->parent();
+			}
+
+			XMVectorSetW(t, 1.0f);
+
+			XMMATRIX parent_trans = XMMatrixTranslationFromVector(t);
+			XMMATRIX root_trans = XMMatrixTranslationFromVector(parent->translation());
+
+			world_matrix_ *= 
+				s * rot * parent_trans * 
+				XMMatrixScalingFromVector(parent->scale()) * 
+				XMMatrixRotationRollPitchYawFromVector(parent->rotation()) * 
+				root_trans;
+		}
 
     return world_matrix_;
   }
@@ -134,15 +174,21 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	D3D11Effect* D3D11RenderElement::effect()
+	D3D11Material* D3D11RenderElement::material()
 	{
-		return effect_;
+		return material_;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	const std::string& D3D11RenderElement::technique()
 	{
 		return technique_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11RenderElement* D3D11RenderElement::parent()
+	{
+		return parent_;
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -190,21 +236,27 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::set_effect(const std::string& path)
+	void D3D11RenderElement::set_material(const std::string& path)
 	{
-		effect_ = ContentManager::Instance()->Get<D3D11Effect>(path);
+		material_ = ContentManager::Instance()->Get<D3D11Material>(path);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::set_effect(D3D11Effect* effect)
+	void D3D11RenderElement::set_material(D3D11Material* effect)
 	{
-		effect_ = effect;
+		material_ = effect;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_technique(const std::string& technique)
 	{
 		technique_ = technique;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_parent(D3D11RenderElement* parent)
+	{
+		parent_ = parent;
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -233,7 +285,7 @@ namespace snuffbox
       { "alpha", JSAlpha },
       { "setBlend", JSSetBlend },
       { "blend", JSBlend },
-			{ "setEffect", JSSetEffect },
+			{ "setMaterial", JSSetMaterial },
 			{ "setTechnique", JSSetTechnique },
       { "spawn", JSSpawn },
 			{ "spawned", JSSpawned },
@@ -478,14 +530,14 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::JSSetEffect(JS_ARGS args)
+	void D3D11RenderElement::JSSetMaterial(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
 		if (wrapper.Check("S"))
 		{
-			self->set_effect(wrapper.GetValue<std::string>(0, "undefined"));
+			self->set_material(wrapper.GetValue<std::string>(0, "undefined"));
 		}
 	}
 
@@ -498,6 +550,27 @@ namespace snuffbox
 		if (wrapper.Check("S"))
 		{
 			self->set_technique(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetParent(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("O") == false)
+		{
+			self->set_parent(nullptr);
+		}
+
+		wrapper.set_error_checks(true);
+
+		if (wrapper.Check("O"))
+		{
+			self->set_parent(wrapper.GetPointer<D3D11RenderElement>(0));
 		}
 	}
 

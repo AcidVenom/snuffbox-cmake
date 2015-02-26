@@ -23,8 +23,11 @@ namespace snuffbox
 
     switch (type)
     {
-    case SamplerTypes::kLinear:
-      desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		case SamplerTypes::kLinear:
+			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			break;
+    case SamplerTypes::kAnisotropic:
+      desc.Filter = D3D11_FILTER_ANISOTROPIC;
       break;
     case SamplerTypes::kPoint:
       desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;

@@ -1,5 +1,8 @@
 #include "../d3d11/d3d11_render_target.h"
 #include "../d3d11/d3d11_render_queue.h"
+#include "../d3d11/d3d11_effect.h"
+
+#include "../content/content_manager.h"
 
 #include "../application/logging.h"
 
@@ -11,7 +14,9 @@ namespace snuffbox
 		name_(name),
 		buffer_(nullptr),
 		view_(nullptr),
-		resource_(nullptr)
+		resource_(nullptr),
+		post_processing_(nullptr),
+		technique_("Default")
 	{
     
 	}
@@ -21,7 +26,9 @@ namespace snuffbox
 		valid_(false),
 		buffer_(nullptr),
 		view_(nullptr),
-		resource_(nullptr)
+		resource_(nullptr),
+		post_processing_(nullptr),
+		technique_("Default")
 	{
 		JSWrapper wrapper(args);
 		
@@ -40,6 +47,16 @@ namespace snuffbox
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		HRESULT result = S_OK;
 
+		if (buffer_ != nullptr)
+		{
+			SNUFF_SAFE_RELEASE(buffer_, "D3D11RenderTarget::Create::buffer_");
+		}
+
+		if (view_ != nullptr)
+		{
+			SNUFF_SAFE_RELEASE(view_, "D3D11RenderTarget::Create::view_");
+		}
+
 		if (type == RenderTargets::kBackBuffer)
 		{
 			name_ = "Backbuffer";
@@ -53,6 +70,11 @@ namespace snuffbox
 		}
 		else if (type == RenderTargets::kRenderTarget)
 		{
+			if (resource_ != nullptr)
+			{
+				SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::Create::resource_");
+			}
+
 			HRESULT result = S_OK;
 
 			D3D11_TEXTURE2D_DESC desc;
@@ -198,6 +220,36 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------------------------------
+	D3D11Effect* D3D11RenderTarget::post_processing()
+	{
+		return post_processing_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const std::string& D3D11RenderTarget::technique()
+	{
+		return technique_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::set_post_processing(const std::string& path)
+	{
+		post_processing_ = ContentManager::Instance()->Get<D3D11Effect>(path);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::set_post_processing(D3D11Effect* effect)
+	{
+		post_processing_ = effect;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::set_technique(const std::string& technique)
+	{
+		technique_ = technique;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderTarget::~D3D11RenderTarget()
 	{
 		Release();
@@ -207,7 +259,9 @@ namespace snuffbox
 	void D3D11RenderTarget::RegisterJS(JS_CONSTRUCTABLE obj)
 	{
 		JSFunctionRegister funcs[] = {
-			{ "clear", JSClear }
+			{ "clear", JSClear },
+			{ "setPostProcessing", JSSetPostProcessing },
+			{ "setTechnique", JSSetTechnique }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -220,5 +274,29 @@ namespace snuffbox
 		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
 
 		self->Clear();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSSetPostProcessing(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		if (wrapper.Check("S"))
+		{
+			self->set_post_processing(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSSetTechnique(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		if (wrapper.Check("S"))
+		{
+			self->set_technique(wrapper.GetValue<std::string>(0, "undefined"));
+		}
 	}
 }

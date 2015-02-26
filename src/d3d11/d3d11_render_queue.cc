@@ -4,6 +4,7 @@
 #include "../d3d11/d3d11_constant_buffer.h"
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_effect.h"
+#include "../d3d11/d3d11_material.h"
 
 #include <algorithm>
 
@@ -86,29 +87,43 @@ namespace snuffbox
     D3D11VertexBuffer* buffer = element->vertex_buffer();
     buffer->Set();
 
-		if (element->effect() != nullptr && element->effect()->is_valid() == true)
+		D3D11Material* material = element->material();
+		if (material != nullptr && material->is_valid() == true)
 		{
-			unsigned int n_pass = element->NumPasses();
+			material->Apply();
+			D3D11Effect* effect = material->effect();
 
-			if (n_pass > 0)
+			if (effect != nullptr && effect->is_valid() == true)
 			{
-				for (unsigned int i = 0; i < n_pass; ++i)
-				{
-					element->ApplyEffect(i);
+				unsigned int n_pass = effect->NumPasses(element->technique());
 
+				if (n_pass > 0)
+				{
+					for (unsigned int i = 0; i < n_pass; ++i)
+					{
+						effect->Apply(element->technique(), i);
+
+						buffer->Draw();
+					}
+				}
+				else
+				{
 					buffer->Draw();
 				}
 			}
 			else
 			{
-				buffer->Draw();
+				if (effect != nullptr)
+				{
+					material->set_effect(nullptr);
+				}
 			}
 		}
 		else
 		{
-			if (element->effect() != nullptr)
+			if (material != nullptr)
 			{
-				element->set_effect(nullptr);
+				element->set_material(nullptr);
 			}
 			buffer->Draw();
 		}

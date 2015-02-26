@@ -26,6 +26,9 @@ namespace snuffbox
 	class D3D11Camera;
   class D3D11BlendState;
 	class D3D11DepthState;
+	class D3D11Texture;
+	class D3D11Effect;
+	class D3D11Shader;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -137,6 +140,16 @@ namespace snuffbox
 		*/
 		D3D11Camera* camera();
 
+		/**
+		* @return snuffbox::D3D11Texture** The currently set textures
+		*/
+		D3D11Texture** set_textures();
+
+		/**
+		* @return snuffbox::D3D11Shader* The currently set shader
+		*/
+		D3D11Shader* current_shader();
+
     /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (const int&) The type to set
@@ -148,6 +161,12 @@ namespace snuffbox
 		* @param[in] camera snuffbox::D3D11Camera* The pointer to the camera
 		*/
 		void set_camera(D3D11Camera* camera);
+
+		/**
+		* @brief Sets the current shader
+		* @param[in] snuffbox::D3D11Shader* The shader to set
+		*/
+		void set_current_shader(D3D11Shader* shader);
 
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
@@ -171,6 +190,7 @@ namespace snuffbox
     SharedPtr<D3D11Viewport> viewport_; //!< The base viewport
 
     SharedPtr<D3D11SamplerState> sampler_linear_; //!< The linear sampler state
+		SharedPtr<D3D11SamplerState> sampler_anisotropic_; //!< The anisotropic sampler state
     SharedPtr<D3D11SamplerState> sampler_point_; //!< The point sampler state
 
 		D3D11Camera* camera_; //!< The current camera
@@ -183,5 +203,8 @@ namespace snuffbox
 		SharedPtr<D3D11DepthState> default_depth_state_; //!< The default depth state
 		ID3D11DepthStencilView* depth_stencil_view_; //!< The depth stencil view
 		ID3D11Texture2D* depth_stencil_buffer_; //!< The actual depth stencil texture
+
+		D3D11Texture* set_textures_[3]; //!< The currently set textures
+		D3D11Shader* current_shader_; //!< The currently set shaders
 	};
 }

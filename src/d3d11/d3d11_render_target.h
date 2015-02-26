@@ -97,6 +97,34 @@ namespace snuffbox
     */
     D3D11RenderQueue* queue();
 
+		/**
+		* @return snuffbox::D3D11Effect* The post-processing effect of this render target
+		*/
+		D3D11Effect* post_processing();
+
+		/**
+		* @return const std::string& The technique currently in use by this render target
+		*/
+		const std::string& technique();
+
+		/**
+		* @brief Sets the post processing effect of this render target
+		* @param[in] path (const std::string&) The path to the effect file
+		*/
+		void set_post_processing(const std::string& path);
+
+		/**
+		* @brief Sets the post processing effect of this render target
+		* @param[in] effect (snuffbox::D3D11Effect*) The pointer to the effect to set
+		*/
+		void set_post_processing(D3D11Effect* effect);
+
+		/**
+		* @brief Sets the technique of this render target
+		* @param[in] technique (const std::string&) The technique to set
+		*/
+		void set_technique(const std::string& technique);
+
 		/// Default destructor
 		virtual ~D3D11RenderTarget();
 
@@ -108,10 +136,14 @@ namespace snuffbox
 		ID3D11RenderTargetView* view_; //!< The actual view of this render target
 		ID3D11ShaderResourceView* resource_; //!< When used as a normal render target, use this to store the texture
     SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
+		D3D11Effect* post_processing_; //! The post processing effect for this render target
+		std::string technique_; //!< The technique of this render target
 
 	public:
 		JS_NAME("RenderTarget");
 		static void RegisterJS(JS_CONSTRUCTABLE obj);
 		static void JSClear(JS_ARGS args);
+		static void JSSetPostProcessing(JS_ARGS args);
+		static void JSSetTechnique(JS_ARGS args);
 	};
 }

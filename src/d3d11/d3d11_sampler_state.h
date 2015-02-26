@@ -21,6 +21,7 @@ namespace snuffbox
     enum SamplerTypes
     {
       kLinear,
+			kAnisotropic,
       kPoint
     };
 

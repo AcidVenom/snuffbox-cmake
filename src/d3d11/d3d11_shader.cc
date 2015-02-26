@@ -77,10 +77,17 @@ namespace snuffbox
 			return;
 		}
 
-    ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		ID3D11DeviceContext* ctx = render_device->context();
 
-    ctx->VSSetShader(vs_, NULL, 0);
-    ctx->PSSetShader(ps_, NULL, 0);
+		D3D11Shader* current = render_device->current_shader();
+
+		if (current != this)
+		{
+			ctx->VSSetShader(vs_, NULL, 0);
+			ctx->PSSetShader(ps_, NULL, 0);
+			render_device->set_current_shader(this);
+		}
   }
 
   //-------------------------------------------------------------------------------------------

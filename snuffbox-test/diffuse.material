@@ -1,0 +1,6 @@
+{
+	"diffuse" : "wood.png",
+	"normal" : "wood_normal.png",
+	"bump" : "wood_bump.png",
+	"effect" : "test.effect"
+}

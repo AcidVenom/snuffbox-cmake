@@ -6,7 +6,7 @@
 namespace snuffbox
 {
   class D3D11VertexBuffer;
-	class D3D11Effect;
+	class D3D11Material;
 
   /**
   * @class snuffbox::D3D11RenderElement
@@ -18,6 +18,9 @@ namespace snuffbox
   public:
     /// Default constructor
     D3D11RenderElement();
+
+		/// JavaScript constructor
+		D3D11RenderElement(JS_ARGS args);
 
     /// Default destructor
     ~D3D11RenderElement();
@@ -46,17 +49,6 @@ namespace snuffbox
     * @param[in] z (const float&) The rotation on the z-axis to add
     */
 		void RotateBy(const float& x, const float& y, const float& z);
-
-		/** 
-		* @brief Applies the current effect with the current technique by pass
-		* @param[in] pass (const unsigned int&) The pass to apply
-		*/
-		void ApplyEffect(const unsigned int& pass);
-
-		/**
-		* @return unsigned int The number of passes for the current effect with the current technique
-		*/
-		unsigned int NumPasses();
 
     /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
@@ -109,14 +101,19 @@ namespace snuffbox
 		const XMFLOAT3& blend() const;
 
 		/**
-		* @return snuffbox::D3D11Effect* The effect of this render element
+		* @return snuffbox::D3D11Material* The material of this render element
 		*/
-		D3D11Effect* effect();
+		D3D11Material* material();
 
 		/**
 		* @return const std::string& The technique of this render element
 		*/
 		const std::string& technique();
+
+		/**
+		* @return snuffbox::D3D11RenderElement* The parent of this render element
+		*/
+		D3D11RenderElement* parent();
 
     /**
     * @brief Sets the translation of this render element
@@ -173,22 +170,28 @@ namespace snuffbox
 		void set_blend(const float& r, const float& g, const float& b);
 
 		/**
-		* @brief Sets the effect of this render element
+		* @brief Sets the material of this render element
 		* @param[in] path (const std::string&) The path to the effect file
 		*/
-		void set_effect(const std::string& path);
+		void set_material(const std::string& path);
 
 		/**
-		* @brief Sets the effect of this render element
-		* @param[in] path (D3D11Effect*) The pointer to the effect
+		* @brief Sets the material of this render element
+		* @param[in] path (D3D11Material*) The pointer to the effect
 		*/
-		void set_effect(D3D11Effect* effect);
+		void set_material(D3D11Material* material);
 
 		/**
 		* @brief Sets the technique of this render element
 		* @param[in] technique (std::string) The name of the technique
 		*/
 		void set_technique(const std::string& technique);
+
+		/**
+		* @brief Sets the parent of this render element
+		* @param[in] parent (D3D11RenderElement*) The parent to this element
+		*/
+		void set_parent(D3D11RenderElement* parent);
 
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
@@ -200,8 +203,9 @@ namespace snuffbox
     bool spawned_; //!< Is this render element spawned?
 		float alpha_; //!< The alpha of this render element
 		XMFLOAT3 blend_; //!< The blend of this render element
-		D3D11Effect* effect_; //!< The effect of this render element
+		D3D11Material* material_; //!< The effect of this render element
 		std::string technique_; //!< The technique of this render element
+		D3D11RenderElement* parent_; //!< The parent of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -221,8 +225,9 @@ namespace snuffbox
     static void JSAlpha(JS_ARGS args);
     static void JSSetBlend(JS_ARGS args);
     static void JSBlend(JS_ARGS args);
-		static void JSSetEffect(JS_ARGS args);
+		static void JSSetMaterial(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
+		static void JSSetParent(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
     static void JSDestroy(JS_ARGS args);

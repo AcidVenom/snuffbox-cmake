@@ -233,9 +233,14 @@ namespace snuffbox
   inline T* JSWrapper::GetPointer(const v8::Handle<v8::Value>& val)
   {
     v8::Local<v8::Object> obj = val->ToObject();
+		if (obj.IsEmpty() || obj->IsUndefined())
+		{
+			return nullptr;
+		}
+
     v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
 
-    if (ext->IsExternal() == false)
+		if (ext.IsEmpty() || ext->IsExternal() == false)
     {
       return nullptr;
     }
@@ -250,9 +255,14 @@ namespace snuffbox
   inline T* JSWrapper::GetPointer(const int& arg)
   {
     v8::Local<v8::Object> obj = args_[arg]->ToObject();
+		if (obj.IsEmpty() || obj->IsUndefined())
+		{
+			return nullptr;
+		}
+
     v8::Local<v8::Value> ext = obj->GetHiddenValue(v8::String::NewFromUtf8(JSStateWrapper::Instance()->isolate(), "__ptr"));
 
-    if (ext->IsExternal() == false)
+    if (ext.IsEmpty() || ext->IsExternal() == false)
     {
       return nullptr;
     }

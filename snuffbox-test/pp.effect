@@ -1,0 +1,18 @@
+{
+	"techniques" : {
+		"Default" : {
+			"passes" : [
+				{
+					"shader" : "shaders/post_processing.fx"
+				}
+			]
+		},
+		"Custom" : {
+			"passes" : [
+				{
+					"shader" : "shaders/post_processing2.fx"
+				}
+			]
+		}
+	}
+}
