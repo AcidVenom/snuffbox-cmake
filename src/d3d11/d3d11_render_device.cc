@@ -215,7 +215,13 @@ namespace snuffbox
 			resolution.x, 
 			resolution.y);
 
-    viewport_->Set();
+    viewport_render_target_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
+    viewport_render_target_->Create(
+      0,
+      0,
+      static_cast<float>(window->width()),
+      static_cast<float>(window->height())
+      );
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -321,6 +327,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::DrawRenderTarget(D3D11RenderTarget* target)
   {
+    viewport_render_target_->Set();
 		D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
 		shader->Set();
     target->Clear(context_);
@@ -332,6 +339,7 @@ namespace snuffbox
 		shader->Set();
     back_buffer_->Set(context_);
 
+    viewport_->Set();
     screen_quad_->Set();
 
     ID3D11ShaderResourceView* resource = target->resource();
@@ -386,17 +394,18 @@ namespace snuffbox
 		depth_stencil_view_->Release();
 		depth_stencil_buffer_->Release();
 
-		HRESULT result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		HRESULT result = swap_chain_->ResizeBuffers(1, 0, 0, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "ResizeBuffers"), "D3D11RenderDevice::ResizeBuffers");
 
 		CreateBackBuffer();
-		CreateBaseViewport();
 		CreateDepthStencilView();
 
 		for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
 		{
 			it->second->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, swap_chain_, device_);
 		}
+
+    CreateBaseViewport();
 
 		ready_ = true;
 	}

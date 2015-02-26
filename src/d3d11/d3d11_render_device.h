@@ -188,6 +188,7 @@ namespace snuffbox
     SharedPtr<D3D11InputLayout> input_layout_; //!< The input layout
 
     SharedPtr<D3D11Viewport> viewport_; //!< The base viewport
+    SharedPtr<D3D11Viewport> viewport_render_target_; //!< The render target viewport
 
     SharedPtr<D3D11SamplerState> sampler_linear_; //!< The linear sampler state
 		SharedPtr<D3D11SamplerState> sampler_anisotropic_; //!< The anisotropic sampler state

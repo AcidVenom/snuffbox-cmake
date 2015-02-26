@@ -26,6 +26,7 @@ struct VOut
 VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TEXCOORD0, float3 normal : NORMAL)
 {
 	VOut output;
+	position.y += sin(position.x / 10 + Time) * 5 + sin(position.x * 5 + Time * 10) * 0.5 * cos(position.z * 10 + Time) * 0.6;
 	output.position = mul(position, World);
 	output.worldPos = output.position.xyz;
 	output.position = mul(output.position, View);
@@ -58,5 +59,7 @@ float4 PS(VOut input) : SV_TARGET
     v = saturate(dot(light, normMap));
     float4 normColour = float4(v, 1);
 
+    base.r *= 1 + sin(Time * 2) / 10;
+    base.g *= 1 + cos(Time * 2) / 5;
     return float4(input.colour * base + specular) * normColour;
 }
