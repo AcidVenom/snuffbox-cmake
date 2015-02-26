@@ -15,7 +15,7 @@ namespace snuffbox
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		scale_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		offset_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
-		size_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
 		alpha_(1.0f),
@@ -32,7 +32,7 @@ namespace snuffbox
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		scale_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		offset_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
-		size_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
+		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
 		alpha_(1.0f),
@@ -120,8 +120,8 @@ namespace snuffbox
   {
 		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
 		world_matrix_ =
-			XMMatrixScalingFromVector(scale_) *
-			XMMatrixTranslationFromVector(offset_ * scale_) *
+			XMMatrixScalingFromVector(scale_ * size_) *
+			XMMatrixTranslationFromVector(offset_ * scale_ * size_) *
 			XMMatrixRotationRollPitchYawFromVector(rotation_) *
 			trans;
 

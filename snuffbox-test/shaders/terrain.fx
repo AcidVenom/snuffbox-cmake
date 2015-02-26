@@ -47,7 +47,7 @@ float4 PS(VOut input) : SV_TARGET
 
  	normMap = normMap * 2 - 1;
 
- 	float3 light = normalize(float3(0, sin(Time) * 2, 1));
+ 	float3 light = normalize(float3(0.5, -0.5, 0.5));
     float3 normal = normalize(input.normal * normMap);
     float3 r = normalize(2 * dot(-light, normal) * normal - light);
     float3 v = normalize(mul(normalize(float4(viewVec, 0)), World)).xyz;

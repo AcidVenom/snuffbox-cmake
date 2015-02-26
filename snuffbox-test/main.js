@@ -5,6 +5,7 @@ Game.renderTarget = Game.renderTarget || new RenderTarget("Default");
 timer = 0;
 Game.Initialise = function()
 {
+	ContentManager.load("shader", "shaders/terrain.fx");
 	ContentManager.load("effect", "test.effect");
 	ContentManager.load("effect", "pp.effect");
 	ContentManager.load("texture", "wood.png");
@@ -25,6 +26,11 @@ Game.Initialise = function()
 	Game.quad3 = new Quad(Game.quad2);
 	Game.quad3.spawn("Default");
 	Game.quad3.setMaterial("diffuse.material");
+
+	Game.terrain = new Terrain();
+	Game.terrain.setMaterial("diffuse.material");
+	Game.terrain.setTechnique("Custom");
+	Game.terrain.spawn("Default");
 
 	Game.camera = new Camera(CameraType.Perspective);
 }

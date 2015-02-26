@@ -91,6 +91,8 @@ SET (D3DElements
 	d3d11/elements/d3d11_render_element.cc
 	d3d11/elements/d3d11_quad_element.h
 	d3d11/elements/d3d11_quad_element.cc
+	d3d11/elements/d3d11_terrain_element.h
+	d3d11/elements/d3d11_terrain_element.cc
 )
 
 SET (OGLSources

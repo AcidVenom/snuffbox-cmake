@@ -6,6 +6,13 @@
 					"shader" : "shaders/base.fx"
 				}
 			]
+		},
+		"Custom" : {
+			"passes" : [
+				{
+					"shader" : "shaders/terrain.fx"
+				}
+			]
 		}
 	}
 }
