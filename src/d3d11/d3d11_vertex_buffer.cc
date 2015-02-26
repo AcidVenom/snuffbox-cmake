@@ -1,4 +1,5 @@
 #include "../d3d11/d3d11_vertex_buffer.h"
+#include "../d3d11/d3d11_shader.h"
 
 namespace snuffbox
 {
@@ -107,7 +108,13 @@ namespace snuffbox
       SNUFF_LOG_WARNING("Attempted to draw an invalid vertex buffer");
       return;
     }
-    D3D11RenderDevice::Instance()->context()->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		D3D11Shader* shader = render_device->current_shader();
+		if (shader == nullptr || shader->valid() == false)
+		{
+			return;
+		}
+    render_device->context()->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
   }
 
   //-------------------------------------------------------------------------------------------

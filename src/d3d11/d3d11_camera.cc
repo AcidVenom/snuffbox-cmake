@@ -10,7 +10,7 @@ namespace snuffbox
 		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
-		near_plane_(1.0f),
+		near_plane_(0.01f),
 		far_plane_(1000.0f),
 		type_(type),
 		fov_(XM_PI / 2),
@@ -29,7 +29,7 @@ namespace snuffbox
 		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		up_(XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)),
-		near_plane_(1.0f),
+		near_plane_(0.01f),
 		far_plane_(1000.0f),
 		fov_(XM_PI / 2),
 		right_(XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f)),
@@ -101,6 +101,15 @@ namespace snuffbox
 		move_up_down_ = 0.0f;
 
 		return view_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT3 D3D11Camera::view_vector()
+	{
+		XMVECTOR view_vec = XMVector3Transform(target_ - translation_, XMMatrixRotationY(0));
+		view_vec = XMVector3Normalize(view_vec);
+
+		return XMFLOAT3(XMVectorGetX(view_vec), XMVectorGetY(view_vec), XMVectorGetZ(view_vec));
 	}
 
 	//---------------------------------------------------------------------------------------------------------

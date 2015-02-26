@@ -75,9 +75,10 @@ namespace snuffbox
   {
 		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->per_object_buffer();
 
+		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
-			element->world_matrix(),
+			XMMatrixInverse(&deter, element->world_matrix()),
 			element->alpha(),
 			element->blend(),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)

@@ -102,6 +102,8 @@ namespace snuffbox
 
 		js_update_.Call(delta_time_);
 
+		time_ += delta_time_;
+
 		FixedUpdate();
 	}
 

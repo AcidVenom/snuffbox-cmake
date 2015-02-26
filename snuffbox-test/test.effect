@@ -6,17 +6,6 @@
 					"shader" : "shaders/base.fx"
 				}
 			]
-		},
-		
-		"Custom" : {
-			"passes" : [
-				{
-					"shader" : "shaders/base.fx"
-				},
-				{
-					"shader" : "shaders/base2.fx"
-				}
-			]
 		}
 	}
 }

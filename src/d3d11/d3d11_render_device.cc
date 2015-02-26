@@ -31,7 +31,8 @@ namespace snuffbox
 		context_(nullptr),
     vertex_buffer_type_(-1),
 		camera_(nullptr),
-		depth_stencil_view_(nullptr)
+		depth_stencil_view_(nullptr),
+		current_shader_(nullptr)
 	{
 
 	}
@@ -295,9 +296,10 @@ namespace snuffbox
     }
 
 		global_buffer_->Map({ 
-			0.0f,
+			static_cast<float>(Game::Instance()->time()),
 			camera_->view(),
-			camera_->projection()
+			camera_->projection(),
+			camera_->view_vector()
 		});
 		global_buffer_->Set(0);
 		

@@ -35,6 +35,11 @@ namespace snuffbox
     */
     ID3D10Blob* ps_buffer();
 
+		/**
+		* @return const bool& Is this shader valid?
+		*/
+		const bool& valid() const;
+
     /// Default destructor
     virtual ~D3D11Shader();
 

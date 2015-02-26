@@ -22,8 +22,12 @@ namespace snuffbox
     if (vs_buffer_ != nullptr)
     {
       SNUFF_SAFE_RELEASE(vs_buffer_, "D3D11Shader::Load::vs_buffer_");
-      SNUFF_SAFE_RELEASE(ps_buffer_, "D3D11Shader::Load::ps_buffer_");
     }
+
+		if (ps_buffer_ != nullptr)
+		{
+			SNUFF_SAFE_RELEASE(ps_buffer_, "D3D11Shader::Load::ps_buffer_");
+		}
 
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     std::string full_path = Game::Instance()->path() + "/" + path;
@@ -101,6 +105,12 @@ namespace snuffbox
   {
     return ps_buffer_;
   }
+
+	//-------------------------------------------------------------------------------------------
+	const bool& D3D11Shader::valid() const
+	{
+		return valid_;
+	}
 
   //-------------------------------------------------------------------------------------------
   D3D11Shader::~D3D11Shader()

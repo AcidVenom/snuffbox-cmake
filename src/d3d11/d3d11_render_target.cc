@@ -74,6 +74,10 @@ namespace snuffbox
 			{
 				SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::Create::resource_");
 			}
+			else
+			{
+				queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>();
+			}
 
 			HRESULT result = S_OK;
 
@@ -102,8 +106,6 @@ namespace snuffbox
 			result = device->CreateRenderTargetView(buffer_, NULL, &view_);
 
 			SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateRenderTargetView"), "D3D11RenderTarget::Create");
-
-      queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>();
 		}
 		else
 		{

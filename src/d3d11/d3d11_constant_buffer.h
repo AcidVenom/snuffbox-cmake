@@ -14,6 +14,7 @@ namespace snuffbox
 		float Time;
 		XMMATRIX View;
 		XMMATRIX Projection;
+		XMFLOAT3 ViewVector;
 	};
 
 	/**
