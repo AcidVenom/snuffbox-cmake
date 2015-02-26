@@ -4,6 +4,8 @@
 #include "../memory/shared_ptr.h"
 #include "../js/js_object.h"
 
+#include <queue>
+
 namespace snuffbox
 {
 	class Content;
@@ -90,6 +92,9 @@ namespace snuffbox
 		*/
 		void Watch(const std::string& path);
 
+		/// Processes the unload queue
+		void UnloadAll();
+
     /**
     * @brief Retrieves content by name
     * @param[in] path (const std::string&) The path to the content to be retrieved
@@ -110,10 +115,13 @@ namespace snuffbox
 
 	private:
 		std::map<std::string, SharedPtr<Content>> loaded_content_;
+		std::queue<std::string> to_unload_;
 
 	public:
 		JS_NAME("ContentManager");
 		static void RegisterJS(JS_SINGLETON obj);
+		static void JSLoad(JS_ARGS args);
+		static void JSUnload(JS_ARGS args);
 		static void JSWatch(JS_ARGS args);
 	};
 

@@ -26,15 +26,27 @@ namespace snuffbox
 		*/
 		virtual void Load(const std::string& path);
 
+		/// Validates this piece of content
+		void Validate();
+
+		/// Invalidates this piece of content
+		void Invalidate();
+
 		/**
 		* @return const snuffbox::ContentTypes& The type of this content
 		*/
 		const ContentTypes& type() const;
+
+		/**
+		* @return const bool& Is this content still valid?
+		*/
+		const bool& is_valid() const;
 
 		/// Default destructor
 		virtual ~Content();
 
 	private:
 		ContentTypes type_; //!< The type of this content
+		bool is_valid_; //!< Is this content still valid?
 	};
 }

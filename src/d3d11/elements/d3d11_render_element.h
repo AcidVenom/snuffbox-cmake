@@ -108,6 +108,16 @@ namespace snuffbox
 		*/
 		const XMFLOAT3& blend() const;
 
+		/**
+		* @return snuffbox::D3D11Effect* The effect of this render element
+		*/
+		D3D11Effect* effect();
+
+		/**
+		* @return const std::string& The technique of this render element
+		*/
+		const std::string& technique();
+
     /**
     * @brief Sets the translation of this render element
     * @param[in] x (const float&) The new x position
@@ -169,6 +179,12 @@ namespace snuffbox
 		void set_effect(const std::string& path);
 
 		/**
+		* @brief Sets the effect of this render element
+		* @param[in] path (D3D11Effect*) The pointer to the effect
+		*/
+		void set_effect(D3D11Effect* effect);
+
+		/**
 		* @brief Sets the technique of this render element
 		* @param[in] technique (std::string) The name of the technique
 		*/
@@ -208,6 +224,7 @@ namespace snuffbox
 		static void JSSetEffect(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
+		static void JSSpawned(JS_ARGS args);
     static void JSDestroy(JS_ARGS args);
   };
 }

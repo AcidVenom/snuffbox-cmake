@@ -48,8 +48,17 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::Load(const ContentTypes& type, const std::string& path)
 	{
+		SNUFF_LOG_INFO("Loading file '" + path + "'");
 		if (type != ContentTypes::kScript)
 		{
+			std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
+
+			if (it != loaded_content_.end())
+			{
+				SNUFF_LOG_WARNING("The file '" + path + "' was already loaded");
+				return;
+			}
+
 			SharedPtr<Content> content;
 			
 			if (type == ContentTypes::kShader)
@@ -62,6 +71,7 @@ namespace snuffbox
 			}
 
 			content->Load(path);
+			content->Validate();
       loaded_content_.emplace(path, content);
     }
 
@@ -76,6 +86,7 @@ namespace snuffbox
 		{
 			SNUFF_LOG_INFO("Hot reloaded script '" + path + "'");
 			JSStateWrapper::Instance()->CompileAndRun(path, true);
+			return;
 		}
 		else if (type == ContentTypes::kCustom)
 		{
@@ -89,7 +100,22 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::Unload(const ContentTypes& type, const std::string& path)
 	{
+		SNUFF_LOG_INFO("Unloading file '" + path + "'");
+		std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
+		if (it != loaded_content_.end())
+		{
+			if (it->second->type() != type)
+			{
+				SNUFF_LOG_ERROR("The specified file type does not match the type of the loaded file '" + path + "'");
+				return;
+			}
+			it->second->Invalidate();
+			to_unload_.push(path);
+			SNUFF_LOG_INFO("Unloaded file '" + path + "'");
+			return;
+		}
 
+		SNUFF_LOG_ERROR("Attempted to unload a file that hasn't been loaded '" + path + "'");
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -104,6 +130,20 @@ namespace snuffbox
 		}
 		
 		SNUFF_LOG_ERROR("'" + path + "' could not be added to the file watch");
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void ContentManager::UnloadAll()
+	{
+		while (to_unload_.empty() == false)
+		{
+			const std::string& top = to_unload_.front();
+
+			loaded_content_.erase(loaded_content_.find(top));
+			FileWatch::Instance()->Remove(top);
+
+			to_unload_.pop();
+		}
 	}
 
   //---------------------------------------------------------------------------------------------------------
@@ -150,10 +190,39 @@ namespace snuffbox
 	void ContentManager::RegisterJS(JS_SINGLETON obj)
 	{
 		JSFunctionRegister funcs[] = {
+			{ "load", JSLoad },
+			{ "unload", JSUnload },
 			{ "watch", JSWatch }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void ContentManager::JSLoad(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("SS"))
+		{
+			ContentManager::Instance()->Notify(ContentManager::Events::kLoad,
+				ContentManager::StringToType(wrapper.GetValue<std::string>(0, "undefined")),
+				wrapper.GetValue<std::string>(1, "undefined")
+				);
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void ContentManager::JSUnload(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("SS"))
+		{
+			ContentManager::Instance()->Notify(ContentManager::Events::kUnload,
+				ContentManager::StringToType(wrapper.GetValue<std::string>(0, "undefined")),
+				wrapper.GetValue<std::string>(1, "undefined"));
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------

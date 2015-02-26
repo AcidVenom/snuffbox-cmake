@@ -63,7 +63,6 @@ namespace snuffbox
 		virtual ~D3D11Effect();
 
 	private:
-		bool valid_; //!< Is this effect valid?
 		std::map<std::string, Technique> techniques_; //!< The different techniques of this effect
 	};
 }

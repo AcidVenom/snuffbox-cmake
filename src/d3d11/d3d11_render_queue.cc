@@ -3,6 +3,7 @@
 #include "../d3d11/d3d11_vertex_buffer.h"
 #include "../d3d11/d3d11_constant_buffer.h"
 #include "../d3d11/d3d11_camera.h"
+#include "../d3d11/d3d11_effect.h"
 
 #include <algorithm>
 
@@ -43,6 +44,13 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::Add(D3D11RenderElement* element)
   {
+		for (D3D11RenderElement* it : elements_)
+		{
+			if (it == element)
+			{
+				return;
+			}
+		}
     elements_.push_back(element);
   }
 
@@ -78,19 +86,30 @@ namespace snuffbox
     D3D11VertexBuffer* buffer = element->vertex_buffer();
     buffer->Set();
 
-		unsigned int n_pass = element->NumPasses();
-
-		if (n_pass > 0)
+		if (element->effect() != nullptr && element->effect()->is_valid() == true)
 		{
-			for (unsigned int i = 0; i < n_pass; ++i)
-			{
-				element->ApplyEffect(i);
+			unsigned int n_pass = element->NumPasses();
 
+			if (n_pass > 0)
+			{
+				for (unsigned int i = 0; i < n_pass; ++i)
+				{
+					element->ApplyEffect(i);
+
+					buffer->Draw();
+				}
+			}
+			else
+			{
 				buffer->Draw();
 			}
 		}
 		else
 		{
+			if (element->effect() != nullptr)
+			{
+				element->set_effect(nullptr);
+			}
 			buffer->Draw();
 		}
   }
@@ -115,6 +134,15 @@ namespace snuffbox
       }
     }
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderQueue::Clear()
+	{
+		for (unsigned int i = 0; i < elements_.size(); ++i)
+		{
+			elements_.at(i)->Destroy();
+		}
+	}
 
   //-------------------------------------------------------------------------------------------
   D3D11RenderQueue::~D3D11RenderQueue()

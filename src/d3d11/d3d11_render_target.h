@@ -76,6 +76,9 @@ namespace snuffbox
     */
     void Draw(ID3D11DeviceContext* context);
 
+		/// Clears the render target of render elements
+		void Clear();
+
 		/// Releases all referenced D3D11 com objects
 		void Release();
 
@@ -109,5 +112,6 @@ namespace snuffbox
 	public:
 		JS_NAME("RenderTarget");
 		static void RegisterJS(JS_CONSTRUCTABLE obj);
+		static void JSClear(JS_ARGS args);
 	};
 }

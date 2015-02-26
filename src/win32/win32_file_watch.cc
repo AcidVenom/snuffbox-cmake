@@ -124,7 +124,7 @@ namespace snuffbox
 
 			watched_files_.erase(watched_files_.find(top));
 
-			queue_.pop();
+			to_remove_.pop();
 		}
 	}
 

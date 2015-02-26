@@ -56,9 +56,7 @@ namespace snuffbox
     CreateBackBuffer();
     CreateScreenQuad();
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
-		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base2.fx");
     ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
-		ContentManager::Instance()->Load(ContentTypes::kEffect, "test.effect");
     CreateInputLayout();
     CreateBaseViewport();
 

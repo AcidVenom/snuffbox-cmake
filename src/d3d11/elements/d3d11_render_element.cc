@@ -133,6 +133,18 @@ namespace snuffbox
 		return blend_;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Effect* D3D11RenderElement::effect()
+	{
+		return effect_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const std::string& D3D11RenderElement::technique()
+	{
+		return technique_;
+	}
+
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)
   {
@@ -184,6 +196,12 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_effect(D3D11Effect* effect)
+	{
+		effect_ = effect;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_technique(const std::string& technique)
 	{
 		technique_ = technique;
@@ -218,6 +236,7 @@ namespace snuffbox
 			{ "setEffect", JSSetEffect },
 			{ "setTechnique", JSSetTechnique },
       { "spawn", JSSpawn },
+			{ "spawned", JSSpawned },
       { "destroy", JSDestroy }
     };
 
@@ -493,6 +512,15 @@ namespace snuffbox
       self->Spawn(wrapper.GetValue<std::string>(0, "undefined"));
     }
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSpawned(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		wrapper.ReturnValue<bool>(self->spawned());
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::JSDestroy(JS_ARGS args)

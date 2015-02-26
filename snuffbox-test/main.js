@@ -5,6 +5,9 @@ timer = 0;
 
 Game.Initialise = function()
 {
+	ContentManager.load("shader", "shaders/base2.fx");
+	ContentManager.load("effect", "test.effect");
+
 	Game.quad1 = new Quad();
 	Game.quad1.spawn("Default");
 	Game.quad1.setEffect("test.effect");

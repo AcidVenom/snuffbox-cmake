@@ -109,6 +109,8 @@ int main(int argc, char** argv)
 		game->Run();
     js_state_wrapper->isolate()->IdleNotification(32);
 
+		ContentManager::Instance()->UnloadAll();
+
 		if (should_reload)
 		{
 			file_watch->Update();

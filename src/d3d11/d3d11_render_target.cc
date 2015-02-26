@@ -156,6 +156,12 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::Clear()
+	{
+		queue_->Clear();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Release()
 	{
 		if (valid_ == false)
@@ -200,6 +206,19 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::RegisterJS(JS_CONSTRUCTABLE obj)
 	{
+		JSFunctionRegister funcs[] = {
+			{ "clear", JSClear }
+		};
 
+		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSClear(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		self->Clear();
 	}
 }

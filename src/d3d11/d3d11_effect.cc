@@ -14,8 +14,7 @@ namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Effect::D3D11Effect() :
-		Content(ContentTypes::kEffect),
-		valid_(false)
+		Content(ContentTypes::kEffect)
 	{
 
 	}
@@ -124,10 +123,18 @@ namespace snuffbox
 			std::vector<Pass>& passes = technique.passes;
 
 			Pass& pass = passes.at(p);
-			if (pass.shader != nullptr)
+			if (pass.shader != nullptr && pass.shader->is_valid() == true)
 			{
-				pass.shader->Set();
+				if (pass.shader != nullptr)
+				{
+					pass.shader->Set();
+				}
 			}
+			else
+			{
+				pass.shader = nullptr;
+			}
+
 			pass.blend_state->Set();
 			pass.depth_state->Set();
 

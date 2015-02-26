@@ -71,7 +71,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11Shader::Set()
   {
-    SNUFF_XASSERT(valid_ == true, "Tried to set invalid shaders", "D3D11Shader::Set");
+		if (valid_ == false)
+		{
+			SNUFF_LOG_WARNING("Attempted to set an invalid shader");
+			return;
+		}
 
     ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
 
@@ -103,5 +107,7 @@ namespace snuffbox
     SNUFF_SAFE_RELEASE(ps_buffer_, "D3D11Shader::~D3D11Shader::ps_buffer_");
     SNUFF_SAFE_RELEASE(vs_, "D3D11Shader::~D3D11Shader::vs_");
     SNUFF_SAFE_RELEASE(ps_, "D3D11Shader::~D3D11Shader::ps_");
+
+		valid_ = false;
   }
 }
