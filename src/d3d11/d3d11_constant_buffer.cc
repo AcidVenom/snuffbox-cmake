@@ -58,7 +58,6 @@ namespace snuffbox
 		mapped->Time = cb.Time;
 		mapped->View = cb.View;
 		mapped->Projection = cb.Projection;
-		mapped->ViewVector = cb.ViewVector;
 		ctx->Unmap(global_buffer_, 0);
 
 		mapped_ = global_buffer_;

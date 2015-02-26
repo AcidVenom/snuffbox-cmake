@@ -298,8 +298,7 @@ namespace snuffbox
 		global_buffer_->Map({ 
 			static_cast<float>(Game::Instance()->time()),
 			camera_->view(),
-			camera_->projection(),
-			camera_->view_vector()
+			camera_->projection()
 		});
 		global_buffer_->Set(0);
 		
