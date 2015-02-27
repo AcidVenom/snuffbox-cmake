@@ -143,8 +143,9 @@ namespace snuffbox
 		static void JSSetTranslation(JS_ARGS args);
 		static void JSTranslateBy(JS_ARGS args);
 		static void JSTranslation(JS_ARGS args);
-		static void JSSetDirection(JS_ARGS args);
-		static void JSDirection(JS_ARGS args);
+		static void JSSetRotation(JS_ARGS args);
+		static void JSRotateBy(JS_ARGS args);
+		static void JSRotation(JS_ARGS args);
 		static void JSSetColour(JS_ARGS args);
 		static void JSColour(JS_ARGS args);
 		static void JSSetSpotAngle(JS_ARGS args);
