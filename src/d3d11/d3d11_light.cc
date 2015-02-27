@@ -5,13 +5,32 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	D3D11Light::D3D11Light(D3D11Light::LightTypes type)
 	{
+		Default();
 		attributes_.type = type;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	D3D11Light::D3D11Light(JS_ARGS args)
 	{
+		Default();
+		JSWrapper wrapper(args);
+		wrapper.Check("N");
 
+		attributes_.type = wrapper.GetValue<int>(0, 0);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Light::Default()
+	{
+		attributes_.translation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		attributes_.rotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		attributes_.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		attributes_.constant_attenuation = 1.0f;
+		attributes_.linear_attenuation = 1.0f;
+		attributes_.quad_attenuation = 1.0f;
+		attributes_.spot_angle = XM_PI / 4;
+		attributes_.type = 0;
+		attributes_.activated = true;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -103,8 +122,22 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void D3D11Light::JSEnumerate()
+	{
+		JSStateWrapper* wrapper = JSStateWrapper::Instance();
+		v8::Handle <v8::Object> obj = JSWrapper::CreateObject();
+
+		wrapper->RegisterToObject(obj, "Point", JSWrapper::CastValue<int>(0));
+		wrapper->RegisterToObject(obj, "Directional", JSWrapper::CastValue<int>(1));
+		wrapper->RegisterToObject(obj, "Spot", JSWrapper::CastValue<int>(2));
+
+		wrapper->RegisterGlobal("LightType", obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void D3D11Light::RegisterJS(JS_CONSTRUCTABLE obj)
 	{
+		D3D11Light::JSEnumerate();
 		JSFunctionRegister funcs[] = {
 			{ "setTranslation", JSSetTranslation },
 			{ "translateBy", JSTranslateBy },

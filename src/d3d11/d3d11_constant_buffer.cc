@@ -6,7 +6,8 @@ namespace snuffbox
 	D3D11ConstantBuffer::D3D11ConstantBuffer() :
 		valid_(false),
 		global_buffer_(nullptr),
-		per_object_buffer_(nullptr)
+		per_object_buffer_(nullptr),
+		light_buffer_(nullptr)
 	{
 
 	}
@@ -16,6 +17,7 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 		CbGlobal cb_global;
+		CbLighting cb_lighting;
 		CbPerObject cb_per_object;
 
 		D3D11_BUFFER_DESC desc;
@@ -36,6 +38,13 @@ namespace snuffbox
 
 		result = device->CreateBuffer(&desc, &data, &global_buffer_);
 		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::global_buffer_");
+
+		desc.ByteWidth = sizeof(CbLighting)* 4;
+		data.pSysMem = &cb_per_object;
+
+		result = device->CreateBuffer(&desc, &data, &lighting_buffer_);
+		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::per_object_buffer_");
+		valid_ = true;
 
 		desc.ByteWidth = sizeof(CbPerObject) * 4;
 		data.pSysMem = &cb_per_object;
@@ -61,6 +70,24 @@ namespace snuffbox
 		ctx->Unmap(global_buffer_, 0);
 
 		mapped_ = global_buffer_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11ConstantBuffer::Map(const CbLighting& cb)
+	{
+		CbLighting* mapped = nullptr;
+
+		D3D11_MAPPED_SUBRESOURCE data;
+		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
+
+		ctx->Map(lighting_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &data);
+		mapped = static_cast<CbLighting*>(data.pData);
+		mapped->Ambient = cb.Ambient;
+		mapped->NumLights = cb.NumLights;
+		mapped->Lights = cb.Lights;
+		ctx->Unmap(lighting_buffer_, 0);
+
+		mapped_ = lighting_buffer_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

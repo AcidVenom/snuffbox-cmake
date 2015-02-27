@@ -2,12 +2,13 @@
 
 #include "../d3d11/d3d11_render_device.h"
 #include "../d3d11/d3d11_material.h"
+#include "../d3d11/d3d11_light.h"
 
 namespace snuffbox
 {
 	/**
 	* @struct snuffbox::CbGlobal
-	* @brief A global context buffer that is mapped once before drawing
+	* @brief A global constant buffer that is mapped once before drawing
 	* @author Daniël Konings
 	*/
 	struct CbGlobal
@@ -18,8 +19,20 @@ namespace snuffbox
 	};
 
 	/**
+	* @struct snuffbox::CbLighting
+	* @brief A lighting buffer to emulate lights
+	* @author Daniël Konings
+	*/
+	struct CbLighting
+	{
+		XMFLOAT4 Ambient;
+		int NumLights;
+		D3D11Light::Attributes* Lights;
+	};
+
+	/**
 	* @struct snuffbox::CbPerObject
-	* @brief A per-object context buffer that is mapped each time before rendering an element
+	* @brief A per-object constant buffer that is mapped each time before rendering an element
 	* @author Daniël Konings
 	*/
 	struct CbPerObject
@@ -53,6 +66,12 @@ namespace snuffbox
 		void Map(const CbGlobal& cb);
 
 		/**
+		* @brief Maps the constant buffer with lighting information
+		* @param[in] const snuffbox::CbLighting& The lighting buffer
+		*/
+		void Map(const CbLighting& cb);
+
+		/**
 		* @brief Maps the constant buffer with per-object information
 		* @param[in] const snuffbox::CbPerObject& The per-object buffer
 		*/
@@ -71,6 +90,7 @@ namespace snuffbox
 		bool valid_; //!< Is this constant buffer valid?
 		ID3D11Buffer* global_buffer_; //!< The global constant buffer
 		ID3D11Buffer* per_object_buffer_; //!< The per-object constant buffer
+		ID3D11Buffer* lighting_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* mapped_; //!< What kind of constant buffer is this?
 	};
 }

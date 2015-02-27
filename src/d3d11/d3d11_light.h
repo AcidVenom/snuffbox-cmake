@@ -55,6 +55,9 @@ namespace snuffbox
 		/// JavaScript constructor
 		D3D11Light(JS_ARGS args);
 
+		/// Defaults the attributes
+		void Default();
+
 		/**
 		* @brief Translates the light by a given value
 		* @param[in] x (const float&) The movement on the x-axis
@@ -139,6 +142,7 @@ namespace snuffbox
 
 	public:
 		JS_NAME("Light");
+		static void JSEnumerate();
 		static void RegisterJS(JS_CONSTRUCTABLE obj);
 		static void JSSetTranslation(JS_ARGS args);
 		static void JSTranslateBy(JS_ARGS args);

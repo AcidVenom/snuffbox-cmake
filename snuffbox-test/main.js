@@ -12,6 +12,8 @@ Game.Initialise = function()
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
+	Game.lights = [];
+
 	Game.quad = new Quad();
 	Game.quad.spawn("Default");
 	Game.quad.setMaterial("test.material");
@@ -19,6 +21,10 @@ Game.Initialise = function()
 	Game.targets.default.setPostProcessing("post_processing.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
+
+	Game.lights.push(new Light(LightType.Point));
+	Game.lights.push(new Light(LightType.Directional));
+	Game.lights.push(new Light(LightType.Spot));
 }
 
 Game.Update = function(dt)
