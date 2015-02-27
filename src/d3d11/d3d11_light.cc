@@ -1,4 +1,5 @@
 #include "../d3d11/d3d11_light.h"
+#include "../d3d11/d3d11_lighting.h"
 
 namespace snuffbox
 {
@@ -31,6 +32,8 @@ namespace snuffbox
 		attributes_.spot_angle = XM_PI / 4;
 		attributes_.type = 0;
 		attributes_.activated = true;
+
+		D3D11Lighting::Instance()->Add(this);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -118,7 +121,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	D3D11Light::~D3D11Light()
 	{
-
+		D3D11Lighting::Instance()->Remove(this);
 	}
 
 	//-------------------------------------------------------------------------------------------
