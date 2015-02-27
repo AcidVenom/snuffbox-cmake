@@ -7,7 +7,7 @@ namespace snuffbox
 		valid_(false),
 		global_buffer_(nullptr),
 		per_object_buffer_(nullptr),
-		light_buffer_(nullptr)
+		lighting_buffer_(nullptr)
 	{
 
 	}
