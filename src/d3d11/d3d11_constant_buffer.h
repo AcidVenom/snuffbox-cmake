@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../d3d11/d3d11_render_device.h"
+#include "../d3d11/d3d11_material.h"
 
 namespace snuffbox
 {
@@ -28,6 +29,7 @@ namespace snuffbox
 		float Alpha;
 		XMFLOAT3 Blend;
 		XMFLOAT4 AnimationCoords;
+		D3D11Material::Attributes Attributes;
 	};
 
 	/**

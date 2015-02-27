@@ -78,6 +78,7 @@ namespace snuffbox
 		mapped->Alpha = cb.Alpha;
 		mapped->Blend = cb.Blend;
 		mapped->AnimationCoords = cb.AnimationCoords;
+		mapped->Attributes = cb.Attributes;
 		ctx->Unmap(per_object_buffer_, 0);
 
 		mapped_ = per_object_buffer_;

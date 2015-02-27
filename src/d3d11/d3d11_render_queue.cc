@@ -75,20 +75,24 @@ namespace snuffbox
   {
 		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->per_object_buffer();
 
+		D3D11Material::Attributes attributes;
+
+		D3D11Material* material = element->material();
+
 		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
 			XMMatrixInverse(&deter, element->world_matrix()),
 			element->alpha(),
 			element->blend(),
-			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)
+			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
+			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
 		constant_buffer->Set(1);
 
     D3D11VertexBuffer* buffer = element->vertex_buffer();
     buffer->Set();
 
-		D3D11Material* material = element->material();
 		if (material != nullptr && material->is_valid() == true)
 		{
 			material->Apply();

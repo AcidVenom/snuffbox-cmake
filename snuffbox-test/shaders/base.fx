@@ -5,6 +5,15 @@ cbuffer Global : register(b0)
 	float4x4 Projection;
 }
 
+struct Attributes
+{
+	float4 Emissive;
+	float4 Diffuse;
+	float4 Ambient;
+	float4 Specular;
+	float SpecularIntensity;
+};
+
 cbuffer PerObject : register(b1)
 {
 	float4x4 World;
@@ -12,6 +21,8 @@ cbuffer PerObject : register(b1)
 	float Alpha;
 	float3 Blend;
 	float4 AnimationCoords;
+	
+	Attributes Material;
 }
 
 struct VOut
@@ -41,22 +52,6 @@ SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	float3 viewVec = normalize(float3(View[3][0], View[3][1], View[3][2]) - input.worldPos.xyz);
  	float4 base = Tex2D[0].Sample(Sampler, input.texcoord);
- 	float3 normMap = Tex2D[1].Sample(Sampler, input.texcoord).rgb;
-
- 	normMap = normMap * 2 - 1;
-
- 	float3 light = normalize(float3(0, sin(Time) * 2, 1));
-    float3 normal = normalize(input.normal * normMap);
-    float3 r = normalize(2 * dot(-light, normal) * normal - light);
-    float3 v = normalize(mul(normalize(float4(viewVec, 0)), World)).xyz;
-
-    float dotProduct = dot(r, v);
-    float4 specular = 1 * float4(1,0.5,0.5,1) * max(pow(abs(dotProduct), 30), 0) * length(base);
-
-    v = saturate(dot(light, normMap));
-    float4 normColour = float4(v, 1);
-
-    return float4(input.colour * base + specular) * normColour;
+    return Material.Ambient;
 }

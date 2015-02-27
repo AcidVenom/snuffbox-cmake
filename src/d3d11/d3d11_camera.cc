@@ -172,9 +172,9 @@ namespace snuffbox
 		switch (trans)
 		{
 		case CameraTransformation::kLocal:
-			move_left_right_ = x;
-			move_back_forward_ = z;
-			move_up_down_ = y;
+			move_left_right_ += x;
+			move_back_forward_ += z;
+			move_up_down_ += y;
 			break;
 
 		case CameraTransformation::kAbsolute:

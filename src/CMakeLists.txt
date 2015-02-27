@@ -84,6 +84,8 @@ SET (D3DSources
 	d3d11/d3d11_material.cc
 	d3d11/d3d11_texture.h
 	d3d11/d3d11_texture.cc
+	d3d11/d3d11_light.h
+	d3d11/d3d11_light.cc
 )
 
 SET (D3DElements
