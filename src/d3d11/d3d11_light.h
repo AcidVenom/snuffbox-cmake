@@ -30,10 +30,10 @@ namespace snuffbox
 		* @brief Different light attributes to adjust lights
 		* @author Daniël Konings
 		*/
-		struct Attributes
+		__declspec(align(16)) struct Attributes
 		{
 			XMFLOAT4 translation;
-			XMFLOAT4 rotation;
+			XMFLOAT4 direction;
 			XMFLOAT4 colour;
 
 			float spot_angle;
@@ -43,6 +43,7 @@ namespace snuffbox
 
 			int type;
 			bool activated;
+			XMFLOAT2 padding;
 		};
 	public:
 		
@@ -67,14 +68,6 @@ namespace snuffbox
 		void TranslateBy(const float& x, const float& y, const float& z);
 
 		/**
-		* @brief Rotates the light by a given value
-		* @param[in] x (const float&) The rotation on the x-axis
-		* @param[in] y (const float&) The rotation on the y-axis
-		* @param[in] z (const float&) The rotation on the z-axis
-		*/
-		void RotateBy(const float& x, const float& y, const float& z);
-
-		/**
 		* @return const snuffbox::D3D11Light::Attributes& The attributes of this light
 		*/
 		const Attributes& attributes() const;
@@ -88,12 +81,12 @@ namespace snuffbox
 		void set_translation(const float& x, const float& y, const float& z);
 
 		/**
-		* @brief Sets the rotation of this light
-		* @param[in] x (const float&) The new x rotation
-		* @param[in] y (const float&) The new y rotation
-		* @param[in] z (const float&) The new z rotation
+		* @brief Sets the direction of this light
+		* @param[in] x (const float&) The new x direction
+		* @param[in] y (const float&) The new y direction
+		* @param[in] z (const float&) The new z direction
 		*/
-		void set_rotation(const float& x, const float& y, const float& z);
+		void set_direction(const float& x, const float& y, const float& z);
 
 		/**
 		* @brief Sets the emitted colour of this light
@@ -147,9 +140,8 @@ namespace snuffbox
 		static void JSSetTranslation(JS_ARGS args);
 		static void JSTranslateBy(JS_ARGS args);
 		static void JSTranslation(JS_ARGS args);
-		static void JSSetRotation(JS_ARGS args);
-		static void JSRotateBy(JS_ARGS args);
-		static void JSRotation(JS_ARGS args);
+		static void JSSetDirection(JS_ARGS args);
+		static void JSDirection(JS_ARGS args);
 		static void JSSetColour(JS_ARGS args);
 		static void JSColour(JS_ARGS args);
 		static void JSSetSpotAngle(JS_ARGS args);

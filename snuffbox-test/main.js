@@ -12,19 +12,18 @@ Game.Initialise = function()
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
-	Game.lights = [];
-
-	Game.quad = new Quad();
-	Game.quad.spawn("Default");
-	Game.quad.setMaterial("test.material");
-
 	Game.targets.default.setPostProcessing("post_processing.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
 
-	Game.lights.push(new Light(LightType.Point));
-	Game.lights.push(new Light(LightType.Directional));
-	Game.lights.push(new Light(LightType.Spot));
+	Game.terrain = new Terrain();
+	Game.terrain.spawn("Default");
+	Game.terrain.setMaterial("test.material");
+
+	Game.light = new Light(LightType.Spot);
+	Game.light.setDirection(0, 1, 0);
+	Game.light.setTranslation(10, 0.05, 10);
+	
 }
 
 Game.Update = function(dt)

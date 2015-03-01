@@ -24,7 +24,7 @@ namespace snuffbox
 	void D3D11Light::Default()
 	{
 		attributes_.translation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		attributes_.rotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		attributes_.direction = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
 		attributes_.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		attributes_.constant_attenuation = 1.0f;
 		attributes_.linear_attenuation = 1.0f;
@@ -46,15 +46,6 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::RotateBy(const float& x, const float& y, const float& z)
-	{
-		XMFLOAT4& t = attributes_.rotation;
-		t.x += x;
-		t.y += y;
-		t.z += z;
-	}
-
-	//-------------------------------------------------------------------------------------------
 	const D3D11Light::Attributes& D3D11Light::attributes() const
 	{
 		return attributes_;
@@ -70,12 +61,12 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::set_rotation(const float& x, const float& y, const float& z)
+	void D3D11Light::set_direction(const float& x, const float& y, const float& z)
 	{
-		XMFLOAT4& r = attributes_.rotation;
-		r.x = x;
-		r.y = y;
-		r.z = z;
+		XMFLOAT4& d = attributes_.direction;
+		d.x = x;
+		d.y = y;
+		d.z = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -145,9 +136,8 @@ namespace snuffbox
 			{ "setTranslation", JSSetTranslation },
 			{ "translateBy", JSTranslateBy },
 			{ "translation", JSTranslation },
-			{ "setRotation", JSSetRotation },
-			{ "rotateBy", JSRotateBy },
-			{ "rotation", JSRotation },
+			{ "setDirection", JSSetDirection },
+			{ "direction", JSDirection },
 			{ "setColour", JSSetColour },
 			{ "colour", JSColour },
 			{ "setSpotAngle", JSSetSpotAngle },
@@ -216,14 +206,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSSetRotation(JS_ARGS args)
+	void D3D11Light::JSSetDirection(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
 
 		if (wrapper.Check("NNN") == true)
 		{
-			self->set_rotation(
+			self->set_direction(
 				wrapper.GetValue<float>(0, 0.0f),
 				wrapper.GetValue<float>(1, 0.0f),
 				wrapper.GetValue<float>(2, 0.0f)
@@ -232,23 +222,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSRotateBy(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
-
-		if (wrapper.Check("NNN") == true)
-		{
-			self->RotateBy(
-				wrapper.GetValue<float>(0, 0.0f),
-				wrapper.GetValue<float>(1, 0.0f),
-				wrapper.GetValue<float>(2, 0.0f)
-				);
-		}
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSRotation(JS_ARGS args)
+	void D3D11Light::JSDirection(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
@@ -257,7 +231,7 @@ namespace snuffbox
 
 		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
 
-		const XMFLOAT4& p = a.rotation;
+		const XMFLOAT4& p = a.direction;
 		JSWrapper::SetObjectValue(obj, "x", p.x);
 		JSWrapper::SetObjectValue(obj, "y", p.y);
 		JSWrapper::SetObjectValue(obj, "z", p.z);

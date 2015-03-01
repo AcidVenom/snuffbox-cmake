@@ -40,7 +40,7 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::global_buffer_");
 
 		desc.ByteWidth = sizeof(CbLighting)* 4;
-		data.pSysMem = &cb_per_object;
+		data.pSysMem = &cb_lighting;
 
 		result = device->CreateBuffer(&desc, &data, &lighting_buffer_);
 		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::per_object_buffer_");
@@ -67,13 +67,14 @@ namespace snuffbox
 		mapped->Time = cb.Time;
 		mapped->View = cb.View;
 		mapped->Projection = cb.Projection;
+		mapped->EyePosition = cb.EyePosition;
 		ctx->Unmap(global_buffer_, 0);
 
 		mapped_ = global_buffer_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ConstantBuffer::Map(const CbLighting& cb)
+	void D3D11ConstantBuffer::Map(const CbLighting& cb, const int& num_lights)
 	{
 		CbLighting* mapped = nullptr;
 
@@ -84,7 +85,10 @@ namespace snuffbox
 		mapped = static_cast<CbLighting*>(data.pData);
 		mapped->Ambient = cb.Ambient;
 		mapped->NumLights = cb.NumLights;
-		mapped->Lights = cb.Lights;
+		for (int i = 0; i < num_lights; ++i)
+		{
+			mapped->Lights[i] = cb.Lights[i];
+		}
 		ctx->Unmap(lighting_buffer_, 0);
 
 		mapped_ = lighting_buffer_;
@@ -129,6 +133,7 @@ namespace snuffbox
 		}
 
 		SNUFF_SAFE_RELEASE(global_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::global_buffer_");
+		SNUFF_SAFE_RELEASE(lighting_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::lighting_buffer_");
 		SNUFF_SAFE_RELEASE(per_object_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::per_object_buffer_");
 	}
 }

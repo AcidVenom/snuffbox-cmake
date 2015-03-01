@@ -16,6 +16,7 @@ namespace snuffbox
 		float Time;
 		XMMATRIX View;
 		XMMATRIX Projection;
+		XMVECTOR EyePosition;
 	};
 
 	/**
@@ -27,7 +28,7 @@ namespace snuffbox
 	{
 		XMFLOAT4 Ambient;
 		int NumLights;
-		D3D11Light::Attributes* Lights;
+		D3D11Light::Attributes Lights[64];
 	};
 
 	/**
@@ -69,7 +70,7 @@ namespace snuffbox
 		* @brief Maps the constant buffer with lighting information
 		* @param[in] const snuffbox::CbLighting& The lighting buffer
 		*/
-		void Map(const CbLighting& cb);
+		void Map(const CbLighting& cb, const int& num_lights);
 
 		/**
 		* @brief Maps the constant buffer with per-object information

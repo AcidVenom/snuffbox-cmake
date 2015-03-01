@@ -29,6 +29,7 @@ namespace snuffbox
 	class D3D11Texture;
 	class D3D11Effect;
 	class D3D11Shader;
+	class D3D11Lighting;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -208,5 +209,7 @@ namespace snuffbox
 
 		D3D11Texture* set_textures_[3]; //!< The currently set textures
 		D3D11Shader* current_shader_; //!< The currently set shaders
+
+		D3D11Lighting* lighting_; //!< The lighting system
 	};
 }

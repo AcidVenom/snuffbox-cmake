@@ -11,6 +11,7 @@
 #include "../d3d11/d3d11_blend_state.h"
 #include "../d3d11/d3d11_depth_state.h"
 #include "../d3d11/d3d11_effect.h"
+#include "../d3d11/d3d11_lighting.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -32,7 +33,8 @@ namespace snuffbox
     vertex_buffer_type_(-1),
 		camera_(nullptr),
 		depth_stencil_view_(nullptr),
-		current_shader_(nullptr)
+		current_shader_(nullptr),
+		lighting_(nullptr)
 	{
 
 	}
@@ -75,6 +77,7 @@ namespace snuffbox
     sampler_linear_->Set();
 
     global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+		lighting_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
     per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
 
     default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
@@ -89,8 +92,11 @@ namespace snuffbox
 
 		global_buffer_->Create();
 		per_object_buffer_->Create();
+		lighting_buffer_->Create();
 
 		CreateDepthStencilView();
+
+		lighting_ = D3D11Lighting::Instance();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -304,9 +310,12 @@ namespace snuffbox
 		global_buffer_->Map({ 
 			static_cast<float>(Game::Instance()->time()),
 			camera_->view(),
-			camera_->projection()
+			camera_->projection(),
+			camera_->translation()
 		});
 		global_buffer_->Set(0);
+
+		lighting_->Update(lighting_buffer_.get());
 		
 		back_buffer_->Clear(context_);
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
