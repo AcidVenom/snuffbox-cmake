@@ -22,6 +22,7 @@ namespace snuffbox
 			XMFLOAT4 specular;
 
 			float specular_intensity;
+			float reflectivity;
 		};
 
 	public:

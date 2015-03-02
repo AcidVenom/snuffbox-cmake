@@ -3,9 +3,6 @@
 #define LIGHT_DIRECTIONAL 1
 #define LIGHT_SPOT 2
 
-#define DIFFUSE_MAP 0
-#define NORMAL_MAP 1
-
 cbuffer Global : register(b0)
 {
 	float Time;
@@ -21,6 +18,7 @@ struct Attributes
 	float4 Ambient;
 	float4 Specular;
 	float SpecularIntensity;
+    float Reflectivity;
 };
 
 struct Light
@@ -196,12 +194,23 @@ LightingResult ComputeLighting(float4 p, float4 eye, float3 normal)
     return total;
 }
 
-Texture2D Tex2D[3];
+TextureCube TexCube : register(t0);
+Texture2D TexDiffuse : register(t1);
+Texture2D TexNormal : register(t2);
+
 SamplerState Sampler;
+
+float4 Reflection(float4 p, float4 eye, float4 normal)
+{
+    float3 i = normalize(p.xyz - eye.xyz);
+    float3 r = reflect(i, normal.xyz);
+
+    return TexCube.Sample(Sampler, r);
+}
 
 float4 PS(VOut input) : SV_TARGET
 {
-    float4 normal = Tex2D[NORMAL_MAP].Sample(Sampler, input.texcoord);
+    float4 normal = TexNormal.Sample(Sampler, input.texcoord);
 
     normal = normal * 2 - 1.0f;
 
@@ -219,9 +228,12 @@ float4 PS(VOut input) : SV_TARGET
     float4 diffuse = Material.Diffuse * lit.Diffuse;
     float4 specular = Material.Specular * lit.Specular;
  
-    float4 base = Tex2D[DIFFUSE_MAP].Sample(Sampler, input.texcoord);
- 
+    float4 base = TexDiffuse.Sample(Sampler, input.texcoord);
+    float4 reflection = Reflection(input.worldPos, EyePosition, normal.yzxw * float4(input.normal, 1));
+
+    base = lerp(base, reflection, Material.Reflectivity);
+
     float4 final = (emissive + ambient + diffuse + specular) * base;
- 
+
     return final;
 }

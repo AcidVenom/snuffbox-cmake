@@ -60,7 +60,7 @@ Game.Update = function(dt)
 		mx = 0,
 		rx = 0,
 		ry = 0,
-		speed = 5;
+		speed = 80;
 
 	if (Keyboard.isDown(Key.W))
 	{

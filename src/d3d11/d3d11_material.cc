@@ -103,7 +103,8 @@ namespace snuffbox
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-			1.0f
+			1.0f,
+			0.0f
 		};
 
 		auto GetFloat4 = [this, obj, isolate, path](const std::string& field, XMFLOAT4& store)
@@ -132,6 +133,13 @@ namespace snuffbox
 		{
 			attributes_.specular_intensity = static_cast<float>(val->ToNumber()->Value());
 		}
+
+		val = obj->Get(String::NewFromUtf8(isolate, "reflectivity"));
+
+		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		{
+			attributes_.reflectivity = static_cast<float>(val->ToNumber()->Value());
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -139,7 +147,7 @@ namespace snuffbox
 	{
 		if (diffuse_ != nullptr && diffuse_->is_valid())
 		{
-			diffuse_->Set(0);
+			diffuse_->Set(1);
 		}
 		else
 		{
@@ -148,7 +156,7 @@ namespace snuffbox
 
 		if (normal_ != nullptr && normal_->is_valid())
 		{
-			normal_->Set(1);
+			normal_->Set(2);
 		}
 		else
 		{
@@ -157,7 +165,7 @@ namespace snuffbox
 
 		if (cube_map_ != nullptr)
 		{
-			cube_map_->Set(2);
+			cube_map_->Set(0);
 		}
 	}
 

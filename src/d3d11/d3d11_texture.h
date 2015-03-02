@@ -80,6 +80,11 @@ namespace snuffbox
 		*/
 		ID3D11ShaderResourceView* texture();
 
+		/**
+		* @return const DXGI_FORMAT& The format of this texture
+		*/
+		const DXGI_FORMAT& format() const;
+
 		/// Default destructor
 		virtual ~D3D11Texture();
 
@@ -88,6 +93,6 @@ namespace snuffbox
 		int width_; //!< The width of the texture
 		int height_; //!< The height of the texture
 		ID3D11ShaderResourceView* texture_; //!< The actual texture
-		SharedPtr<D3D11RenderTarget> target_; //!< A render target to use as a texture
+		DXGI_FORMAT format_; //!< The format of this texture
 	};
 }
