@@ -265,7 +265,7 @@ namespace snuffbox
 	template<typename T>
 	bool SharedPtr<T>::operator!=(std::nullptr_t) const
 	{
-		return ptr_ != nullptr
+		return ptr_ != nullptr;
 	}
 
 	//------------------------------------------------------------------------------------------------------

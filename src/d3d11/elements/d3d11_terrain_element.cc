@@ -38,7 +38,7 @@ namespace snuffbox
 
 				vertex.position = XMFLOAT4(static_cast<float>(x), 0.0f, static_cast<float>(y), 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-				vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_, 1.0f - (static_cast<float>(y) / height_));
+				vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_, static_cast<float>(y) / height_);
 				vertex.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 

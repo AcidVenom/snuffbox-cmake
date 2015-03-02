@@ -15,10 +15,9 @@ namespace snuffbox
 		Content(ContentTypes::kMaterial),
 		effect_(nullptr),
 		diffuse_(nullptr),
-		normal_(nullptr),
-		bump_(nullptr)
+		normal_(nullptr)
 	{
-
+		
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -70,25 +69,33 @@ namespace snuffbox
 			SNUFF_LOG_WARNING("Even though not required, the material '" + path + "' doesn't have an 'effect' field");
 		}
 
-		val = obj->Get(String::NewFromUtf8(isolate, "diffuse_map"));
-
-		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		auto GetTexture = [this, isolate](const Local<Object>& v, const std::string& field, D3D11Texture** out)
 		{
-			diffuse_ = ContentManager::Instance()->Get<D3D11Texture>(*String::Utf8Value(val->ToString()));
-		}
+			Local<Value> value = v->Get(String::NewFromUtf8(isolate, field.c_str()));
 
-		val = obj->Get(String::NewFromUtf8(isolate, "normal_map"));
+			if (value.IsEmpty() == false && value->IsUndefined() == false)
+			{
+				*out = ContentManager::Instance()->Get<D3D11Texture>(*String::Utf8Value(value->ToString()));
+			}
+		};
 
-		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		GetTexture(obj, "diffuse_map", &diffuse_);
+		GetTexture(obj, "normal_map", &normal_);
+
+		Local<Value> cube = obj->Get(String::NewFromUtf8(isolate, "cube_map"));
+
+		if (cube.IsEmpty() == false && cube->IsObject() == true)
 		{
-			normal_ = ContentManager::Instance()->Get<D3D11Texture>(*String::Utf8Value(val->ToString()));
-		}
+			Local<Object> cube_map = cube->ToObject();
+			GetTexture(cube_map, "left", &cube_.left);
+			GetTexture(cube_map, "right", &cube_.right);
+			GetTexture(cube_map, "top", &cube_.top);
+			GetTexture(cube_map, "bottom", &cube_.bottom);
+			GetTexture(cube_map, "front", &cube_.front);
+			GetTexture(cube_map, "back", &cube_.back);
 
-		val = obj->Get(String::NewFromUtf8(isolate, "bump_map"));
-
-		if (val.IsEmpty() == false && val->IsUndefined() == false)
-		{
-			bump_ = ContentManager::Instance()->Get<D3D11Texture>(*String::Utf8Value(val->ToString()));
+			cube_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+			cube_map_->CreateCubeMap(cube_);
 		}
 
 		attributes_ = {
@@ -147,14 +154,10 @@ namespace snuffbox
 		{
 			normal_ = nullptr;
 		}
-		
-		if (bump_ != nullptr && bump_->is_valid())
+
+		if (cube_map_ != nullptr)
 		{
-			bump_->Set(2);
-		}
-		else
-		{
-			bump_ = nullptr;
+			cube_map_->Set(2);
 		}
 	}
 

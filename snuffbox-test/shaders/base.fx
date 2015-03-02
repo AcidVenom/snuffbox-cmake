@@ -3,6 +3,9 @@
 #define LIGHT_DIRECTIONAL 1
 #define LIGHT_SPOT 2
 
+#define DIFFUSE_MAP 0
+#define NORMAL_MAP 1
+
 cbuffer Global : register(b0)
 {
 	float Time;
@@ -198,14 +201,25 @@ SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
+    float4 normal = Tex2D[NORMAL_MAP].Sample(Sampler, input.texcoord);
+
+    normal = normal * 2 - 1.0f;
+
 	LightingResult lit = ComputeLighting(input.worldPos, EyePosition, input.normal);
-     
+    LightingResult litNormal = ComputeLighting(input.worldPos, EyePosition, normal.xyz);
+
+    lit.Specular += litNormal.Specular;
+    lit.Diffuse += litNormal.Diffuse;
+
+    lit.Specular = saturate(lit.Specular);
+    lit.Diffuse = saturate(lit.Diffuse);
+
     float4 emissive = Material.Emissive;
     float4 ambient = Material.Ambient * AmbientColour;
     float4 diffuse = Material.Diffuse * lit.Diffuse;
     float4 specular = Material.Specular * lit.Specular;
  
-    float4 base = Tex2D[0].Sample(Sampler, input.texcoord);
+    float4 base = Tex2D[DIFFUSE_MAP].Sample(Sampler, input.texcoord);
  
     float4 final = (emissive + ambient + diffuse + specular) * base;
  

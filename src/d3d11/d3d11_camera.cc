@@ -273,6 +273,8 @@ namespace snuffbox
 		JSWrapper::SetObjectValue(obj, "x", x);
 		JSWrapper::SetObjectValue(obj, "y", y);
 		JSWrapper::SetObjectValue(obj, "z", z);
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -315,6 +317,8 @@ namespace snuffbox
 		JSWrapper::SetObjectValue(obj, "x", x);
 		JSWrapper::SetObjectValue(obj, "y", y);
 		JSWrapper::SetObjectValue(obj, "z", z);
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

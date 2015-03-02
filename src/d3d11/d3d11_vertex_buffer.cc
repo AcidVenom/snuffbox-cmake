@@ -82,7 +82,8 @@ namespace snuffbox
     ID3D11DeviceContext* ctx = render_device->context();
 
     int type = static_cast<int>(type_);
-    if (render_device->vertex_buffer_type() != type)
+		int old = render_device->vertex_buffer_type();
+		if (type_ == VertexBufferType::kOther || old != type)
     {
       render_device->set_vertex_buffer_type(type);
 

@@ -13,6 +13,24 @@ namespace snuffbox
 	class D3D11Texture : public Content
 	{
 	public:
+		/**
+		* @struct snuffbox::Cube
+		* @brief Contains cube map information
+		* @author Daniël Konings
+		*/
+		struct Cube
+		{
+			Cube() : left(nullptr), right(nullptr), top(nullptr), bottom(nullptr), front(nullptr), back(nullptr){}
+
+			D3D11Texture* left;
+			D3D11Texture* right;
+			D3D11Texture* top; 
+			D3D11Texture* bottom;
+			D3D11Texture* front;
+			D3D11Texture* back;
+		};
+
+	public:
 		/// Default constructor
 		D3D11Texture();
 
@@ -36,6 +54,12 @@ namespace snuffbox
 		void Create(ID3D11ShaderResourceView* texture);
 
 		/**
+		* @brief Creates a cube map from a given cube map description
+		* @param[in] cube (const Cube&) The cube description to create the cube map from
+		*/
+		void CreateCubeMap(const Cube& cube);
+
+		/**
 		* @brief Sets the texture as a shader resource on a given slot
 		* @param[in] slot (const int&) The slot to store the texture in
 		*/
@@ -51,6 +75,11 @@ namespace snuffbox
 		*/
 		const int& height() const;
 
+		/**
+		* @return ID3D11ShaderResourceView* The actual texture
+		*/
+		ID3D11ShaderResourceView* texture();
+
 		/// Default destructor
 		virtual ~D3D11Texture();
 
@@ -59,5 +88,6 @@ namespace snuffbox
 		int width_; //!< The width of the texture
 		int height_; //!< The height of the texture
 		ID3D11ShaderResourceView* texture_; //!< The actual texture
+		SharedPtr<D3D11RenderTarget> target_; //!< A render target to use as a texture
 	};
 }

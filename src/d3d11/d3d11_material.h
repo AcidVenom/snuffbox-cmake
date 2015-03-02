@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../d3d11/d3d11_render_device.h"
+#include "../d3d11/d3d11_texture.h"
 #include "../content/content.h"
 
 namespace snuffbox
@@ -63,8 +64,9 @@ namespace snuffbox
 	private:
 		D3D11Texture* diffuse_;
 		D3D11Texture* normal_;
-		D3D11Texture* bump_;
+		SharedPtr<D3D11Texture> cube_map_;
 		D3D11Effect* effect_;
+		D3D11Texture::Cube cube_;
 		Attributes attributes_;
 	};
 }

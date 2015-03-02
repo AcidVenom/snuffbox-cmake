@@ -1,4 +1,9 @@
 #include "../d3d11/d3d11_texture.h"
+#include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_vertex_buffer.h"
+#include "../d3d11/d3d11_shader.h"
+#include "../d3d11/d3d11_viewport.h"
+
 #include "../content/content_manager.h"
 #include "../application/game.h"
 
@@ -107,6 +112,65 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11Texture::CreateCubeMap(const D3D11Texture::Cube& cube)
+	{
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		ID3D11Device* device = render_device->device();
+		ID3D11DeviceContext* ctx = render_device->context();
+
+		target_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("Cubemap");
+
+		target_->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, render_device->swap_chain(), device);
+
+		D3D11VertexBuffer vb(D3D11VertexBuffer::kOther);
+
+		std::vector<int> indices = { 0, 1, 2, 3 };
+		std::vector<Vertex> vertices = {
+			{ XMFLOAT4(-1.0f, -0.25f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+			{ XMFLOAT4(-1.0f, 0.25f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+			{ XMFLOAT4(-0.5f, -0.25f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+			{ XMFLOAT4(-0.5f, 0.25f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) }
+		};
+
+		auto ShiftDraw = [vb, vertices, indices](const float& x, const float& y, D3D11Texture* to_set) mutable
+		{
+			for (unsigned int i = 0; i < 4; ++i)
+			{
+				vertices.at(i).position.x += x;
+				vertices.at(i).position.y += y;
+			}
+
+			vb.Create(vertices, indices);
+
+			to_set->Set(0);
+			vb.Set();
+			vb.Draw();
+		};
+
+		D3D11Viewport view_port;
+		float w = cube.left->width() * 4.0f;
+		float h = cube.left->height() * 3.0f;
+
+		view_port.Create(0.0f, 0.0f, w, h);
+		view_port.Set();
+		D3D11Shader* pp = ContentManager::Instance()->Get<D3D11Shader>("shaders/post_processing.fx");
+		
+		pp->Set();
+		target_->Set(ctx);
+
+		ShiftDraw(0.0f, 0.0f, cube.front);
+		ShiftDraw(0.5f, 0.0f, cube.left);
+		ShiftDraw(0.5f, 0.0f, cube.back);
+		ShiftDraw(0.5f, 0.0f, cube.right);
+		ShiftDraw(-0.5f, -0.5f, cube.top);
+		ShiftDraw(0.0f, 1.0f, cube.bottom);
+
+		texture_ = target_->resource();
+
+		valid_ = true;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11Texture::Set(const int& slot)
 	{
 		if (valid_ == false)
@@ -137,9 +201,15 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	ID3D11ShaderResourceView* D3D11Texture::texture()
+	{
+		return texture_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11Texture::~D3D11Texture()
 	{
-		if (valid_ == false)
+		if (valid_ == false || target_ != nullptr)
 		{
 			return;
 		}
