@@ -97,6 +97,8 @@ SET (D3DElements
 	d3d11/elements/d3d11_quad_element.cc
 	d3d11/elements/d3d11_terrain_element.h
 	d3d11/elements/d3d11_terrain_element.cc
+	d3d11/elements/d3d11_model_element.h
+	d3d11/elements/d3d11_model_element.cc
 )
 
 SET (OGLSources
@@ -149,6 +151,13 @@ SET (IOSources
 	io/io_manager.cc
 )
 
+SET (FBXSources
+	fbx/fbx_loader.h
+	fbx/fbx_loader.cc
+	fbx/fbx_model.h
+	fbx/fbx_model.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -161,6 +170,7 @@ SOURCE_GROUP("js" 				FILES ${JavaScriptSources})
 SOURCE_GROUP("cvar" 				FILES ${CVarSources})
 SOURCE_GROUP("content" 		FILES ${ContentSources})
 SOURCE_GROUP("io" 				FILES ${IOSources})
+SOURCE_GROUP("fbx" 				FILES ${FBXSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -172,6 +182,7 @@ SET (SNUFF_SOURCES
 	${CVarSources}
 	${ContentSources}
 	${IOSources}
+	${FBXSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

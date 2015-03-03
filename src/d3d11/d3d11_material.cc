@@ -104,7 +104,8 @@ namespace snuffbox
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			1.0f,
-			0.0f
+			0.0f,
+			1.0f
 		};
 
 		auto GetFloat4 = [this, obj, isolate, path](const std::string& field, XMFLOAT4& store)
@@ -139,6 +140,13 @@ namespace snuffbox
 		if (val.IsEmpty() == false && val->IsUndefined() == false)
 		{
 			attributes_.reflectivity = static_cast<float>(val->ToNumber()->Value());
+		}
+
+		val = obj->Get(String::NewFromUtf8(isolate, "normal_scale"));
+
+		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		{
+			attributes_.normal_scale = static_cast<float>(val->ToNumber()->Value());
 		}
 	}
 

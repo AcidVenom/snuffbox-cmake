@@ -17,6 +17,8 @@
 
 #include "../platform/platform_file_watch.h"
 
+#include "../fbx/fbx_loader.h"
+
 #ifdef SNUFF_BUILD_CONSOLE
 #include <qapplication.h>
 #include <qmainwindow.h>
@@ -87,6 +89,9 @@ int main(int argc, char** argv)
 	game->set_render_device(render_device);
 
 	IOManager* io_manager = IOManager::Instance();
+	FBXLoader* fbx_loader = FBXLoader::Instance();
+
+	fbx_loader->Initialise();
 
 	js_state_wrapper->Initialise();
   render_device->Initialise();

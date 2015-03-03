@@ -19,7 +19,7 @@ namespace snuffbox
     desc.MinLOD = 0.0f;
     desc.MaxLOD = D3D11_FLOAT32_MAX;
     desc.MipLODBias = 0.0f;
-    desc.MaxAnisotropy = 0;
+    desc.MaxAnisotropy = 2;
 
     switch (type)
     {

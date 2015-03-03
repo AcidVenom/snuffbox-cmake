@@ -21,6 +21,8 @@ Game.Initialise = function()
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
+	ContentManager.load("model", "axew.fbx");
+
 	Game.targets.default.setPostProcessing("post_processing.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
@@ -29,24 +31,17 @@ Game.Initialise = function()
 	Game.terrain.spawn("Default");
 	Game.terrain.setMaterial("test.material");
 
-	Game.light = new Light(LightType.Point);
-	Game.light.setConstantAttenuation(0.01);
-	Game.light.setLinearAttenuation(0.01);
-	Game.light.setQuadraticAttenuation(0.01);
-
-	Game.light.setTranslation(20, 2, 20);
-
-	Game.light2 = new Light(LightType.Point);
-	Game.light2.setConstantAttenuation(0.01);
-	Game.light2.setLinearAttenuation(0.01);
-	Game.light2.setQuadraticAttenuation(0.01);
-
-	Game.light2.setTranslation(40, 2, 40);
-	Game.light2.setColour(1, 0, 0, 1);
+	Game.light = new Light(LightType.Directional);
+	Game.light.setDirection(0.2, 0.8, 0.2);
 
 	Game.camera.setTranslation(-2.5, -22, 16);
 	Game.camera.setRotation(0.66, -2.2, 0);
 	
+	Game.model = new Model("axew.fbx");
+	Game.model.spawn("Default");
+	Game.model.setMaterial("test.material");
+	
+	Game.model.setScale(10, 10, 10);
 }
 
 Game.Update = function(dt)
@@ -60,7 +55,7 @@ Game.Update = function(dt)
 		mx = 0,
 		rx = 0,
 		ry = 0,
-		speed = 80;
+		speed = 20;
 
 	if (Keyboard.isDown(Key.W))
 	{
@@ -90,9 +85,7 @@ Game.Update = function(dt)
 	Game.camera.translateBy(mx, 0, mz);
 	Game.camera.rotateBy(rx, ry, 0);
 
-	var t = Game.time();
-	Game.light.setTranslation(20 + Math.sin(t) * 10, 10, 20 + Math.cos(t) * 10);
-	Game.light.setColour(0,1,1,1);
+	Game.model.rotateBy(0, dt, 0);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)

@@ -23,6 +23,7 @@ namespace snuffbox
 
 			float specular_intensity;
 			float reflectivity;
+			float normal_scale;
 		};
 
 	public:

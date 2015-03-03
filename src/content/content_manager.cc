@@ -9,6 +9,7 @@
 #include "../d3d11/d3d11_depth_state.h"
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
+#include "../fbx/fbx_model.h"
 
 namespace snuffbox
 {
@@ -78,6 +79,10 @@ namespace snuffbox
 			else if (type == ContentTypes::kMaterial)
 			{
 				content = AllocatedMemory::Instance().Construct<D3D11Material>();
+			}
+			else if (type == ContentTypes::kModel)
+			{
+				content = AllocatedMemory::Instance().Construct<FBXModel>();
 			}
 			else
 			{

@@ -115,6 +115,7 @@ namespace snuffbox
 		{
 			return;
 		}
+		
     render_device->context()->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
   }
 
