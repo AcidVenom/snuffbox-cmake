@@ -72,6 +72,7 @@ namespace snuffbox
     void Clear();
 
   private:
-    std::vector<D3D11RenderElement*> elements_; //!< A list of elements to sort and / or draw
+    std::vector<D3D11RenderElement*> world_; //!< A list of world elements to sort and / or draw
+		std::vector<D3D11RenderElement*> ui_; //!< A list of UI elements to sort and / or draw
   };
 }

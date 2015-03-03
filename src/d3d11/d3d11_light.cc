@@ -24,7 +24,7 @@ namespace snuffbox
 	void D3D11Light::Default()
 	{
 		attributes_.translation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		attributes_.direction = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
+		attributes_.direction = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
 		attributes_.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		attributes_.constant_attenuation = 1.0f;
 		attributes_.linear_attenuation = 1.0f;

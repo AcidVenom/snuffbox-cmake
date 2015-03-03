@@ -11,7 +11,7 @@ namespace snuffbox
 	* @brief A global constant buffer that is mapped once before drawing
 	* @author Daniël Konings
 	*/
-	struct CbGlobal
+	__declspec(align(16)) struct CbGlobal
 	{
 		float Time;
 		XMMATRIX View;
@@ -24,7 +24,7 @@ namespace snuffbox
 	* @brief A lighting buffer to emulate lights
 	* @author Daniël Konings
 	*/
-	struct CbLighting
+	__declspec(align(16)) struct CbLighting
 	{
 		XMFLOAT4 Ambient;
 		int NumLights;
@@ -36,12 +36,10 @@ namespace snuffbox
 	* @brief A per-object constant buffer that is mapped each time before rendering an element
 	* @author Daniël Konings
 	*/
-	struct CbPerObject
+	__declspec(align(16)) struct CbPerObject
 	{
 		XMMATRIX World;
 		XMMATRIX InvWorld;
-		float Alpha;
-		XMFLOAT3 Blend;
 		XMFLOAT4 AnimationCoords;
 		D3D11Material::Attributes Attributes;
 	};

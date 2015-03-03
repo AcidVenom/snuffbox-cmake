@@ -35,15 +35,12 @@ struct Light
 
 	int Type;
 	bool Activated;
-	int2 Padding;
 };
 
 cbuffer PerObject : register(b1)
 {
 	float4x4 World;
 	float4x4 InvWorld;
-	float Alpha;
-	float3 Blend;
 	float4 AnimationCoords;
 
 	Attributes Material;
@@ -106,6 +103,11 @@ float4 Specular(Light light, float3 l, float3 v, float3 n)
     return light.Colour * pow(d, Material.SpecularIntensity);
 }
 
+float Attenuation(Light light, float d)
+{
+    return 1.0f / (light.ConstantAttenuation + light.LinearAttenuation * d + light.QuadraticAttenuation * d * d);
+}
+
 LightResult Directional(Light light, float3 v, float3 n)
 {
     LightResult result;
@@ -117,7 +119,48 @@ LightResult Directional(Light light, float3 v, float3 n)
     return result;
 }
 
-LightResult ComputeLighting(float3 view, float3 normal)
+float SpotCone(Light light, float3 l)
+{
+    float min_cos = cos(light.SpotAngle);
+    float max_cos = (min_cos + 1.0f) / 2.0f;
+    float cos_angle = dot(light.Direction.xyz, -l);
+    return smoothstep(min_cos, max_cos, cos_angle);
+}
+
+LightResult SpotLight(Light light, float3 v, float4 p, float3 n)
+{
+    LightResult result;
+
+    float3 l = (light.Translation - p).xyz;
+    float distance = length(l);
+
+    l /= distance;
+
+    float attenuation = Attenuation(light, distance);
+    float spot_intensity = SpotCone(light, l);
+
+    result.Diffuse = Diffuse(light, l, n) * attenuation * spot_intensity;
+    result.Specular = Specular(light, v, l, n) * attenuation * spot_intensity;
+
+    return result;
+}
+
+LightResult PointLight(Light light, float3 v, float4 p, float3 n)
+{
+    LightResult result;
+    float3 l = (light.Translation - p).xyz;
+    float distance = length(l);
+    l /= distance;
+
+    float attenuation = Attenuation(light, distance);
+
+    result.Diffuse = Diffuse(light, l, n) * attenuation;
+    result.Specular = Specular(light, l, v, n) * attenuation;
+
+    return result;
+}
+
+LightResult ComputeLighting(float3 view, float4 p, float3 normal)
 {
     LightResult total = {
         {0.0, 0.0, 0.0, 0.0},
@@ -130,9 +173,21 @@ LightResult ComputeLighting(float3 view, float3 normal)
         switch(Lights[i].Type)
         {
             case LIGHT_DIRECTIONAL:
-            result = Directional(Lights[i], view, normal);
-            total.Diffuse += result.Diffuse;
-            total.Specular += result.Specular;
+                result = Directional(Lights[i], view, normal);
+                total.Diffuse += result.Diffuse;
+                total.Specular += result.Specular;
+            break;
+
+            case LIGHT_POINT:
+                result = PointLight(Lights[i], view, p, normal);
+                total.Diffuse += result.Diffuse;
+                total.Specular += result.Specular;
+            break;
+
+            case LIGHT_SPOT:
+                result = SpotLight(Lights[i], view, p, normal);
+                total.Diffuse += result.Diffuse;
+                total.Specular += result.Specular;
             break;
         }
     }
@@ -156,13 +211,13 @@ float4 PS(VOut input) : SV_TARGET
     float4 normal_map = TexNormal.Sample(Sampler, input.texcoord);
     normal_map = (normal_map * 2.0f - 1.0f) * Material.NormalScale;
 
-    LightResult resA = ComputeLighting(view, normal);
-    LightResult resB = ComputeLighting(view, normal_map.xyz);
+    LightResult res_a = ComputeLighting(view, input.world_pos, normal);
+    LightResult res_b = ComputeLighting(view, input.world_pos, -normal * normal_map.xyz);
     
     float4 emissive = Material.Emissive;
     float4 ambient = Material.Ambient * AmbientColour;
-    float4 diffuse = normalize(resA.Diffuse + resB.Diffuse) * Material.Diffuse;
-    float4 specular = (resA.Specular + resB.Specular) * Material.Specular;
+    float4 diffuse = saturate(res_a.Diffuse + res_b.Diffuse) * Material.Diffuse;
+    float4 specular = saturate(res_a.Specular + res_b.Specular) * Material.Specular;
     float4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);
     
     float4 r = Reflection(view, normal - normal_map.xyz);
@@ -171,6 +226,6 @@ float4 PS(VOut input) : SV_TARGET
     float4 colour = (saturate(ambient + diffuse) * diffuse_map + specular) + emissive;
 
     float alpha = Material.Diffuse.a * diffuse_map.a;
-
+    colour.a *= alpha;
     return colour;
 }

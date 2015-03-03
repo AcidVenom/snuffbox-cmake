@@ -21,6 +21,7 @@
 #include "../d3d11/elements/d3d11_quad_element.h"
 #include "../d3d11/elements/d3d11_terrain_element.h"
 #include "../d3d11/elements/d3d11_model_element.h"
+#include "../d3d11/elements/d3d11_widget_element.h"
 
 namespace snuffbox
 {
@@ -48,6 +49,7 @@ namespace snuffbox
     JSObjectRegister<D3D11Quad>::Register();
 		JSObjectRegister<D3D11Terrain>::Register();
 		JSObjectRegister<D3D11Model>::Register();
+		JSObjectRegister<D3D11Widget>::Register();
   }
 
   //-------------------------------------------------------------------------------------------

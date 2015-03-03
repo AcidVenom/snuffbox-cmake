@@ -17,6 +17,7 @@ Game.Initialise = function()
 	ContentManager.load("texture", "cube_map_front.png");
 	ContentManager.load("texture", "cube_map_back.png");
 
+	ContentManager.load("shader", "shaders/ui.fx");
 	ContentManager.load("effect", "test.effect");
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
@@ -32,7 +33,6 @@ Game.Initialise = function()
 	Game.terrain.setMaterial("test.material");
 
 	Game.light = new Light(LightType.Directional);
-	Game.light.setDirection(0.2, 0.8, 0.2);
 
 	Game.camera.setTranslation(-2.5, -22, 16);
 	Game.camera.setRotation(0.66, -2.2, 0);
@@ -42,6 +42,11 @@ Game.Initialise = function()
 	Game.model.setMaterial("test.material");
 	
 	Game.model.setScale(10, 10, 10);
+
+	Game.widget = new Widget();
+	Game.widget.spawn("Default");
+	Game.widget.setMaterial("test.material");
+	Game.widget.setTechnique("UI");
 }
 
 Game.Update = function(dt)

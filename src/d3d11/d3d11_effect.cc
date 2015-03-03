@@ -53,7 +53,7 @@ namespace snuffbox
 
 		if (json->IsObject() == false)
 		{
-			SNUFF_LOG_ERROR("Input JSON is not of an object type for a effect '" + path + "'");
+			SNUFF_LOG_ERROR("Input JSON is not of an object type for an effect '" + path + "'");
 			return;
 		}
 

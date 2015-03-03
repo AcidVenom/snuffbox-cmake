@@ -106,8 +106,6 @@ namespace snuffbox
 		mapped = static_cast<CbPerObject*>(data.pData);
 		mapped->World = cb.World;
 		mapped->InvWorld = cb.InvWorld;
-		mapped->Alpha = cb.Alpha;
-		mapped->Blend = cb.Blend;
 		mapped->AnimationCoords = cb.AnimationCoords;
 		mapped->Attributes = cb.Attributes;
 		ctx->Unmap(per_object_buffer_, 0);

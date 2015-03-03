@@ -100,6 +100,12 @@ namespace snuffbox
 		*/
     void AddRenderTarget(D3D11RenderTarget* target);
 
+		/// Maps the UI constant buffer
+		void MapUIBuffer();
+
+		/// Maps the global constant buffer
+		void MapGlobalBuffer();
+
     /**
     * @brief Retrieves a render target by name
     * @param[in] name (const std::string&) The name of the render target to retrieve

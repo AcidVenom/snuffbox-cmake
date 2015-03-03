@@ -18,10 +18,9 @@ namespace snuffbox
 		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
-		alpha_(1.0f),
-		blend_(1.0f, 1.0f, 1.0f),
 		material_(nullptr),
-		technique_("Default")
+		technique_("Default"),
+		layer_type_(LayerType::kWorld)
   {
 
   }
@@ -35,10 +34,9 @@ namespace snuffbox
 		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
-		alpha_(1.0f),
-		blend_(1.0f, 1.0f, 1.0f),
 		material_(nullptr),
-		technique_("Default")
+		technique_("Default"),
+		layer_type_(LayerType::kWorld)
 	{
 		JSWrapper wrapper(args);
 		wrapper.set_error_checks(false);
@@ -85,6 +83,49 @@ namespace snuffbox
     rotation_ += XMVectorSet(x, y, z, 0.0f);
   }
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::CalculateWorldMatrix(XMMATRIX* world, const bool& invert_y)
+	{
+		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
+		trans._42 *= invert_y == false ? -1 : 1;
+
+		*world =
+			XMMatrixScalingFromVector(scale_ * size_) *
+			XMMatrixTranslationFromVector(offset_ * scale_ * size_) *
+			XMMatrixRotationRollPitchYawFromVector(rotation_) *
+			trans;
+
+		if (parent_ != nullptr)
+		{
+			D3D11RenderElement* parent = parent_;
+			XMVECTOR t = XMVectorSet(0, 0, 0, 0);
+			XMMATRIX rot = XMMatrixIdentity();
+			XMMATRIX s = XMMatrixIdentity();
+
+			while (parent->parent() != nullptr)
+			{
+				t += parent->translation();
+				rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
+				s *= XMMatrixScalingFromVector(parent->scale());
+				parent = parent->parent();
+			}
+
+			XMVectorSetW(t, 1.0f);
+
+			XMMATRIX parent_trans = XMMatrixTranslationFromVector(t);
+			parent_trans._42 *= invert_y == false ? -1 : 1;
+
+			XMMATRIX root_trans = XMMatrixTranslationFromVector(parent->translation());
+			root_trans._42 *= invert_y == false ? -1 : 1;
+
+			*world *=
+				s * rot * parent_trans *
+				XMMatrixScalingFromVector(parent->scale()) *
+				XMMatrixRotationRollPitchYawFromVector(parent->rotation()) *
+				root_trans;
+		}
+	}
+
   //-------------------------------------------------------------------------------------------
   const XMVECTOR& D3D11RenderElement::translation() const
   {
@@ -118,40 +159,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   const XMMATRIX& D3D11RenderElement::world_matrix()
   {
-		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
-		world_matrix_ =
-			XMMatrixScalingFromVector(scale_ * size_) *
-			XMMatrixTranslationFromVector(offset_ * scale_ * size_) *
-			XMMatrixRotationRollPitchYawFromVector(rotation_) *
-			trans;
-
-		if (parent_ != nullptr)
-		{
-			D3D11RenderElement* parent = parent_;
-			XMVECTOR t = XMVectorSet(0, 0, 0, 0);
-			XMMATRIX rot = XMMatrixIdentity();
-			XMMATRIX s = XMMatrixIdentity();
-
-			while (parent->parent() != nullptr)
-			{
-				t += parent->translation();
-				rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
-				s *= XMMatrixScalingFromVector(parent->scale());
-				parent = parent->parent();
-			}
-
-			XMVectorSetW(t, 1.0f);
-
-			XMMATRIX parent_trans = XMMatrixTranslationFromVector(t);
-			XMMATRIX root_trans = XMMatrixTranslationFromVector(parent->translation());
-
-			world_matrix_ *= 
-				s * rot * parent_trans * 
-				XMMatrixScalingFromVector(parent->scale()) * 
-				XMMatrixRotationRollPitchYawFromVector(parent->rotation()) * 
-				root_trans;
-		}
-
+		CalculateWorldMatrix(&world_matrix_);
     return world_matrix_;
   }
 
@@ -162,25 +170,13 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	const float& D3D11RenderElement::alpha() const
-	{
-		return alpha_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	const XMFLOAT3& D3D11RenderElement::blend() const
-	{
-		return blend_;
-	}
-
-	//-------------------------------------------------------------------------------------------
 	D3D11Material* D3D11RenderElement::material()
 	{
 		return material_;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	const std::string& D3D11RenderElement::technique()
+	const std::string& D3D11RenderElement::technique() const
 	{
 		return technique_;
 	}
@@ -189,6 +185,12 @@ namespace snuffbox
 	D3D11RenderElement* D3D11RenderElement::parent()
 	{
 		return parent_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const D3D11RenderElement::LayerType& D3D11RenderElement::layer_type() const
+	{
+		return layer_type_;
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -212,27 +214,13 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_offset(const float& x, const float& y, const float& z)
   {
-    offset_ = XMVectorSet(x, y, z, 1.0f);
+    offset_ = XMVectorSet(-x, -y, -z, 1.0f);
   }
 
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_size(const float& x, const float& y, const float& z)
   {
     size_ = XMVectorSet(x, y, z, 1.0f);
-  }
-
-  //-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::set_alpha(const float& a)
-  {
-    alpha_ = a;
-  }
-	
-  //-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::set_blend(const float& r, const float& g, const float& b)
-  {
-    blend_.x = r;
-    blend_.y = g;
-    blend_.z = b;
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -259,6 +247,18 @@ namespace snuffbox
 		parent_ = parent;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_layer_type(const D3D11RenderElement::LayerType& type)
+	{
+		layer_type_ = type;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_world_matrix(const XMMATRIX& matrix)
+	{
+		world_matrix_ = matrix;
+	}
+
   //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
   {
@@ -281,10 +281,6 @@ namespace snuffbox
       { "offset", JSOffset },
       { "setSize", JSSetSize },
       { "size", JSSize },
-      { "setAlpha", JSSetAlpha },
-      { "alpha", JSAlpha },
-      { "setBlend", JSSetBlend },
-      { "blend", JSBlend },
 			{ "setMaterial", JSSetMaterial },
 			{ "setTechnique", JSSetTechnique },
       { "spawn", JSSpawn },
@@ -301,10 +297,11 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-    if (wrapper.Check("NNN") == true)
-    {
-      self->set_translation(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
-    }
+		if (wrapper.Check("NN") == true)
+		{
+			const XMVECTOR& v = self->translation();
+			self->set_translation(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, XMVectorGetZ(v)));
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -313,10 +310,10 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-    if (wrapper.Check("NNN") == true)
-    {
-      self->TranslateBy(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
-    }
+		if (wrapper.Check("NN") == true)
+		{
+			self->TranslateBy(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -389,10 +386,11 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-    if (wrapper.Check("NNN") == true)
-    {
-      self->set_scale(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
-    }
+		if (wrapper.Check("NN") == true)
+		{
+			const XMVECTOR& v = self->scale();
+			self->set_scale(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, XMVectorGetZ(v)));
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -421,10 +419,11 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-    if (wrapper.Check("NNN") == true)
-    {
-      self->set_offset(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
-    }
+		if (wrapper.Check("NN") == true)
+		{
+			const XMVECTOR& v = self->offset();
+			self->set_offset(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, XMVectorGetZ(v)));
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -453,9 +452,10 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-    if (wrapper.Check("NNN") == true)
+    if (wrapper.Check("NN") == true)
     {
-      self->set_size(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+			const XMVECTOR& v = self->size();
+      self->set_size(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, XMVectorGetZ(v)));
     }
   }
 
@@ -475,56 +475,6 @@ namespace snuffbox
     JSWrapper::SetObjectValue(obj, "x", x);
     JSWrapper::SetObjectValue(obj, "y", y);
     JSWrapper::SetObjectValue(obj, "z", z);
-
-    wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
-  }
-
-  //-------------------------------------------------------------------------------------------
-  void D3D11RenderElement::JSAlpha(JS_ARGS args)
-  {
-    JSWrapper wrapper(args);
-    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
-
-    wrapper.ReturnValue<double>(self->alpha());
-  }
-
-  //-------------------------------------------------------------------------------------------
-  void D3D11RenderElement::JSSetAlpha(JS_ARGS args)
-  {
-    JSWrapper wrapper(args);
-    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
-
-    if (wrapper.Check("N"))
-    {
-      self->set_alpha(wrapper.GetValue<float>(0, 1.0));
-    }
-  }
-
-  //-------------------------------------------------------------------------------------------
-  void D3D11RenderElement::JSSetBlend(JS_ARGS args)
-  {
-    JSWrapper wrapper(args);
-    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
-
-    if (wrapper.Check("NNN") == true)
-    {
-      self->set_blend(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
-    }
-  }
-
-  //-------------------------------------------------------------------------------------------
-  void D3D11RenderElement::JSBlend(JS_ARGS args)
-  {
-    JSWrapper wrapper(args);
-    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
-
-    const XMFLOAT3& v = self->blend();
-
-    v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
-
-    JSWrapper::SetObjectValue(obj, "r", v.x);
-    JSWrapper::SetObjectValue(obj, "g", v.y);
-    JSWrapper::SetObjectValue(obj, "b", v.z);
 
     wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
   }

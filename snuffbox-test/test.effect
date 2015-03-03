@@ -6,6 +6,14 @@
 					"shader" : "shaders/base.fx"
 				}
 			]
+		},
+
+		"UI" : {
+			"passes" : [
+				{
+					"shader" : "shaders/ui.fx"
+				}
+			]
 		}
 	}
 }

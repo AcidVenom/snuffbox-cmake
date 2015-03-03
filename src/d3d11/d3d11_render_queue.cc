@@ -45,14 +45,17 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::Add(D3D11RenderElement* element)
   {
-		for (D3D11RenderElement* it : elements_)
+		std::vector<D3D11RenderElement*>& add_to = 
+			element->layer_type() == D3D11RenderElement::LayerType::kWorld ? world_ : ui_;
+
+		for (D3D11RenderElement* it : add_to)
 		{
 			if (it == element)
 			{
 				return;
 			}
 		}
-    elements_.push_back(element);
+		add_to.push_back(element);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -61,13 +64,15 @@ namespace snuffbox
 		switch (method)
 		{
 		case SortMethods::kZSorting:
-			std::sort(elements_.begin(), elements_.end(), RenderSorterZ());
+			std::sort(world_.begin(), world_.end(), RenderSorterZ());
 			break;
 
 		case SortMethods::kDistanceFromCamera:
-			std::sort(elements_.begin(), elements_.end(), RenderSorterDistance());
+			std::sort(world_.begin(), world_.end(), RenderSorterDistance());
 			break;
 		}
+
+		std::sort(ui_.begin(), ui_.end(), RenderSorterZ());
   }
 
   //-------------------------------------------------------------------------------------------
@@ -82,9 +87,7 @@ namespace snuffbox
 		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
-			XMMatrixInverse(&deter, element->world_matrix()),
-			element->alpha(),
-			element->blend(),
+			XMMatrixTranspose(XMMatrixInverse(&deter, element->world_matrix())),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
@@ -140,9 +143,10 @@ namespace snuffbox
 		Sort(D3D11RenderDevice::Instance()->camera()->type() == D3D11Camera::CameraTypes::kPerspective ?
 			SortMethods::kDistanceFromCamera : SortMethods::kZSorting);
     D3D11RenderElement* element = nullptr;
-    for (int i = static_cast<int>(elements_.size()) - 1; i >= 0; --i)
+
+		for (int i = static_cast<int>(world_.size()) - 1; i >= 0; --i)
     {
-      element = elements_.at(i);
+			element = world_.at(i);
 
       if (element->spawned() == true)
       {
@@ -150,17 +154,38 @@ namespace snuffbox
       }
       else
       {
-        elements_.erase(elements_.begin() + i);
+				world_.erase(world_.begin() + i);
       }
     }
+
+		D3D11RenderDevice::Instance()->MapUIBuffer();
+
+		for (int i = static_cast<int>(ui_.size()) - 1; i >= 0; --i)
+		{
+			element = ui_.at(i);
+
+			if (element->spawned() == true)
+			{
+				DrawElement(context, element);
+			}
+			else
+			{
+				ui_.erase(ui_.begin() + i);
+			}
+		}
   }
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderQueue::Clear()
 	{
-		for (unsigned int i = 0; i < elements_.size(); ++i)
+		for (unsigned int i = 0; i < world_.size(); ++i)
 		{
-			elements_.at(i)->Destroy();
+			world_.at(i)->Destroy();
+		}
+
+		for (unsigned int i = 0; i < ui_.size(); ++i)
+		{
+			ui_.at(i)->Destroy();
 		}
 	}
 

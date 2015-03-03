@@ -15,6 +15,19 @@ namespace snuffbox
   */
   class D3D11RenderElement
   {
+	public:
+
+		/**
+		* @enum snuffbox::D3D11RenderElement::LayerType
+		* @brief Contains enumerators to specify the layer an element should be spawned on
+		* @author Daniël Konings
+		*/
+		enum LayerType
+		{
+			kWorld,
+			kUI
+		};
+
   public:
     /// Default constructor
     D3D11RenderElement();
@@ -50,6 +63,13 @@ namespace snuffbox
     */
 		void RotateBy(const float& x, const float& y, const float& z);
 
+		/**
+		* @brief Calculates the world matrix and stores it
+		* @param[out] world (XMMATRIX*) The matrix to store the world matrix in
+		* @param[in] invert_y (const bool&) Should the Y axis be inverted? Default = false
+		*/
+		void CalculateWorldMatrix(XMMATRIX* world, const bool& invert_y = false);
+
     /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
     */
@@ -83,22 +103,12 @@ namespace snuffbox
     /**
     * @return const XMMATRIX& The world matrix of this render element
     */
-    const XMMATRIX& world_matrix();
+    virtual const XMMATRIX& world_matrix();
 
     /**
     * @return const bool& Was this render element spawned?
     */
     const bool& spawned() const;
-
-		/**
-		* @return const float& The alpha of this render element
-		*/
-		const float& alpha() const;
-
-		/**
-		* @return const XMFLOAT3& The blend of this render element
-		*/
-		const XMFLOAT3& blend() const;
 
 		/**
 		* @return snuffbox::D3D11Material* The material of this render element
@@ -108,12 +118,17 @@ namespace snuffbox
 		/**
 		* @return const std::string& The technique of this render element
 		*/
-		const std::string& technique();
+		const std::string& technique() const;
 
 		/**
 		* @return snuffbox::D3D11RenderElement* The parent of this render element
 		*/
 		D3D11RenderElement* parent();
+
+		/**
+		* @return  constsnuffbox::D3D11RenderElement::LayerType& The layer type of this render element
+		*/
+		const LayerType& layer_type() const;
 
     /**
     * @brief Sets the translation of this render element
@@ -155,20 +170,6 @@ namespace snuffbox
     */
 		void set_size(const float& x, const float& y, const float& z);
 
-    /**
-    * @brief Sets the alpha of this render element
-    * @param[in] a (const float&) The new alpha value
-    */
-		void set_alpha(const float& a);
-
-    /**
-    * @brief Sets the blend of this render element
-    * @param[in] r (const float&) The new r colour
-    * @param[in] g (const float&) The new g colour
-    * @param[in] b (const float&) The new b colour
-    */
-		void set_blend(const float& r, const float& g, const float& b);
-
 		/**
 		* @brief Sets the material of this render element
 		* @param[in] path (const std::string&) The path to the effect file
@@ -193,6 +194,18 @@ namespace snuffbox
 		*/
 		void set_parent(D3D11RenderElement* parent);
 
+		/**
+		* @brief Sets the layer type of this render element
+		* @param[in] type (const snuffbox::D3D11RenderElement::LayerType&) The type to set
+		*/
+		void set_layer_type(const LayerType& type);
+
+		/**
+		* @brief Sets the world matrix of this render element
+		* @param[in] matrix (const XMMATRIX&) The matrix to set
+		*/
+		void set_world_matrix(const XMMATRIX& matrix);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -201,11 +214,10 @@ namespace snuffbox
     XMVECTOR size_; //!< The size vector of this render element
     XMMATRIX world_matrix_; //!< The world matrix of this render element
     bool spawned_; //!< Is this render element spawned?
-		float alpha_; //!< The alpha of this render element
-		XMFLOAT3 blend_; //!< The blend of this render element
 		D3D11Material* material_; //!< The effect of this render element
 		std::string technique_; //!< The technique of this render element
 		D3D11RenderElement* parent_; //!< The parent of this render element
+		LayerType layer_type_; //!< The layer type of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -221,10 +233,6 @@ namespace snuffbox
     static void JSOffset(JS_ARGS args);
     static void JSSetSize(JS_ARGS args);
     static void JSSize(JS_ARGS args);
-    static void JSSetAlpha(JS_ARGS args);
-    static void JSAlpha(JS_ARGS args);
-    static void JSSetBlend(JS_ARGS args);
-    static void JSBlend(JS_ARGS args);
 		static void JSSetMaterial(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
 		static void JSSetParent(JS_ARGS args);

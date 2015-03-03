@@ -307,14 +307,6 @@ namespace snuffbox
       return;
     }
 
-		global_buffer_->Map({ 
-			static_cast<float>(Game::Instance()->time()),
-			camera_->view(),
-			camera_->projection(),
-			camera_->translation()
-		});
-		global_buffer_->Set(0);
-
 		lighting_->Update(lighting_buffer_.get());
 		
 		back_buffer_->Clear(context_);
@@ -322,6 +314,7 @@ namespace snuffbox
 
     for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
     {
+			MapGlobalBuffer();
       DrawRenderTarget(it->second);
     }
 
@@ -464,6 +457,36 @@ namespace snuffbox
     SNUFF_LOG_WARNING("Attempted to retrieve a non-existant render target '" + name + "'");
     return nullptr;
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::MapGlobalBuffer()
+	{
+		global_buffer_->Map({
+			static_cast<float>(Game::Instance()->time()),
+			camera_->view(),
+			camera_->projection(),
+			camera_->translation()
+		});
+
+		global_buffer_->Set(0);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::MapUIBuffer()
+	{
+		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+
+		XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, 0.0f, 1000.0f);
+
+		global_buffer_->Map({
+			static_cast<float>(Game::Instance()->time()),
+			XMMatrixIdentity(),
+			projection,
+			XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)
+		});
+
+		global_buffer_->Set(0);
+	}
 
   //-------------------------------------------------------------------------------------------
 	IDXGISwapChain* D3D11RenderDevice::swap_chain()
