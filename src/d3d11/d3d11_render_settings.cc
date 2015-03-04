@@ -7,7 +7,8 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderSettings::D3D11RenderSettings() :
 		vsync_(false),
-		resolution_(640.0f, 480.0f)
+		resolution_(640.0f, 480.0f),
+		invert_y_(false)
 	{
 
 	}
@@ -32,6 +33,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	const bool& D3D11RenderSettings::invert_y() const
+	{
+		return invert_y_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderSettings::set_vsync(const bool& vsync)
 	{
 		vsync_ = vsync;
@@ -48,6 +55,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderSettings::set_invert_y(const bool& value)
+	{
+		invert_y_ = value;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderSettings::~D3D11RenderSettings()
 	{
 
@@ -60,7 +73,9 @@ namespace snuffbox
 			{ "setVsync", JSSetVsync },
 			{ "vsync", JSVsync },
 			{ "setResolution", JSSetResolution },
-			{ "resolution", JSResolution }
+			{ "resolution", JSResolution },
+			{ "setInvertY", JSSetInvertY },
+			{ "invertY", JSInvertY }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -113,5 +128,26 @@ namespace snuffbox
 		JSWrapper::SetObjectValue<double>(obj, "h", resolution.y);
 
 		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderSettings::JSSetInvertY(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("B") == false)
+		{
+			SNUFF_LOG_WARNING("Unspecified value, defaulting to 'false'");
+		}
+
+		D3D11RenderSettings::Instance()->set_invert_y(wrapper.GetValue<bool>(0, false));
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderSettings::JSInvertY(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		wrapper.ReturnValue<bool>(D3D11RenderSettings::Instance()->invert_y());
 	}
 }

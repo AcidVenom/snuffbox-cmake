@@ -101,6 +101,10 @@ SET (D3DElements
 	d3d11/elements/d3d11_model_element.cc
 	d3d11/elements/d3d11_widget_element.h
 	d3d11/elements/d3d11_widget_element.cc
+	d3d11/elements/d3d11_billboard_element.h
+	d3d11/elements/d3d11_billboard_element.cc
+	d3d11/elements/d3d11_text_element.h
+	d3d11/elements/d3d11_text_element.cc
 )
 
 SET (OGLSources

@@ -4,6 +4,8 @@
 #include "../../d3d11/d3d11_render_queue.h"
 #include "../../d3d11/d3d11_effect.h"
 #include "../../d3d11/d3d11_material.h"
+#include "../../d3d11/d3d11_render_settings.h"
+#include "../../d3d11/d3d11_camera.h"
 
 #include "../../content/content_manager.h"
 
@@ -35,6 +37,7 @@ namespace snuffbox
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
 		material_(nullptr),
+		billboarding_(false),
 		technique_("Default"),
 		layer_type_(LayerType::kWorld)
 	{
@@ -87,12 +90,19 @@ namespace snuffbox
 	void D3D11RenderElement::CalculateWorldMatrix(XMMATRIX* world, const bool& invert_y)
 	{
 		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
+
+		XMMATRIX rotation = XMMatrixTranspose(D3D11RenderDevice::Instance()->camera()->view());
+
+		rotation._14 = rotation._24 = rotation._34 = rotation._41 = rotation._42 = rotation._43 = 0;
+		rotation._44 = 1;
+
+		rotation = billboarding_ == false ? XMMatrixRotationRollPitchYawFromVector(rotation_) : rotation;
 		trans._42 *= invert_y == false ? -1 : 1;
 
 		*world =
 			XMMatrixScalingFromVector(scale_ * size_) *
 			XMMatrixTranslationFromVector(offset_ * scale_ * size_) *
-			XMMatrixRotationRollPitchYawFromVector(rotation_) *
+			rotation *
 			trans;
 
 		if (parent_ != nullptr)
@@ -105,7 +115,12 @@ namespace snuffbox
 			while (parent->parent() != nullptr)
 			{
 				t += parent->translation();
-				rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
+				
+				if (billboarding_ == false)
+				{
+					rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
+				}
+				
 				s *= XMMatrixScalingFromVector(parent->scale());
 				parent = parent->parent();
 			}
@@ -159,7 +174,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   const XMMATRIX& D3D11RenderElement::world_matrix()
   {
-		CalculateWorldMatrix(&world_matrix_);
+		CalculateWorldMatrix(&world_matrix_, D3D11RenderSettings::Instance()->invert_y());
     return world_matrix_;
   }
 
@@ -257,6 +272,12 @@ namespace snuffbox
 	void D3D11RenderElement::set_world_matrix(const XMMATRIX& matrix)
 	{
 		world_matrix_ = matrix;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_billboarding(const bool& billboarding)
+	{
+		billboarding_ = billboarding;
 	}
 
   //-------------------------------------------------------------------------------------------

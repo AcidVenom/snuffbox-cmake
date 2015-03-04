@@ -206,6 +206,12 @@ namespace snuffbox
 		*/
 		void set_world_matrix(const XMMATRIX& matrix);
 
+		/**
+		* @brief Sets if this render element should billboard towards the camera
+		* @param[in] billboarding (const bool&) The boolean value
+		*/
+		void set_billboarding(const bool& billboarding);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -218,6 +224,7 @@ namespace snuffbox
 		std::string technique_; //!< The technique of this render element
 		D3D11RenderElement* parent_; //!< The parent of this render element
 		LayerType layer_type_; //!< The layer type of this render element
+		bool billboarding_; //!< Should this render element billboard towards the camera?
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);

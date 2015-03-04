@@ -23,6 +23,11 @@ namespace snuffbox
 		const bool& vsync() const;
 
 		/**
+		* @return const bool& Should the Y-axis be inverted?
+		*/
+		const bool& invert_y() const;
+
+		/**
 		* @return const XMFLOAT2& The resolution of the renderer
 		*/
 		const XMFLOAT2& resolution() const;
@@ -40,12 +45,19 @@ namespace snuffbox
 		*/
 		void set_resolution(const float& width, const float& height);
 
+		/**
+		* @brief Sets if the Y-axis should be inverted or not
+		* @param[in] value (const bool&) The boolean value
+		*/
+		void set_invert_y(const bool& value);
+
 		/// Default destructor
 		~D3D11RenderSettings();
 
 	private:
 		bool vsync_; //!< Is vertical sync enabled?
 		XMFLOAT2 resolution_; //!< The resolution of the renderer
+		bool invert_y_; //!< Should the Y-axis be inverted? Mainly for 2D rendering
 
 	public:
     JS_NAME("RenderSettings");
@@ -54,5 +66,7 @@ namespace snuffbox
 		static void JSVsync(JS_ARGS args);
 		static void JSSetResolution(JS_ARGS args);
 		static void JSResolution(JS_ARGS args);
+		static void JSSetInvertY(JS_ARGS args);
+		static void JSInvertY(JS_ARGS args);
 	};
 }
