@@ -60,6 +60,13 @@ namespace snuffbox
 		*/
 		void set_effect(D3D11Effect* effect);
 
+		/**
+		* @brief Sets the textures this material uses
+		* @param[in] diffuse (snuffbox::D3D11Texture*) The diffuse map texture
+		* @param[in] normal (snuffbox::D3D11Texture*) The normal map texture
+		*/
+		void set_textures(D3D11Texture* diffuse, D3D11Texture* normal = nullptr);
+
 		/// Default destructor
 		~D3D11Material();
 

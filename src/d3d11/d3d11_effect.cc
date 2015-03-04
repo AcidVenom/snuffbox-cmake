@@ -103,7 +103,7 @@ namespace snuffbox
 				new_pass.depth_state = AllocatedMemory::Instance().Construct<D3D11DepthState>();
 				new_pass.depth_state->CreateFromJson(pass->ToObject()->Get(String::NewFromUtf8(isolate, "depth"))->ToObject());
 
-				new_pass.sampling = StringToSampling(*String::Utf8Value(pass->ToObject()->Get(String::NewFromUtf8(isolate, "sampling")->ToString())));
+				new_pass.sampling = StringToSampling(*String::Utf8Value(pass->ToObject()->Get(String::NewFromUtf8(isolate, "sampling"))->ToString()));
 				new_passes.push_back(new_pass);
 			}
 

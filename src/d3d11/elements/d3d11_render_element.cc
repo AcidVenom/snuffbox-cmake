@@ -322,6 +322,7 @@ namespace snuffbox
     JSFunctionRegister funcs[] = {
       { "setTranslation", JSSetTranslation },
       { "translateBy", JSTranslateBy },
+			{ "setZ", JSSetZ },
       { "translation", JSTranslation },
       { "setRotation", JSSetRotation },
       { "rotateBy", JSRotateBy },
@@ -370,6 +371,19 @@ namespace snuffbox
 			self->TranslateBy(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
 		}
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetZ(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		if (wrapper.Check("N") == true)
+		{
+			const XMVECTOR& v = self->translation();
+			self->set_translation(XMVectorGetX(v), XMVectorGetY(v), wrapper.GetValue<float>(0, 0.0f));
+		}
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::JSTranslation(JS_ARGS args)
@@ -613,7 +627,7 @@ namespace snuffbox
 		JSWrapper wrapper(args);
 		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
-		if (wrapper.Check("N") == false)
+		if (wrapper.Check("N") == true)
 		{
 			self->set_alpha(wrapper.GetValue<float>(0, 1.0f));
 		}

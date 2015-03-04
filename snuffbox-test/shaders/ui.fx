@@ -39,11 +39,13 @@ struct VOut
     float4 colour : COLOUR;
     float2 texcoord : TEXCOORD0;
     float3 normal : TEXCOORD2;
+    float shift : TEXCOORD3;
 };
 
 VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TEXCOORD0, float3 normal : NORMAL)
 {
     VOut output;
+    output.shift = position.x - floor(position.x);
     output.position = mul(position, World);
     output.position = mul(output.position, Projection);
     output.normal = mul(normal, (float3x3) InvWorld);
@@ -53,14 +55,12 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 }
 
 Texture2D TexDiffuse : register(t1);
-
 SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-    float4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);
-    diffuse_map *= Material.Diffuse;
-    
-    diffuse_map.a *= Material.Diffuse.a;
-    return 1;
+    float4 diffuse = TexDiffuse.Sample(Sampler, input.texcoord);
+    diffuse.rgb *= input.colour.rgb * Blend;
+    diffuse.a *= Alpha;
+    return diffuse;
 }

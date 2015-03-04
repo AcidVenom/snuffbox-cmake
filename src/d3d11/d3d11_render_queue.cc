@@ -5,6 +5,8 @@
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_material.h"
+#include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/elements/d3d11_text_element.h"
 
 #include <algorithm>
 
@@ -13,7 +15,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	bool RenderSorterZ::operator()(D3D11RenderElement* a, D3D11RenderElement* b)
 	{
-		return XMVectorGetZ(a->translation()) < XMVectorGetZ(b->translation());
+		return XMVectorGetZ(a->translation()) > XMVectorGetZ(b->translation());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -83,7 +85,7 @@ namespace snuffbox
 		D3D11Material::Attributes attributes;
 
 		D3D11Material* material = element->material();
-
+		
 		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
@@ -164,7 +166,10 @@ namespace snuffbox
       }
     }
 
-		D3D11RenderDevice::Instance()->MapUIBuffer();
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		render_device->MapUIBuffer();
+
+		render_device->current_target()->Set(render_device->context());
 
 		for (int i = static_cast<int>(ui_.size()) - 1; i >= 0; --i)
 		{
@@ -172,7 +177,27 @@ namespace snuffbox
 
 			if (element->spawned() == true)
 			{
+				D3D11Text* text = dynamic_cast<D3D11Text*>(element);
+
+				if (text != nullptr)
+				{
+					if (text->shadow_set() == true)
+					{
+						XMFLOAT3 blend = text->blend();
+						float alpha = text->alpha();
+
+						text->PrepareShadow();
+						DrawElement(context, element);
+						text->Reset(blend, alpha);
+					}
+				}
+
 				DrawElement(context, element);
+
+				if (text != nullptr)
+				{
+					text->DrawIcons();
+				}
 			}
 			else
 			{

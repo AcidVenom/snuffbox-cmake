@@ -68,6 +68,7 @@ namespace snuffbox
 	{
 		width_ = width;
 		height_ = height;
+		format_ = format;
 		ID3D11Texture2D* texture = nullptr;
 
 		D3D11_TEXTURE2D_DESC desc;

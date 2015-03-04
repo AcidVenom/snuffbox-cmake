@@ -163,6 +163,11 @@ namespace snuffbox
 		*/
 		D3D11Shader* current_shader();
 
+		/**
+		* @return snuffbox::D3D11RenderTarget* The current target being rendered to
+		*/
+		D3D11RenderTarget* current_target();
+
     /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (const int&) The type to set
@@ -194,6 +199,7 @@ namespace snuffbox
 
 		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
 		std::map<std::string, D3D11RenderTarget*> render_targets_; //!< The map of render targets
+		D3D11RenderTarget* current_target_; //!< The current target being rendered
 
     SharedPtr<D3D11VertexBuffer> screen_quad_; //!< The vertex buffer of the screen quad
     int vertex_buffer_type_; //!< The current vertex buffer type
@@ -214,8 +220,8 @@ namespace snuffbox
 		SharedPtr<D3D11ConstantBuffer> per_object_buffer_; //!< The per-object constant buffer
 
     SharedPtr<D3D11BlendState> default_blend_state_; //!< The default blend state
-
 		SharedPtr<D3D11DepthState> default_depth_state_; //!< The default depth state
+
 		ID3D11DepthStencilView* depth_stencil_view_; //!< The depth stencil view
 		ID3D11Texture2D* depth_stencil_buffer_; //!< The actual depth stencil texture
 

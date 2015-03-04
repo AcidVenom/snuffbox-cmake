@@ -3,7 +3,23 @@
 		"Default" : {
 			"passes" : [
 				{
-					"shader" : "shaders/base.fx"
+					"shader" : "shaders/base.fx",
+					"sampling" : "Anisotropic"
+				}
+			]
+		},
+
+		"Text" : {
+			"passes" : [
+				{
+					"blend" : {
+						"SrcBlend" : "SrcAlpha",
+						"DestBlend" : "InvSrcAlpha",
+						"SrcBlendAlpha" : "InvDestAlpha",
+						"DestBlendAlpha" : "One"
+					},
+					"shader" : "shaders/text.fx",
+					"sampling" : "Linear"
 				}
 			]
 		},
@@ -11,7 +27,8 @@
 		"UI" : {
 			"passes" : [
 				{
-					"shader" : "shaders/ui.fx"
+					"shader" : "shaders/ui.fx",
+					"sampling" : "Linear"
 				}
 			]
 		}

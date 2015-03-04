@@ -21,6 +21,8 @@
 
 #include <comdef.h>
 
+#undef max
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -34,7 +36,8 @@ namespace snuffbox
 		camera_(nullptr),
 		depth_stencil_view_(nullptr),
 		current_shader_(nullptr),
-		lighting_(nullptr)
+		lighting_(nullptr),
+		current_target_(nullptr)
 	{
 
 	}
@@ -329,6 +332,8 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::DrawRenderTarget(D3D11RenderTarget* target)
   {
+		current_target_ = target;
+
     viewport_render_target_->Set();
 		D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
 		shader->Set();
@@ -379,6 +384,7 @@ namespace snuffbox
 		set_textures_[2] = nullptr;
 
 		current_shader_ = nullptr;
+		current_target_ = nullptr;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -475,7 +481,7 @@ namespace snuffbox
 	{
 		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
 
-		XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, 0.0f, 1000.0f);
+		XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
 
 		global_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
@@ -558,6 +564,12 @@ namespace snuffbox
 	D3D11Shader* D3D11RenderDevice::current_shader()
 	{
 		return current_shader_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11RenderTarget* D3D11RenderDevice::current_target()
+	{
+		return current_target_;
 	}
 
   //-------------------------------------------------------------------------------------------

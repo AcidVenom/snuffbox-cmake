@@ -5,6 +5,8 @@
 #include "../../freetype/freetype_rich_text.h"
 #include "../../d3d11/d3d11_vertex_buffer.h"
 #include "../../d3d11/d3d11_texture.h"
+#include "../../d3d11/d3d11_material.h"
+#include "../../d3d11/d3d11_effect.h"
 #include "../../content/content_manager.h"
 
 #include <ft2build.h>
@@ -57,6 +59,12 @@ namespace snuffbox
 
 		pen_.x = 0.0f;
 		pen_.y = 0.0f;
+
+		material_ = AllocatedMemory::Instance().Construct<D3D11Material>();
+
+		material_->Validate();
+		material_->set_effect(ContentManager::Instance()->Get<D3D11Effect>("test.effect"));
+		set_technique("Text");
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -71,15 +79,27 @@ namespace snuffbox
 		markup.font = current_font_;
 		markup.colour = current_colour_;
 
+		float new_height = markup.font->line_height();
+
+		if (new_height > highest_)
+		{
+			highest_ = new_height;
+		}
+
 		for (int i = 0; i < buffer.size(); ++i)
 		{
 			wchar_t ch = buffer.at(i);
 
 			if (ch == L'\n')
 			{
-				pen_.y -= (markup.font->line_gap() + markup.font->line_height());
+				if (highest_ == 0.0f)
+				{
+					highest_ = markup.font->line_height();
+				}
+				pen_.y += (markup.font->line_gap() + highest_);
 				pen_.x = 0.0f;
 				++line_;
+				highest_ = 0.0f;
 				continue;
 			}
 
@@ -88,7 +108,7 @@ namespace snuffbox
 			w = static_cast<float>(glyph->width);
 			h = static_cast<float>(glyph->height);
 			x = std::roundf(pen_.x + glyph->x_offset);
-			y = std::roundf(pen_.y + glyph->y_offset - current_font_->ascender());
+			y = std::roundf(pen_.y - glyph->y_offset + current_font_->ascender());
 
 			tx = glyph->tex_coords.left;
 			th = glyph->tex_coords.top;
@@ -96,14 +116,15 @@ namespace snuffbox
 			ty = glyph->tex_coords.bottom;
 
 			Vertex verts[] = {
-				{ XMFLOAT4(x, y - h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, ty), XMFLOAT3(0.0f, 0.0f, 1.0f) },
 				{ XMFLOAT4(x, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, th), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-				{ XMFLOAT4(x + w, y - h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, ty), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-				{ XMFLOAT4(x + w, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, th), XMFLOAT3(0.0f, 1.0f, 0.0f) }
+				{ XMFLOAT4(x, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, ty), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ XMFLOAT4(x + w, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, th), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+				{ XMFLOAT4(x + w, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, ty), XMFLOAT3(0.0f, 1.0f, 0.0f) }
 			};
 
 			for (int j = 0; j < 4; ++j)
 			{
+				verts[j].position.z -= index_offset;
 				vertices_.push_back(verts[j]);
 				indices_.push_back(index_offset * 4 + j);
 
@@ -122,15 +143,15 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Text::FillIconBuffer(TextIcon& icon)
 	{
-		float size = std::floor(icon.size);
-		float x = std::floor(icon.position.x) + 0.5f;
-		float y = std::floor(icon.position.y) + 0.5f;
+		float size = icon.size * 2.0f;
+		float x = icon.position.x;
+		float y = icon.position.y;
 
 		Vertex verts[] = {
 			{ XMFLOAT4(x, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-			{ XMFLOAT4(x, y - size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+			{ XMFLOAT4(x, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 			{ XMFLOAT4(x + size, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-			{ XMFLOAT4(x + size, y - size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) }
+			{ XMFLOAT4(x + size, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) }
 		};
 
 		for (int j = 0; j < 4; ++j)
@@ -143,11 +164,16 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Text::DrawIcons()
 	{
+		material()->effect()->Apply("UI", 0);
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		for (D3D11Text::TextIcon& it : icon_buffer_)
 		{
+			if (it.icon == nullptr)
+			{
+				continue;
+			}
 			it.vertex_buffer->Set();
-			it.icon->Set(0);
+			it.icon->Set(1);
 			it.vertex_buffer->Draw();
 		}
 	}
@@ -155,6 +181,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Text::set_text(const std::string& text)
 	{
+		highest_ = 0.0f;
 		line_ = 0;
 
 		vertices_.clear();
@@ -438,6 +465,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	D3D11Material* D3D11Text::material()
+	{
+		material_->set_textures(FontManager::Instance()->atlas()->texture());
+		return material_.get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void D3D11Text::Align(std::wstring* buffer)
 	{
 		float highest_x;
@@ -459,24 +493,28 @@ namespace snuffbox
 				highest_x = it.position.x;
 			}
 
-			if (it.position.y < highest_y)
+			if (it.position.y > highest_y)
 			{
 				highest_y = it.position.y;
 			}
 		}
 
+		float xx = 0.0f;
+		float yy = 0.0f;
 		for (TextIcon& it : icon_buffer_)
 		{
 			FillIconBuffer(it);
+			xx = it.position.x + it.size * 2.0f;
+			yy = it.position.y + it.size * 2.0f;
 
-			if (it.position.x > highest_x)
+			if (xx > highest_x)
 			{
-				highest_x = it.position.x;
+				highest_x = xx;
 			}
 
-			if (it.position.y < highest_y)
+			if (yy > highest_y)
 			{
-				highest_y = it.position.y;
+				highest_y = yy;
 			}
 		}
 
@@ -509,6 +547,19 @@ namespace snuffbox
 				if (ch == L'\n' || (i == buffer->size() - 1 && buffer->size() != 1))
 				{
 					float x = verts.at(index).position.x;
+
+					for (TextIcon& it : icon_buffer_)
+					{
+						if (it.line == line_)
+						{
+							float xx = it.position.x + it.size * 2.0f;
+							if (xx > x)
+							{
+								x = xx;
+							}
+						}
+					}
+					
 					if (x < highest_x)
 					{
 						int delta = static_cast<int>(highest_x - x);
@@ -588,6 +639,14 @@ namespace snuffbox
 	void D3D11Text::RegisterJS(JS_CONSTRUCTABLE obj)
 	{
 		D3D11RenderElement::Register(obj);
+
+		v8::Handle<v8::Object> enumerator = JSWrapper::CreateObject();
+
+		JSWrapper::SetObjectValue(enumerator, "Left", 0);
+		JSWrapper::SetObjectValue(enumerator, "Right", 1);
+		JSWrapper::SetObjectValue(enumerator, "Center", 2);
+
+		JSStateWrapper::Instance()->RegisterGlobal("TextAlignment", enumerator);
 
 		JSFunctionRegister funcs[] = {
 			{ "setText", JSSetText },

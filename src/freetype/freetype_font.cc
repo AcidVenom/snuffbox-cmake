@@ -87,7 +87,7 @@ namespace snuffbox
   }
 
   //------------------------------------------------------------------------------------------------
-  FontGlyph* Font::LoadGlyph(const wchar_t& charcode)
+  FontGlyph* Font::LoadGlyph(wchar_t charcode)
   {
 		FontAtlas* atlas = FontManager::Instance()->atlas();
 		for (GlyphMap::iterator it = glyphs_.find(charcode); it != glyphs_.end() && it->second->charcode == charcode; ++it)
@@ -220,7 +220,7 @@ namespace snuffbox
 	}
 
   //------------------------------------------------------------------------------------------------
-  FontGlyph* Font::glyph(const wchar_t& charcode)
+  FontGlyph* Font::glyph(wchar_t charcode)
   {
 		GlyphMap::iterator glyph = glyphs_.find(charcode);
 

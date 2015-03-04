@@ -197,6 +197,9 @@ namespace snuffbox
 		//// @see snuffbox::D3D11RenderElement::world_matrix
 		const XMMATRIX& world_matrix();
 
+		//// @see snuffbox::D3D11RenderElement::material
+		D3D11Material* material();
+
 		/// Default destructor
 		virtual ~D3D11Text();
 
@@ -225,7 +228,9 @@ namespace snuffbox
 		std::vector<int>					indices_; //!< The indices of this element
 
 		XMMATRIX									world_matrix_; //!< The world matrix of the text
+		SharedPtr<D3D11Material>  material_; //!< The material used for text
 
+		float											highest_; //!< The biggest height found to adjust to newline
 	public:
 		JS_NAME("Text");
 		static void RegisterJS(JS_CONSTRUCTABLE obj);

@@ -18,6 +18,8 @@ Game.Initialise = function()
 	ContentManager.load("texture", "cube_map_back.png");
 
 	ContentManager.load("shader", "shaders/ui.fx");
+	ContentManager.load("shader", "shaders/text.fx");
+
 	ContentManager.load("effect", "test.effect");
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
@@ -42,13 +44,6 @@ Game.Initialise = function()
 	Game.model.setMaterial("test.material");
 	
 	Game.model.setScale(10, 10, 10);
-
-	Game.widget = new Widget();
-	Game.widget.spawn("Default");
-	Game.widget.setMaterial("test.material");
-	Game.widget.setTechnique("UI");
-
-	
 }
 
 Game.Update = function(dt)

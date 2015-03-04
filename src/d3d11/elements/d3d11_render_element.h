@@ -113,7 +113,7 @@ namespace snuffbox
 		/**
 		* @return snuffbox::D3D11Material* The material of this render element
 		*/
-		D3D11Material* material();
+		virtual D3D11Material* material();
 
 		/**
 		* @return const std::string& The technique of this render element
@@ -256,6 +256,7 @@ namespace snuffbox
     static void Register(JS_CONSTRUCTABLE obj);
     static void JSSetTranslation(JS_ARGS args);
     static void JSTranslateBy(JS_ARGS args);
+		static void JSSetZ(JS_ARGS args);
     static void JSTranslation(JS_ARGS args);
     static void JSSetRotation(JS_ARGS args);
     static void JSRotateBy(JS_ARGS args);

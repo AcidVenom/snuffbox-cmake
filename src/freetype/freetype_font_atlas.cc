@@ -186,6 +186,7 @@ namespace snuffbox
 
 		texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
 		texture_->Create(size_, size_, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM, arr, size_ * depth_);
+		texture_->Validate();
 
 		delete arr;
 	}

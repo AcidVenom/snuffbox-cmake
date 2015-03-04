@@ -36,10 +36,10 @@ namespace snuffbox
 
     /**
     * @brief Loads a glyph from a given charcode
-    * @param[in] charcode (const wchar_t&) The character code to load as a glyph
+    * @param[in] charcode (wchar_t) The character code to load as a glyph
     * @return (snuffbox::FontGlyph*) The new or old glyph
     */
-    FontGlyph* LoadGlyph(const wchar_t& charcode);
+    FontGlyph* LoadGlyph(wchar_t charcode);
 
     /**
     * @brief Loads an entire string of glyphs
@@ -50,10 +50,10 @@ namespace snuffbox
 
     /**
 		* @brief Retrieves the glyph of a given character code
-		* @param[in] charcode (const wchar_t&) The character code to retrieve the glyph of
+		* @param[in] charcode (wchar_t) The character code to retrieve the glyph of
     * @return (snuffbox::FontGlyph*) The glyph for the specific charcode
     */
-		FontGlyph* glyph(const wchar_t& charcode);
+		FontGlyph* glyph(wchar_t charcode);
 
 		/**
 		* @return const float& The ascender of this font
