@@ -4,6 +4,7 @@ Game.targets = Game.targets || {
 
 Game.Initialise = function()
 {
+	RenderSettings.setResolution(1920, 1080);
 	ContentManager.load("texture", "wood.png");
 	ContentManager.load("texture", "wood_normal.png");
 
@@ -30,9 +31,20 @@ Game.Initialise = function()
 
 	Game.camera = new Camera(CameraType.Perspective);
 
-	Game.terrain = new Terrain();
-	Game.terrain.spawn("Default");
-	Game.terrain.setMaterial("test.material");
+	Game.quadA = new Quad();
+	Game.quadA.spawn("Default");
+	Game.quadA.setMaterial("test.material");
+	Game.quadA.setRotation(Math.PI / 2, 0, 0);
+	Game.quadA.setSize(512, 512);
+	Game.quadA.setOffset(0.5, 0.5);
+
+	Game.quadB = new Quad();
+	Game.quadB.spawn("Default");
+	Game.quadB.setMaterial("test.material");
+	Game.quadB.setRotation(0, -Math.PI / 2, -Math.PI / 2);
+	Game.quadB.setSize(512, 512);
+	Game.quadB.setOffset(0.5, 0.5);
+	Game.quadB.setTranslation(256, 256);
 
 	Game.light = new Light(LightType.Directional);
 

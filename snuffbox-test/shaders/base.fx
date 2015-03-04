@@ -52,7 +52,7 @@ cbuffer Lighting : register(b2)
 {
 	float4 AmbientColour;
 	int NumLights;
-	Light Lights[64];
+	Light Lights[MAX_LIGHTS];
 }
 
 struct VOut
@@ -230,5 +230,5 @@ float4 PS(VOut input) : SV_TARGET
     float alpha = Material.Diffuse.a * diffuse_map.a;
     colour.a *= alpha;
 
-    return colour;
+    return r;
 }

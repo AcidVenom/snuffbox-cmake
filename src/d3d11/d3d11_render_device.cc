@@ -481,7 +481,7 @@ namespace snuffbox
 	{
 		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
 
-		XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -9999999.0f, 9999999.0f);
 
 		global_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),

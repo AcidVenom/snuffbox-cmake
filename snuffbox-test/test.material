@@ -1,6 +1,6 @@
 {
-	"diffuse_map" : "wood.png",
-	"normal_map" : "wood_normal.png",
+	"diffuse_map" : "metal.png",
+	"normal_map" : "metal_normal.png",
 	
 	"cube_map" : {
 		"left" : "cube_map_left.png",
@@ -13,11 +13,11 @@
 
 	"emissive" : [0, 0, 0, 1],
 	"diffuse" : [1, 1, 1, 1],
-	"ambient" : [0, 0, 0, 1],
-	"specular" : [0.5, 0.5, 0.25, 1],
+	"ambient" : [0.2, 0.15, 0, 1],
+	"specular" : [1, 1, 1, 1],
 	"specular_intensity" : 16,
-	"reflectivity" : 0.1,
-	"normal_scale" : 0.5,
+	"reflectivity" : 1,
+	"normal_scale" : 0,
 
 	"effect" : "test.effect"
 }
