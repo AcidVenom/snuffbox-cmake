@@ -52,6 +52,11 @@ namespace snuffbox
     {
       ctx->PSSetSamplers(0, 1, &sampler_state_);
     }
+
+		if (state != nullptr)
+		{
+			state->Release();
+		}
   }
 
   //-------------------------------------------------------------------------------------------
