@@ -42,6 +42,8 @@ cbuffer PerObject : register(b1)
 	float4x4 World;
 	float4x4 InvWorld;
 	float4 AnimationCoords;
+    float3 Blend;
+    float Alpha;
 
 	Attributes Material;
 }
@@ -227,5 +229,6 @@ float4 PS(VOut input) : SV_TARGET
 
     float alpha = Material.Diffuse.a * diffuse_map.a;
     colour.a *= alpha;
+
     return colour;
 }

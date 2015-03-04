@@ -103,6 +103,7 @@ namespace snuffbox
 				new_pass.depth_state = AllocatedMemory::Instance().Construct<D3D11DepthState>();
 				new_pass.depth_state->CreateFromJson(pass->ToObject()->Get(String::NewFromUtf8(isolate, "depth"))->ToObject());
 
+				new_pass.sampling = StringToSampling(*String::Utf8Value(pass->ToObject()->Get(String::NewFromUtf8(isolate, "sampling")->ToString())));
 				new_passes.push_back(new_pass);
 			}
 
@@ -137,6 +138,7 @@ namespace snuffbox
 
 			pass.blend_state->Set();
 			pass.depth_state->Set();
+			D3D11RenderDevice::Instance()->SetSampler(static_cast<D3D11SamplerState::SamplerTypes>(pass.sampling));
 
 			return;
 		}
@@ -156,6 +158,28 @@ namespace snuffbox
 
 		SNUFF_LOG_WARNING("Technique with name '" + tech + "' does not exist in the effect");
 		return 0;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	D3D11SamplerState::SamplerTypes D3D11Effect::StringToSampling(const std::string& str)
+	{
+		if (str == "Linear")
+		{
+			return D3D11SamplerState::SamplerTypes::kLinear;
+		}
+		else if (str == "Anisotropic")
+		{
+			return D3D11SamplerState::SamplerTypes::kAnisotropic;
+		}
+		else if (str == "Point")
+		{
+			return D3D11SamplerState::SamplerTypes::kPoint;
+		}
+		else
+		{
+			SNUFF_LOG_WARNING("Unknown sampling type '" + str + "', defaulting to 'Linear'");
+			return D3D11SamplerState::SamplerTypes::kLinear;
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------

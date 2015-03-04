@@ -89,11 +89,17 @@ namespace snuffbox
 			element->world_matrix(),
 			XMMatrixTranspose(XMMatrixInverse(&deter, element->world_matrix())),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
+			element->blend(),
+			element->alpha(),
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
 		constant_buffer->Set(1);
 
     D3D11VertexBuffer* buffer = element->vertex_buffer();
+		if (buffer == nullptr)
+		{
+			return;
+		}
     buffer->Set();
 
 		if (material != nullptr && material->is_valid() == true)

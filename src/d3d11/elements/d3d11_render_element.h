@@ -126,9 +126,19 @@ namespace snuffbox
 		D3D11RenderElement* parent();
 
 		/**
-		* @return  constsnuffbox::D3D11RenderElement::LayerType& The layer type of this render element
+		* @return const snuffbox::D3D11RenderElement::LayerType& The layer type of this render element
 		*/
 		const LayerType& layer_type() const;
+
+		/**
+		* @return const XMFLOAT3& The blend of this render element
+		*/
+		const XMFLOAT3& blend() const;
+
+		/**
+		* @return const float& The alpha of this render element
+		*/
+		const float& alpha() const;
 
     /**
     * @brief Sets the translation of this render element
@@ -212,6 +222,20 @@ namespace snuffbox
 		*/
 		void set_billboarding(const bool& billboarding);
 
+		/**
+		* @brief Sets the blend of this render element
+		* @param[in] r (const float&) The red value
+		* @param[in] g (const float&) The green value
+		* @param[in] b (const float&) The blue value
+		*/
+		void set_blend(const float& r, const float& g, const float& b);
+
+		/**
+		* @brief Sets the alpha of this render element
+		* @param[in] a (const float&) The alpha to set
+		*/
+		void set_alpha(const float& a);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -225,6 +249,8 @@ namespace snuffbox
 		D3D11RenderElement* parent_; //!< The parent of this render element
 		LayerType layer_type_; //!< The layer type of this render element
 		bool billboarding_; //!< Should this render element billboard towards the camera?
+		XMFLOAT3 blend_; //!< The blend of this render element
+		float alpha_; //!< The alpha of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -243,8 +269,12 @@ namespace snuffbox
 		static void JSSetMaterial(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
 		static void JSSetParent(JS_ARGS args);
+		static void JSSetBlend(JS_ARGS args);
+		static void JSBlend(JS_ARGS args);
+		static void JSSetAlpha(JS_ARGS args);
+		static void JSAlpha(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
-    static void JSDestroy(JS_ARGS args);
+		static void JSDestroy(JS_ARGS args);
   };
 }

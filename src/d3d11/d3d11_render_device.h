@@ -106,6 +106,12 @@ namespace snuffbox
 		/// Maps the global constant buffer
 		void MapGlobalBuffer();
 
+		/**
+		* @brief Sets the sampler currently in use
+		* @param[in] type (const int&) The type of sampler to set, castable to snuffbox::D3D11SamplerState::SamplerTypes
+		*/
+		void SetSampler(const int& type);
+
     /**
     * @brief Retrieves a render target by name
     * @param[in] name (const std::string&) The name of the render target to retrieve

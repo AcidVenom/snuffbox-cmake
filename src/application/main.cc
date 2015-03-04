@@ -19,6 +19,8 @@
 
 #include "../fbx/fbx_loader.h"
 
+#include "../freetype/freetype_font_manager.h"
+
 #ifdef SNUFF_BUILD_CONSOLE
 #include <qapplication.h>
 #include <qmainwindow.h>
@@ -95,6 +97,9 @@ int main(int argc, char** argv)
 
 	js_state_wrapper->Initialise();
   render_device->Initialise();
+
+	FontManager* font_manager = FontManager::Instance();
+	font_manager->Initialise();
 
 	js_state_wrapper->CompileAndRun("main.js");
 

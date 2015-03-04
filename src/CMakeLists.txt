@@ -164,6 +164,17 @@ SET (FBXSources
 	fbx/fbx_model.cc
 )
 
+SET (FTSources
+	freetype/freetype_font.h
+	freetype/freetype_font.cc
+	freetype/freetype_font_atlas.h
+	freetype/freetype_font_atlas.cc
+	freetype/freetype_font_manager.h
+	freetype/freetype_font_manager.cc
+	freetype/freetype_rich_text.h
+	freetype/freetype_rich_text.cc
+)
+
 SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
@@ -177,6 +188,7 @@ SOURCE_GROUP("cvar" 				FILES ${CVarSources})
 SOURCE_GROUP("content" 		FILES ${ContentSources})
 SOURCE_GROUP("io" 				FILES ${IOSources})
 SOURCE_GROUP("fbx" 				FILES ${FBXSources})
+SOURCE_GROUP("freetype" 		FILES ${FTSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -189,6 +201,7 @@ SET (SNUFF_SOURCES
 	${ContentSources}
 	${IOSources}
 	${FBXSources}
+	${FTSources}
 )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

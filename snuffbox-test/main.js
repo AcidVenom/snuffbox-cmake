@@ -47,6 +47,8 @@ Game.Initialise = function()
 	Game.widget.spawn("Default");
 	Game.widget.setMaterial("test.material");
 	Game.widget.setTechnique("UI");
+
+	
 }
 
 Game.Update = function(dt)

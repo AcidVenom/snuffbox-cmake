@@ -107,6 +107,8 @@ namespace snuffbox
 		mapped->World = cb.World;
 		mapped->InvWorld = cb.InvWorld;
 		mapped->AnimationCoords = cb.AnimationCoords;
+		mapped->Blend = cb.Blend;
+		mapped->Alpha = cb.Alpha;
 		mapped->Attributes = cb.Attributes;
 		ctx->Unmap(per_object_buffer_, 0);
 

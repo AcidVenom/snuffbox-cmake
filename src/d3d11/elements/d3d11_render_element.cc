@@ -22,7 +22,9 @@ namespace snuffbox
 		spawned_(false),
 		material_(nullptr),
 		technique_("Default"),
-		layer_type_(LayerType::kWorld)
+		layer_type_(LayerType::kWorld),
+		blend_(1.0f, 1.0f, 1.0f),
+		alpha_(1.0f)
   {
 
   }
@@ -39,7 +41,9 @@ namespace snuffbox
 		material_(nullptr),
 		billboarding_(false),
 		technique_("Default"),
-		layer_type_(LayerType::kWorld)
+		layer_type_(LayerType::kWorld),
+		blend_(1.0f, 1.0f, 1.0f),
+		alpha_(1.0f)
 	{
 		JSWrapper wrapper(args);
 		wrapper.set_error_checks(false);
@@ -203,6 +207,18 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	const XMFLOAT3& D3D11RenderElement::blend() const
+	{
+		return blend_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const float& D3D11RenderElement::alpha() const
+	{
+		return alpha_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	const D3D11RenderElement::LayerType& D3D11RenderElement::layer_type() const
 	{
 		return layer_type_;
@@ -280,6 +296,20 @@ namespace snuffbox
 		billboarding_ = billboarding;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_blend(const float& r, const float& g, const float& b)
+	{
+		blend_.x = r;
+		blend_.y = g;
+		blend_.z = b;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_alpha(const float& a)
+	{
+		alpha_ = a;
+	}
+
   //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
   {
@@ -306,6 +336,10 @@ namespace snuffbox
 			{ "setTechnique", JSSetTechnique },
       { "spawn", JSSpawn },
 			{ "spawned", JSSpawned },
+			{ "setBlend", JSSetBlend },
+			{ "blend", JSBlend },
+			{ "setAlpha", JSSetAlpha },
+			{ "alpha", JSAlpha },
       { "destroy", JSDestroy }
     };
 
@@ -543,6 +577,55 @@ namespace snuffbox
 		{
 			self->set_parent(wrapper.GetPointer<D3D11RenderElement>(0));
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetBlend(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		if (wrapper.Check("NNN") == true)
+		{
+			self->set_blend(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSBlend(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		const XMFLOAT3& v = self->blend();
+		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+
+		JSWrapper::SetObjectValue(obj, "r", v.x);
+		JSWrapper::SetObjectValue(obj, "g", v.y);
+		JSWrapper::SetObjectValue(obj, "b", v.z);
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetAlpha(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		if (wrapper.Check("N") == false)
+		{
+			self->set_alpha(wrapper.GetValue<float>(0, 1.0f));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSAlpha(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		wrapper.ReturnValue<float>(self->alpha());
 	}
 
   //-------------------------------------------------------------------------------------------

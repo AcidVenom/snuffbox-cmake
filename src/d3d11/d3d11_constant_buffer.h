@@ -41,6 +41,9 @@ namespace snuffbox
 		XMMATRIX World;
 		XMMATRIX InvWorld;
 		XMFLOAT4 AnimationCoords;
+		XMFLOAT3 Blend;
+		float Alpha;
+
 		D3D11Material::Attributes Attributes;
 	};
 

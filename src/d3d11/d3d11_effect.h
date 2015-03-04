@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../d3d11/d3d11_render_device.h"
+#include "../d3d11/d3d11_sampler_state.h"
 #include "../content/content.h"
 #include <vector>
 
@@ -22,6 +23,7 @@ namespace snuffbox
 			D3D11Shader* shader;
 			SharedPtr<D3D11BlendState> blend_state;
 			SharedPtr<D3D11DepthState> depth_state;
+			D3D11SamplerState::SamplerTypes sampling;
 		};
 
 		/**
@@ -58,6 +60,12 @@ namespace snuffbox
 		* @return unsigned int The number of passes of this effect by technique
 		*/
 		unsigned int NumPasses(const std::string& tech);
+
+		/**
+		* @brief Converts a string to a sampling type
+		* @param[in] str (const std::string&) The string to convert
+		*/
+		D3D11SamplerState::SamplerTypes StringToSampling(const std::string& str);
 
 		/// Default destructor
 		virtual ~D3D11Effect();

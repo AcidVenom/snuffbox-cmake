@@ -336,9 +336,8 @@ namespace snuffbox
 		default_depth_state_->Set();
     target->Set(context_, camera_->type() == D3D11Camera::CameraTypes::kPerspective ? depth_stencil_view_ : nullptr);
     target->Draw(context_);
-
-		shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/post_processing.fx");
-		shader->Set();
+		
+		sampler_linear_->Set();
     back_buffer_->Set(context_);
 
     viewport_->Set();
@@ -486,6 +485,25 @@ namespace snuffbox
 		});
 
 		global_buffer_->Set(0);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::SetSampler(const int& type)
+	{
+		D3D11SamplerState::SamplerTypes t = static_cast<D3D11SamplerState::SamplerTypes>(type);
+
+		switch (t)
+		{
+		case D3D11SamplerState::SamplerTypes::kLinear:
+			sampler_linear_->Set();
+			break;
+		case D3D11SamplerState::SamplerTypes::kAnisotropic:
+			sampler_anisotropic_->Set();
+			break;
+		case D3D11SamplerState::SamplerTypes::kPoint:
+			sampler_point_->Set();
+			break;
+		}
 	}
 
   //-------------------------------------------------------------------------------------------
