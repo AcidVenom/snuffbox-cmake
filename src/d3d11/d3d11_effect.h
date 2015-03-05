@@ -67,6 +67,12 @@ namespace snuffbox
 		*/
 		D3D11SamplerState::SamplerTypes StringToSampling(const std::string& str);
 
+    /**
+    * @brief Adds a technique to this effect
+    * @param[in] technique (const snuffbox::D3D11Effect::Techinque&) The technique to add
+    */
+    void AddTechnique(const Technique& technique);
+
 		/// Default destructor
 		virtual ~D3D11Effect();
 

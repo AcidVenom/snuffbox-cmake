@@ -52,7 +52,7 @@ namespace snuffbox
 		/**
 		* @return const snuffbox::D3D11Material::Attributes& Retrieves the attributes of this material
 		*/
-		const Attributes& attributes() const;
+		Attributes& attributes();
 
 		/**
 		* @brief Sets the effect of this material

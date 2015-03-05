@@ -63,7 +63,7 @@ namespace snuffbox
 		material_ = AllocatedMemory::Instance().Construct<D3D11Material>();
 
 		material_->Validate();
-		material_->set_effect(ContentManager::Instance()->Get<D3D11Effect>("test.effect"));
+		material_->set_effect(D3D11RenderDevice::Instance()->default_effect());
 		set_technique("Text");
 	}
 

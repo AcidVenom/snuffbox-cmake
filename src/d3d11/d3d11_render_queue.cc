@@ -141,6 +141,10 @@ namespace snuffbox
 			{
 				element->set_material(nullptr);
 			}
+      else
+      {
+        element->set_material(D3D11RenderDevice::Instance()->default_material());
+      }
 			buffer->Draw();
 		}
   }

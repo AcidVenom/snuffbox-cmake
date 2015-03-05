@@ -116,6 +116,12 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Texture::CreateCubeMap(const D3D11Texture::Cube& cube)
 	{
+    if (cube.front == nullptr || cube.back == nullptr || cube.left == nullptr || cube.right == nullptr || cube.top == nullptr || cube.bottom == nullptr)
+    {
+      SNUFF_LOG_WARNING("Attempted to create an invalid cube map");
+      return;
+    }
+
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		ID3D11Device* device = render_device->device();
 		ID3D11DeviceContext* ctx = render_device->context();

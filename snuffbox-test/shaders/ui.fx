@@ -11,17 +11,6 @@ cbuffer Global : register(b0)
     float4 EyePosition;
 }
 
-struct Attributes
-{
-    float4 Emissive;
-    float4 Diffuse;
-    float4 Ambient;
-    float4 Specular;
-    float SpecularIntensity;
-    float Reflectivity;
-    float NormalScale;
-};
-
 cbuffer PerObject : register(b1)
 {
     float4x4 World;
@@ -29,8 +18,6 @@ cbuffer PerObject : register(b1)
     float4 AnimationCoords;
     float3 Blend;
     float Alpha;
-
-    Attributes Material;
 }
 
 struct VOut

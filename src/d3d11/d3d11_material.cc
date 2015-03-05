@@ -219,7 +219,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	const D3D11Material::Attributes& D3D11Material::attributes() const
+	D3D11Material::Attributes& D3D11Material::attributes()
 	{
 		return attributes_;
 	}

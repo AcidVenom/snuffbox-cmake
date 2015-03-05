@@ -136,9 +136,27 @@ namespace snuffbox
 				pass.shader = nullptr;
 			}
 
-			pass.blend_state->Set();
-			pass.depth_state->Set();
-			D3D11RenderDevice::Instance()->SetSampler(static_cast<D3D11SamplerState::SamplerTypes>(pass.sampling));
+      D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+      if (pass.blend_state != nullptr)
+      {
+        pass.blend_state->Set();
+      }
+      else
+      {
+        render_device->default_blend_state()->Set();
+      }
+			
+      if (pass.depth_state != nullptr)
+      {
+        pass.depth_state->Set();
+      }
+      else
+      {
+        render_device->default_depth_state()->Set();
+      }
+
+      render_device->SetSampler(static_cast<D3D11SamplerState::SamplerTypes>(pass.sampling));
 
 			return;
 		}
@@ -181,6 +199,12 @@ namespace snuffbox
 			return D3D11SamplerState::SamplerTypes::kLinear;
 		}
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11Effect::AddTechnique(const Technique& technique)
+  {
+    techniques_.emplace(technique.name, technique);
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Effect::~D3D11Effect()

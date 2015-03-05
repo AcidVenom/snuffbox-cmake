@@ -43,9 +43,6 @@ Game.Initialise = function()
 	Game.model.setMaterial("test.material");
 
 	Game.skybox = new Model("skybox.fbx");
-	Game.skybox.spawn("Default");
-	Game.skybox.setTechnique("Skybox");
-	Game.skybox.setMaterial("test.material");
 	
 	Game.model.setScale(10, 10, 10);
 }

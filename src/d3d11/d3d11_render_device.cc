@@ -12,6 +12,8 @@
 #include "../d3d11/d3d11_depth_state.h"
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_lighting.h"
+#include "../d3d11/d3d11_texture.h"
+#include "../d3d11/d3d11_material.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -62,10 +64,7 @@ namespace snuffbox
     CreateDevice();
     CreateBackBuffer();
     CreateScreenQuad();
-
-		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/base.fx");
-		ContentManager::Instance()->Load(ContentTypes::kShader, "shaders/post_processing.fx");
-
+    LoadBaseShaders();
     CreateInputLayout();
     CreateBaseViewport();
 
@@ -97,6 +96,11 @@ namespace snuffbox
 		per_object_buffer_->Create();
 		lighting_buffer_->Create();
 
+    default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
+    default_texture_->Validate();
+
+    CreateDefaultMaterial();
 		CreateDepthStencilView();
 
 		lighting_ = D3D11Lighting::Instance();
@@ -191,6 +195,16 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::LoadBaseShaders()
+  {
+    ContentManager* content_manager = ContentManager::Instance();
+    content_manager->Load(ContentTypes::kShader, "shaders/base.fx");
+    content_manager->Load(ContentTypes::kShader, "shaders/post_processing.fx");
+    content_manager->Load(ContentTypes::kShader, "shaders/ui.fx");
+    content_manager->Load(ContentTypes::kShader, "shaders/text.fx");
+  }
+
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::CreateInputLayout()
   {
     D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
@@ -231,6 +245,56 @@ namespace snuffbox
       static_cast<float>(window->width()),
       static_cast<float>(window->height())
       );
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::CreateDefaultMaterial()
+  {
+    default_effect_ = AllocatedMemory::Instance().Construct<D3D11Effect>();
+
+    D3D11Effect::Technique technique;
+    D3D11Effect::Pass pass;
+
+    ContentManager* content_manager = ContentManager::Instance();
+    pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
+    pass.shader = content_manager->Get<D3D11Shader>("shaders/base.fx");
+
+    technique.name = "Default";
+    technique.passes = { pass };
+
+    default_effect_->AddTechnique(technique);
+
+    pass.shader = content_manager->Get<D3D11Shader>("shaders/ui.fx");
+
+    technique.name = "UI";
+    technique.passes = { pass };
+
+    default_effect_->AddTechnique(technique);
+
+    pass.sampling = D3D11SamplerState::SamplerTypes::kPoint;
+    pass.shader = content_manager->Get<D3D11Shader>("shaders/text.fx");
+
+    technique.name = "Text";
+    technique.passes = { pass };
+
+    default_effect_->AddTechnique(technique);
+
+    default_effect_->Validate();
+
+    default_material_ = AllocatedMemory::Instance().Construct<D3D11Material>();
+    default_material_->set_textures(default_texture_.get());
+    default_material_->set_effect(default_effect_.get());
+
+    D3D11Material::Attributes& attributes = default_material_->attributes();
+    attributes.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    attributes.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    attributes.emissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+    attributes.normal_scale = 0.0f;
+    attributes.reflectivity = 0.0f;
+    attributes.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+    attributes.specular_intensity = 0.0f;
+
+    default_material_->Validate();
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -571,6 +635,36 @@ namespace snuffbox
 	{
 		return current_target_;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  D3D11Texture* D3D11RenderDevice::default_texture()
+  {
+    return default_texture_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11Effect* D3D11RenderDevice::default_effect()
+  {
+    return default_effect_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11Material* D3D11RenderDevice::default_material()
+  {
+    return default_material_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11BlendState* D3D11RenderDevice::default_blend_state()
+  {
+    return default_blend_state_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11DepthState* D3D11RenderDevice::default_depth_state()
+  {
+    return default_depth_state_.get();
+  }
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(const int& type)

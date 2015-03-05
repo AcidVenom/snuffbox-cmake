@@ -30,6 +30,7 @@ namespace snuffbox
 	class D3D11Effect;
 	class D3D11Shader;
 	class D3D11Lighting;
+  class D3D11Material;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -68,12 +69,19 @@ namespace snuffbox
     /// Creates the screen quad
     void CreateScreenQuad();
 
+    /// Loads the base shaders
+    void LoadBaseShaders();
+
     /// Creates the input layout
     void CreateInputLayout();
 
     /// Creates the base viewport
     void CreateBaseViewport();
 
+    /// Creates the default material
+    void CreateDefaultMaterial();
+
+    /// Creates the depth stencil view
 		void CreateDepthStencilView();
 
 		/// Finds the default adapter to use
@@ -169,6 +177,31 @@ namespace snuffbox
 		D3D11RenderTarget* current_target();
 
     /**
+    * @return snuffbox::D3D11Texture* The default texture
+    */
+    D3D11Texture* default_texture();
+
+    /**
+    * @return snuffbox::D3D11Texture* The default effect
+    */
+    D3D11Effect* default_effect();
+
+    /**
+    * @return snuffbox::D3D11Texture* The default material
+    */
+    D3D11Material* default_material();
+
+    /**
+    * @return snuffbox::D3D11BlendState* The default depth state
+    */
+    D3D11DepthState* default_depth_state();
+
+    /**
+    * @return snuffbox::D3D11BlendState* The default blend state
+    */
+    D3D11BlendState* default_blend_state();
+
+    /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (const int&) The type to set
     */
@@ -229,5 +262,9 @@ namespace snuffbox
 		D3D11Shader* current_shader_; //!< The currently set shaders
 
 		D3D11Lighting* lighting_; //!< The lighting system
+
+    SharedPtr<D3D11Texture> default_texture_; //!< The default texture
+    SharedPtr<D3D11Effect> default_effect_; //!< The default effect
+    SharedPtr<D3D11Material> default_material_; //!< The default material
 	};
 }
