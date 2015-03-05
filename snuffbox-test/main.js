@@ -43,8 +43,24 @@ Game.Initialise = function()
 	Game.model.setMaterial("test.material");
 
 	Game.skybox = new Model("skybox.fbx");
-	
+	Game.skybox.spawn("Default");
+	Game.skybox.setTechnique("Skybox");
+	Game.skybox.setMaterial("test.material");
+
+	Game.text = new Text();
+	Game.text.setText("Snuffbox - Work In Progress");
+	Game.text.setFontSize(32);
+	Game.text.setAlignment(TextAlignment.Right);
+	Game.text.setTranslation(1920 / 2 - 20, 1080 / 2 - 20 - Game.text.metrics().h);
+	Game.text.spawn("Default");
+	Game.text.setShadowOffset(1, 1);
+	Game.text.setShadowColour(0, 0, 0, 0.1);
+	Game.text.setAlpha(0.25);
+
 	Game.model.setScale(10, 10, 10);
+	Game.skybox.setScale(5, 5, 5);
+
+	Game.camera.setFarPlane(99999);
 }
 
 Game.Update = function(dt)
