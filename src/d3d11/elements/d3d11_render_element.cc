@@ -96,12 +96,18 @@ namespace snuffbox
 	{
 		XMMATRIX trans = XMMatrixTranslationFromVector(translation_);
 
-		XMMATRIX rotation = XMMatrixTranspose(D3D11RenderDevice::Instance()->camera()->view());
+		XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(rotation_);
 
-		rotation._14 = rotation._24 = rotation._34 = rotation._41 = rotation._42 = rotation._43 = 0;
-		rotation._44 = 1;
+    if (billboarding_ == true)
+    {
+      XMMATRIX billboard = XMMatrixTranspose(D3D11RenderDevice::Instance()->camera()->view());
 
-		rotation = billboarding_ == false ? XMMatrixRotationRollPitchYawFromVector(rotation_) : rotation;
+      billboard._14 = billboard._24 = billboard._34 = billboard._41 = billboard._42 = billboard._43 = 0;
+      billboard._44 = 1;
+
+      rotation *= billboard;
+    }
+
 		trans._42 *= invert_y == false ? -1 : 1;
 
 		*world =
@@ -121,10 +127,7 @@ namespace snuffbox
 			{
 				t += parent->translation();
 				
-				if (billboarding_ == false)
-				{
-					rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
-				}
+				rot *= XMMatrixRotationRollPitchYawFromVector(parent->rotation());
 				
 				s *= XMMatrixScalingFromVector(parent->scale());
 				parent = parent->parent();

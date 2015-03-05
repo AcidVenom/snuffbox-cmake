@@ -9,6 +9,15 @@
 			]
 		},
 
+		"Skybox" : {
+			"passes" : [
+				{
+					"shader" : "shaders/skybox.fx",
+					"sampling" : "Anisotropic"
+				}
+			]
+		},
+
 		"Text" : {
 			"passes" : [
 				{

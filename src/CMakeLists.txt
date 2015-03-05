@@ -105,6 +105,8 @@ SET (D3DElements
 	d3d11/elements/d3d11_billboard_element.cc
 	d3d11/elements/d3d11_text_element.h
 	d3d11/elements/d3d11_text_element.cc
+	d3d11/elements/d3d11_polygon_element.h
+	d3d11/elements/d3d11_polygon_element.cc
 )
 
 SET (OGLSources

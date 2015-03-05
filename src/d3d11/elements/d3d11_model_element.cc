@@ -48,7 +48,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
 	D3D11VertexBuffer* D3D11Model::vertex_buffer()
   {
-		if (model_->is_valid() == false)
+		if (model_ == nullptr || model_->is_valid() == false)
 		{
 			model_ = nullptr;
 		}

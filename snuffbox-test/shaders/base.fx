@@ -202,7 +202,7 @@ LightResult ComputeLighting(float3 view, float4 p, float3 normal)
 
 float4 Reflection(float3 view, float3 normal)
 {
-    float3 r = normalize(reflect(-view, normal));
+    float3 r = normalize(reflect(view, normal));
     return TexCube.Sample(Sampler, r);
 }
 
@@ -230,5 +230,5 @@ float4 PS(VOut input) : SV_TARGET
     float alpha = Material.Diffuse.a * diffuse_map.a;
     colour.a *= alpha;
 
-    return r;
+    return colour;
 }

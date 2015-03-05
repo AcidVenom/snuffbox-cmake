@@ -20,31 +20,18 @@ Game.Initialise = function()
 
 	ContentManager.load("shader", "shaders/ui.fx");
 	ContentManager.load("shader", "shaders/text.fx");
+	ContentManager.load("shader", "shaders/skybox.fx");
 
 	ContentManager.load("effect", "test.effect");
 	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
 	ContentManager.load("model", "axew.fbx");
+	ContentManager.load("model", "skybox.fbx");
 
 	Game.targets.default.setPostProcessing("post_processing.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
-
-	Game.quadA = new Quad();
-	Game.quadA.spawn("Default");
-	Game.quadA.setMaterial("test.material");
-	Game.quadA.setRotation(Math.PI / 2, 0, 0);
-	Game.quadA.setSize(512, 512);
-	Game.quadA.setOffset(0.5, 0.5);
-
-	Game.quadB = new Quad();
-	Game.quadB.spawn("Default");
-	Game.quadB.setMaterial("test.material");
-	Game.quadB.setRotation(0, -Math.PI / 2, -Math.PI / 2);
-	Game.quadB.setSize(512, 512);
-	Game.quadB.setOffset(0.5, 0.5);
-	Game.quadB.setTranslation(256, 256);
 
 	Game.light = new Light(LightType.Directional);
 
@@ -54,6 +41,11 @@ Game.Initialise = function()
 	Game.model = new Model("axew.fbx");
 	Game.model.spawn("Default");
 	Game.model.setMaterial("test.material");
+
+	Game.skybox = new Model("skybox.fbx");
+	Game.skybox.spawn("Default");
+	Game.skybox.setTechnique("Skybox");
+	Game.skybox.setMaterial("test.material");
 	
 	Game.model.setScale(10, 10, 10);
 }
@@ -100,6 +92,9 @@ Game.Update = function(dt)
 	Game.camera.rotateBy(rx, ry, 0);
 
 	Game.model.rotateBy(0, dt, 0);
+
+	var t = Game.camera.translation();
+	Game.skybox.setTranslation(t.x, -t.y, t.z);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
