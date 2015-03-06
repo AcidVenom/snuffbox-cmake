@@ -5,40 +5,40 @@
 
 cbuffer Global : register(b0)
 {
-    float Time;
-    float4x4 View;
-    float4x4 Projection;
-    float4 EyePosition;
+	float Time;
+	float4x4 View;
+	float4x4 Projection;
+	float4 EyePosition;
 }
 
 cbuffer PerObject : register(b1)
 {
-    float4x4 World;
-    float4x4 InvWorld;
-    float4 AnimationCoords;
-    float3 Blend;
-    float Alpha;
+	float4x4 World;
+	float4x4 InvWorld;
+	float4 AnimationCoords;
+	float3 Blend;
+	float Alpha;
 }
 
 struct VOut
 {
-    float4 position : SV_POSITION;
-    float4 colour : COLOUR;
-    float2 texcoord : TEXCOORD0;
-    float3 normal : TEXCOORD2;
-    float shift : TEXCOORD3;
+	float4 position : SV_POSITION;
+	float4 colour : COLOUR;
+	float2 texcoord : TEXCOORD0;
+	float3 normal : TEXCOORD2;
+	float shift : TEXCOORD3;
 };
 
 VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TEXCOORD0, float3 normal : NORMAL)
 {
-    VOut output;
-    output.shift = position.x - floor(position.x);
-    output.position = mul(position, World);
-    output.position = mul(output.position, Projection);
-    output.normal = mul(normal, (float3x3) InvWorld);
-    output.texcoord = texcoord;
-    output.colour = colour;
-    return output;
+	VOut output;
+	output.shift = position.x - floor(position.x);
+	output.position = mul(position, World);
+	output.position = mul(output.position, Projection);
+	output.normal = mul(normal, (float3x3)InvWorld);
+	output.texcoord = texcoord;
+	output.colour = colour;
+	return output;
 }
 
 Texture2D TexDiffuse : register(t1);
@@ -46,8 +46,8 @@ SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-    float4 diffuse = TexDiffuse.Sample(Sampler, input.texcoord);
-    diffuse.rgb *= input.colour.rgb * Blend;
-    diffuse.a *= Alpha;
-    return diffuse;
+	float4 diffuse = TexDiffuse.Sample(Sampler, input.texcoord);
+	diffuse.rgb *= input.colour.rgb * Blend;
+	diffuse.a *= Alpha;
+	return diffuse;
 }

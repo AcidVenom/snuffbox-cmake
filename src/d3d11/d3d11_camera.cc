@@ -139,7 +139,8 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Camera::set_translation(const float& x, const float& y, const float& z)
 	{
-		translation_ = XMVectorSet(x, y, z, 1.0f);
+		float yy = D3D11RenderSettings::Instance()->invert_y() == false ? -y : y;
+		translation_ = XMVectorSet(x, yy, z, 1.0f);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -270,8 +271,9 @@ namespace snuffbox
 		float y = XMVectorGetY(v);
 		float z = XMVectorGetZ(v);
 
+		float yy = D3D11RenderSettings::Instance()->invert_y() == false ? -y : y;
 		JSWrapper::SetObjectValue(obj, "x", x);
-		JSWrapper::SetObjectValue(obj, "y", y);
+		JSWrapper::SetObjectValue(obj, "y", yy);
 		JSWrapper::SetObjectValue(obj, "z", z);
 
 		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);

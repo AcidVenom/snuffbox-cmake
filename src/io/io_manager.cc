@@ -49,6 +49,31 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	bool IOManager::DirectoryExists(const std::string& path)
+	{
+		DWORD dir = GetFileAttributesA((Game::Instance()->path() + "/" + path).c_str());
+
+		if (dir != INVALID_FILE_ATTRIBUTES && dir & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void IOManager::CreateDir(const std::string& path)
+	{
+		if (DirectoryExists(path) == true)
+		{
+			SNUFF_LOG_WARNING("Attempted to create directory '" + path + "', but it already exists");
+			return;
+		}
+
+		CreateDirectoryA((Game::Instance()->path() + "/" + path).c_str(), 0);
+	}
+
+	//-------------------------------------------------------------------------------------------
 	IOManager::~IOManager()
 	{
 
@@ -60,7 +85,9 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = {
 			{ "read", JSRead },
 			{ "exists", JSExists },
-			{ "write", JSWrite }
+			{ "write", JSWrite },
+			{ "directoryExists", JSDirectoryExists },
+			{ "createDirectory", JSCreateDir }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -118,6 +145,28 @@ namespace snuffbox
 			}
 			
 			SNUFF_LOG_INFO("Saved '" + path + "'");
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void IOManager::JSDirectoryExists(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("S") == true)
+		{
+			wrapper.ReturnValue<bool>(IOManager::Instance()->DirectoryExists(wrapper.GetValue<std::string>(0, "undefined")));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void IOManager::JSCreateDir(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("S") == true)
+		{
+			IOManager::Instance()->CreateDir(wrapper.GetValue<std::string>(0, "undefined"));
 		}
 	}
 }

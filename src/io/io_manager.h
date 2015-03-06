@@ -42,11 +42,26 @@ namespace snuffbox
 		*/
 		bool Write(const std::string& path, const std::string& src);
 
+		/**
+		* @brief Does a given directory exist?
+		* @param[in] path (const std::string&) The path to the directory
+		* @return bool The boolean value
+		*/
+		bool DirectoryExists(const std::string& path);
+
+		/**
+		* @brief Creates a directory
+		* @param[in] path (const std::string&) The path to the directory to create
+		*/
+		void CreateDir(const std::string& path);
+
 	public:
 		JS_NAME("IO");
 		static void RegisterJS(JS_SINGLETON obj);
 		static void JSRead(JS_ARGS args);
 		static void JSExists(JS_ARGS args);
 		static void JSWrite(JS_ARGS args);
+		static void JSDirectoryExists(JS_ARGS args);
+		static void JSCreateDir(JS_ARGS args);
 	};
 }

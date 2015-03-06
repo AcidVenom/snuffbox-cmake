@@ -4,7 +4,7 @@ Game.targets = Game.targets || {
 
 Game.Initialise = function()
 {
-	RenderSettings.setResolution(1920, 1080);
+	RenderSettings.setResolution(1366, 768);
 	ContentManager.load("texture", "wood.png");
 	ContentManager.load("texture", "wood_normal.png");
 
@@ -18,31 +18,29 @@ Game.Initialise = function()
 	ContentManager.load("texture", "cube_map_front.png");
 	ContentManager.load("texture", "cube_map_back.png");
 
-	ContentManager.load("shader", "shaders/ui.fx");
-	ContentManager.load("shader", "shaders/text.fx");
 	ContentManager.load("shader", "shaders/skybox.fx");
 
 	ContentManager.load("effect", "test.effect");
-	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
 	ContentManager.load("model", "axew.fbx");
 	ContentManager.load("model", "skybox.fbx");
 
-	Game.targets.default.setPostProcessing("post_processing.effect");
-
 	Game.camera = new Camera(CameraType.Perspective);
 
 	Game.light = new Light(LightType.Directional);
 
-	Game.camera.setTranslation(-2.5, -22, 16);
-	Game.camera.setRotation(0.66, -2.2, 0);
+	Game.camera.setTranslation(0, 0, 0);
+	Game.camera.setRotation(0, 0, 0);
 	
 	Game.model = new Model("axew.fbx");
 	Game.model.spawn("Default");
 	Game.model.setMaterial("test.material");
 
 	Game.skybox = new Model("skybox.fbx");
+	Game.skybox.spawn("Default");
+	Game.skybox.setMaterial("test.material");
+	Game.skybox.setTechnique("Skybox");
 	
 	Game.model.setScale(10, 10, 10);
 }
@@ -91,7 +89,7 @@ Game.Update = function(dt)
 	Game.model.rotateBy(0, dt, 0);
 
 	var t = Game.camera.translation();
-	Game.skybox.setTranslation(t.x, -t.y, t.z);
+	Game.skybox.setTranslation(t.x, t.y, t.z);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)

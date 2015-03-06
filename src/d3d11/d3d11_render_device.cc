@@ -14,12 +14,19 @@
 #include "../d3d11/d3d11_lighting.h"
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
+#include "../d3d11/d3d11_line.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
 
 #include "../cvar/cvar.h"
 #include "../content/content_manager.h"
+#include "../io/io_manager.h"
+
+#include "../d3d11/shaders/d3d11_base_shader.h"
+#include "../d3d11/shaders/d3d11_post_processing_shader.h"
+#include "../d3d11/shaders/d3d11_ui_shader.h"
+#include "../d3d11/shaders/d3d11_text_shader.h"
 
 #include <comdef.h>
 
@@ -104,6 +111,7 @@ namespace snuffbox
 		CreateDepthStencilView();
 
 		lighting_ = D3D11Lighting::Instance();
+		line_ = D3D11Line::Instance();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -197,6 +205,37 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::LoadBaseShaders()
   {
+		IOManager* io = IOManager::Instance();
+
+		if (io->DirectoryExists("shaders") == false)
+		{
+			io->CreateDir("shaders");
+		}
+
+		bool exists = IOManager::Instance()->Exists("shaders/base.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/base.fx", D3D11_BASE_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/post_processing.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/post_processing.fx", D3D11_POST_PROCESSING_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/ui.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/ui.fx", D3D11_UI_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/text.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/text.fx", D3D11_TEXT_SHADER);
+		}
+
     ContentManager* content_manager = ContentManager::Instance();
     content_manager->Load(ContentTypes::kShader, "shaders/base.fx");
     content_manager->Load(ContentTypes::kShader, "shaders/post_processing.fx");
@@ -273,6 +312,14 @@ namespace snuffbox
 
     pass.sampling = D3D11SamplerState::SamplerTypes::kPoint;
     pass.shader = content_manager->Get<D3D11Shader>("shaders/text.fx");
+		pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+
+		pass.blend_state->CreateFromJson(std::string("{\
+			\"SrcBlend\" : \"SrcAlpha\",\
+			\"DestBlend\" : \"InvSrcAlpha\",\
+			\"SrcBlendAlpha\" : \"InvDestAlpha\",\
+			\"DestBlendAlpha\" : \"One\"\
+	}"));
 
     technique.name = "Text";
     technique.passes = { pass };
@@ -295,6 +342,17 @@ namespace snuffbox
     attributes.specular_intensity = 0.0f;
 
     default_material_->Validate();
+
+		default_post_processing_ = AllocatedMemory::Instance().Construct<D3D11Effect>();
+		
+		pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
+		pass.shader = content_manager->Get<D3D11Shader>("shaders/post_processing.fx");
+
+		technique.name = "Default";
+		technique.passes = { pass };
+
+		default_post_processing_->AddTechnique(technique);
+		default_post_processing_->Validate();
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -405,6 +463,9 @@ namespace snuffbox
 		default_depth_state_->Set();
     target->Set(context_, camera_->type() == D3D11Camera::CameraTypes::kPerspective ? depth_stencil_view_ : nullptr);
     target->Draw(context_);
+
+		MapGlobalBuffer();
+		line_->Draw();
 		
 		sampler_linear_->Set();
     back_buffer_->Set(context_);
@@ -647,6 +708,12 @@ namespace snuffbox
   {
     return default_effect_.get();
   }
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Effect* D3D11RenderDevice::default_post_processing()
+	{
+		return default_post_processing_.get();
+	}
 
   //-------------------------------------------------------------------------------------------
   D3D11Material* D3D11RenderDevice::default_material()

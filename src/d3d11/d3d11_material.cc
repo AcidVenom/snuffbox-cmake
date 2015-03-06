@@ -159,7 +159,7 @@ namespace snuffbox
 		}
 		else
 		{
-			diffuse_ = nullptr;
+			diffuse_ = D3D11RenderDevice::Instance()->default_texture();
 		}
 
 		if (normal_ != nullptr && normal_->is_valid())

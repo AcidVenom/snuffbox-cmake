@@ -70,6 +70,8 @@ namespace snuffbox
 		}
 		else if (type == RenderTargets::kRenderTarget)
 		{
+			post_processing_ = D3D11RenderDevice::Instance()->default_post_processing();
+
 			if (resource_ != nullptr)
 			{
 				SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::Create::resource_");

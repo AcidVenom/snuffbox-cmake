@@ -88,6 +88,10 @@ SET (D3DSources
 	d3d11/d3d11_light.cc
 	d3d11/d3d11_lighting.h
 	d3d11/d3d11_lighting.cc
+	d3d11/d3d11_line.h
+	d3d11/d3d11_line.cc
+	d3d11/d3d11_uniforms.h
+	d3d11/d3d11_uniforms.cc
 )
 
 SET (D3DElements
@@ -107,6 +111,13 @@ SET (D3DElements
 	d3d11/elements/d3d11_text_element.cc
 	d3d11/elements/d3d11_polygon_element.h
 	d3d11/elements/d3d11_polygon_element.cc
+)
+
+SET (D3DShaders
+	d3d11/shaders/d3d11_base_shader.h
+	d3d11/shaders/d3d11_ui_shader.h
+	d3d11/shaders/d3d11_text_shader.h
+	d3d11/shaders/d3d11_post_processing_shader.h
 )
 
 SET (OGLSources
@@ -181,7 +192,8 @@ SOURCE_GROUP("win32" 			FILES ${Win32Sources})
 SOURCE_GROUP("platform" 		FILES ${PlatformSources})
 SOURCE_GROUP("application" 	FILES ${ApplicationSources})
 SOURCE_GROUP("d3d11" 			FILES ${D3DSources})
-SOURCE_GROUP("d3d11\\elements" 			FILES ${D3DElements})
+SOURCE_GROUP("d3d11\\elements" 	FILES ${D3DElements})
+SOURCE_GROUP("d3d11\\shaders" 		FILES ${D3DShaders})
 SOURCE_GROUP("ogl" 				FILES ${OGLSources})
 SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
@@ -220,6 +232,7 @@ ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 IF (WIN32 AND NOT SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DSources})
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DElements})
+	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DShaders})
 ELSEIF (SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${OGLSources})
 ELSE ()

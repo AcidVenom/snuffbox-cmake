@@ -25,6 +25,7 @@
 #include "../d3d11/elements/d3d11_billboard_element.h"
 #include "../d3d11/elements/d3d11_text_element.h"
 #include "../d3d11/elements/d3d11_polygon_element.h"
+#include "../d3d11/d3d11_line.h"
 
 namespace snuffbox
 {
@@ -40,6 +41,7 @@ namespace snuffbox
 		JSObjectRegister<IOManager>::RegisterSingleton();
     JSObjectRegister<D3D11RenderSettings>::RegisterSingleton();
 		JSObjectRegister<D3D11Lighting>::RegisterSingleton();
+		JSObjectRegister<D3D11Line>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------
