@@ -232,6 +232,7 @@ float4 PS(VOut input) : SV_TARGET\n\
 \n\
 \tfloat alpha = Material.Diffuse.a * diffuse_map.a;\n\
 \tcolour.a *= alpha;\n\
+\tcolour *= input.colour;\n\
 \n\
 \treturn colour;\n\
 }"
