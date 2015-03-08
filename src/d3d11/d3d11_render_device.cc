@@ -87,7 +87,8 @@ namespace snuffbox
 
     global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
 		lighting_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-    per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+		per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+		uniforms_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
 
     default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 
@@ -102,6 +103,7 @@ namespace snuffbox
 		global_buffer_->Create();
 		per_object_buffer_->Create();
 		lighting_buffer_->Create();
+		uniforms_buffer_->Create();
 
     default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
@@ -671,6 +673,12 @@ namespace snuffbox
 	D3D11ConstantBuffer* D3D11RenderDevice::per_object_buffer()
 	{
 		return per_object_buffer_.get();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11ConstantBuffer* D3D11RenderDevice::uniforms_buffer()
+	{
+		return uniforms_buffer_.get();
 	}
 
 	//-------------------------------------------------------------------------------------------

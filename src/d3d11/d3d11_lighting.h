@@ -17,6 +17,18 @@ namespace snuffbox
 	{
 	public:
 
+		/**
+		* @struct snuffbox::D3D11Lighting::LightSorter
+		* @brief Sorts lights by distance to camera
+		* @author Daniël Konings
+		*/
+		struct LightSorter
+		{
+			bool operator()(D3D11Light* a, D3D11Light* b);
+		};
+
+	public:
+	
 		/// Default constructor
 		D3D11Lighting();
 
@@ -68,6 +80,7 @@ namespace snuffbox
 	private:
 		std::vector<D3D11Light*> lights_; //!< The list of lights that need to be passed to the constant buffer
 		XMFLOAT4 ambient_colour_; //!< The global ambient colour
+		const int MAX_LIGHTS = 64;
 
 	public:
 		JS_NAME("Lighting");

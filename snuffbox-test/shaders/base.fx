@@ -82,6 +82,8 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 TextureCube TexCube : register(t0);
 Texture2D TexDiffuse : register(t1);
 Texture2D TexNormal : register(t2);
+Texture2D TexSpecular : register(t3);
+Texture2D TexLight : register(t4);
 
 SamplerState Sampler;
 
@@ -202,7 +204,7 @@ LightResult ComputeLighting(float3 view, float4 p, float3 normal)
 
 float4 Reflection(float3 view, float3 normal)
 {
-	float3 r = normalize(reflect(-view, normal));
+	float3 r = normalize(reflect(view, normal));
 	return TexCube.Sample(Sampler, r);
 }
 
@@ -213,13 +215,13 @@ float4 PS(VOut input) : SV_TARGET
 	float4 normal_map = TexNormal.Sample(Sampler, input.texcoord);
 	normal_map = (normal_map * 2.0f - 1.0f) * Material.NormalScale;
 
-	LightResult res_a = ComputeLighting(view, input.world_pos, normal);
-	LightResult res_b = ComputeLighting(view, input.world_pos, -normal * normal_map.xyz);
+	LightResult result = ComputeLighting(view, input.world_pos, normal);
+	LightResult normal_mapped = ComputeLighting(view, input.world_pos, normal_map.xyz);
 
-	float4 emissive = Material.Emissive;
+	float4 emissive = Material.Emissive * TexLight.Sample(Sampler, input.texcoord);
 	float4 ambient = Material.Ambient * AmbientColour;
-	float4 diffuse = saturate(res_a.Diffuse + res_b.Diffuse) * Material.Diffuse;
-	float4 specular = saturate(res_a.Specular + res_b.Specular) * Material.Specular;
+	float4 diffuse = saturate(normal_mapped.Diffuse + result.Diffuse) * Material.Diffuse;
+	float4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, input.texcoord);
 	float4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);
 
 	float4 r = Reflection(view, normal - normal_map.xyz);
@@ -229,7 +231,7 @@ float4 PS(VOut input) : SV_TARGET
 
 	float alpha = Material.Diffuse.a * diffuse_map.a;
 	colour.a *= alpha;
-    colour *= input.colour;
+	colour *= input.colour;
 
 	return colour;
 }

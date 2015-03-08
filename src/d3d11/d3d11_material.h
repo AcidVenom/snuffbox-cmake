@@ -73,6 +73,8 @@ namespace snuffbox
 	private:
 		D3D11Texture* diffuse_;
 		D3D11Texture* normal_;
+		D3D11Texture* specular_;
+		D3D11Texture* light_map_;
 		SharedPtr<D3D11Texture> cube_map_;
 		D3D11Effect* effect_;
 		D3D11Texture::Cube cube_;
