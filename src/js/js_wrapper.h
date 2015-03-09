@@ -367,7 +367,7 @@ namespace snuffbox
 
   //-------------------------------------------------------------------------------------------
   template<>
-  inline void JSWrapper::SetObjectValue<v8::Handle<v8::Value>>(const v8::Handle<v8::Object>& obj, const std::string& field, const v8::Handle<v8::Value>& val)
+  inline void JSWrapper::SetObjectValue<v8::Handle<v8::Object>>(const v8::Handle<v8::Object>& obj, const std::string& field, const v8::Handle<v8::Object>& val)
   {
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), val);
