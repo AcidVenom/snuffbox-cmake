@@ -57,7 +57,7 @@ namespace snuffbox
 		{
 			D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 
-			D3D11ConstantBuffer* constant_buffer = render_device->per_object_buffer();
+			D3D11ConstantBuffer* constant_buffer = render_device->constant_buffer();
 			constant_buffer->Map({
 				XMMatrixIdentity(),
 				XMMatrixIdentity(),
@@ -66,8 +66,6 @@ namespace snuffbox
 				1.0f,
 				material_->attributes()
 			});
-
-			constant_buffer->Set(1);
 
 			vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
 			vertex_buffer_->Create(vertices_, indices_);

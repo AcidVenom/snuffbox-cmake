@@ -86,11 +86,6 @@ namespace snuffbox
 
     sampler_linear_->Set();
 
-    global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-		lighting_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-		per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-		uniforms_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-
     default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 
 		default_blend_state_->CreateFromJson(std::string("{}"));
@@ -101,11 +96,6 @@ namespace snuffbox
 		default_depth_state_->CreateFromJson(std::string("{}"));
 		default_depth_state_->Set();
 
-		global_buffer_->Create();
-		per_object_buffer_->Create();
-		lighting_buffer_->Create();
-		uniforms_buffer_->Create();
-
     default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
     default_texture_->Validate();
@@ -115,6 +105,8 @@ namespace snuffbox
 
 		lighting_ = D3D11Lighting::Instance();
 		line_ = D3D11Line::Instance();
+		constant_buffer_ = D3D11ConstantBuffer::Instance();
+		constant_buffer_->Create();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -435,7 +427,7 @@ namespace snuffbox
       return;
     }
 
-		lighting_->Update(lighting_buffer_.get());
+		lighting_->Update(constant_buffer_);
 		
 		back_buffer_->Clear(context_);
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -481,7 +473,7 @@ namespace snuffbox
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
-		target->uniforms()->Apply();
+		//target->uniforms()->Apply();
 		D3D11Effect* effect = target->post_processing();
 
 		if (effect != nullptr && effect->is_valid())
@@ -595,14 +587,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::MapGlobalBuffer()
 	{
-		global_buffer_->Map({
+		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
 			camera_->view(),
 			camera_->projection(),
 			camera_->translation()
 		});
-
-		global_buffer_->Set(0);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -612,14 +602,12 @@ namespace snuffbox
 
     XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -9999999.0f, 9999999.0f);
 
-		global_buffer_->Map({
+		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
 			XMMatrixIdentity(),
 			projection,
 			XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)
 		});
-
-		global_buffer_->Set(0);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -672,15 +660,9 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	D3D11ConstantBuffer* D3D11RenderDevice::per_object_buffer()
+	D3D11ConstantBuffer* D3D11RenderDevice::constant_buffer()
 	{
-		return per_object_buffer_.get();
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11ConstantBuffer* D3D11RenderDevice::uniforms_buffer()
-	{
-		return uniforms_buffer_.get();
+		return constant_buffer_;
 	}
 
 	//-------------------------------------------------------------------------------------------

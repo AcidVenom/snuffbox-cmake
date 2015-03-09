@@ -68,6 +68,12 @@ namespace snuffbox
 		/// Default constructor
 		D3D11ConstantBuffer();
 
+		/**
+		* @brief Retrieves the singleton instance of this class
+		* @return snuffbox::D3D11ConstantBuffer* The pointer to the singleton instance of this class
+		*/
+		static D3D11ConstantBuffer* Instance();
+
 		/// Creates the constant buffer
 		void Create();
 		
@@ -95,11 +101,8 @@ namespace snuffbox
 		*/
 		void Map(const CbUniforms& cb, const int& num_uniforms);
 
-		/**
-		* @brief Sets the constant buffer at a given index
-		* @param[in] index (const int&) The index to map the buffer to
-		*/
-		void Set(const int& index);
+		/// Sets the constant buffer at a given index
+		void Set();
 
 		/// Default denstructor
 		~D3D11ConstantBuffer();
@@ -110,6 +113,5 @@ namespace snuffbox
 		ID3D11Buffer* per_object_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* lighting_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* uniforms_buffer_; //!< The uniforms constant buffer
-		ID3D11Buffer* mapped_; //!< What kind of constant buffer is this?
 	};
 }

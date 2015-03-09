@@ -115,7 +115,7 @@ namespace snuffbox
 			return;
 		}
 		
-		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+		//uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
 		type_ = type;
 		valid_ = true;
@@ -238,11 +238,11 @@ namespace snuffbox
 		return technique_;
 	}
 
-	//---------------------------------------------------------------------------------------------------------
-	D3D11Uniforms* D3D11RenderTarget::uniforms()
-	{
-		return uniforms_.get();
-	}
+	////---------------------------------------------------------------------------------------------------------
+	//D3D11Uniforms* D3D11RenderTarget::uniforms()
+	//{
+	//	return uniforms_.get();
+	//}
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_post_processing(const std::string& path)
@@ -329,10 +329,10 @@ namespace snuffbox
 				wrapper.GetValue<float>(5, 0.0f),
 			};
 
-			self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
+			/*self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
 				wrapper.GetValue<int>(0, 1)),
 				wrapper.GetValue<std::string>(1, "undefined"),
-				buffer);
+				buffer);*/
 		}
 	}
 }

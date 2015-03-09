@@ -81,7 +81,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::DrawElement(ID3D11DeviceContext* context, D3D11RenderElement* element)
   {
-		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->per_object_buffer();
+		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->constant_buffer();
 
 		D3D11Material::Attributes attributes;
 
@@ -96,7 +96,6 @@ namespace snuffbox
 			element->alpha(),
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
-		constant_buffer->Set(1);
 
 		element->uniforms()->Apply();
 

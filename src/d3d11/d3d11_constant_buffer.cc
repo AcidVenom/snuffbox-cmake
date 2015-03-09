@@ -14,6 +14,13 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	D3D11ConstantBuffer* D3D11ConstantBuffer::Instance()
+	{
+		static SharedPtr<D3D11ConstantBuffer> constant_buffer = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
+		return constant_buffer.get();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11ConstantBuffer::Create()
 	{
 		HRESULT result = S_OK;
@@ -77,8 +84,7 @@ namespace snuffbox
 		mapped->Projection = cb.Projection;
 		mapped->EyePosition = cb.EyePosition;
 		ctx->Unmap(global_buffer_, 0);
-
-		mapped_ = global_buffer_;
+		Set();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -98,8 +104,7 @@ namespace snuffbox
 			mapped->Lights[i] = cb.Lights[i];
 		}
 		ctx->Unmap(lighting_buffer_, 0);
-
-		mapped_ = lighting_buffer_;
+		Set();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -119,8 +124,7 @@ namespace snuffbox
 		mapped->Alpha = cb.Alpha;
 		mapped->Attributes = cb.Attributes;
 		ctx->Unmap(per_object_buffer_, 0);
-
-		mapped_ = per_object_buffer_;
+		Set();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -137,18 +141,24 @@ namespace snuffbox
 		{
 			mapped->Uniforms[i] = cb.Uniforms[i];
 		}
-		ctx->Unmap(per_object_buffer_, 0);
-
-		mapped_ = uniforms_buffer_;
+		ctx->Unmap(uniforms_buffer_, 0);
+		Set();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ConstantBuffer::Set(const int& index)
+	void D3D11ConstantBuffer::Set()
 	{
 		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
 
-		ctx->VSSetConstantBuffers(index, 1, &mapped_);
-		ctx->PSSetConstantBuffers(index, 1, &mapped_);
+		ID3D11Buffer* buffers[] = {
+			global_buffer_,
+			per_object_buffer_,
+			lighting_buffer_,
+			uniforms_buffer_
+		};
+
+		ctx->VSSetConstantBuffers(0, 4, buffers);
+		ctx->PSSetConstantBuffers(0, 4, buffers);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

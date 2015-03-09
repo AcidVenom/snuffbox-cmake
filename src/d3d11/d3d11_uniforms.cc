@@ -66,7 +66,7 @@ namespace snuffbox
 		}
 
 		CbUniforms cb_uniforms;
-		D3D11ConstantBuffer* buffer = D3D11RenderDevice::Instance()->uniforms_buffer();
+		D3D11ConstantBuffer* buffer = D3D11RenderDevice::Instance()->constant_buffer();
 
 		int s = static_cast<int>(uniforms.size());
 		for (int i = 0; i < s; ++i)
@@ -75,7 +75,6 @@ namespace snuffbox
 		}
 
 		buffer->Map(cb_uniforms, s);
-		buffer->Set(3);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

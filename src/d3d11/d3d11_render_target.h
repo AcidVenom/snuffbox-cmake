@@ -111,7 +111,7 @@ namespace snuffbox
 		/**
 		* @return snuffbox::D3D11Uniforms* The uniforms buffer of this render target
 		*/
-		D3D11Uniforms* uniforms();
+		//D3D11Uniforms* uniforms();
 
 		/**
 		* @brief Sets the post processing effect of this render target
@@ -142,7 +142,7 @@ namespace snuffbox
 		ID3D11RenderTargetView* view_; //!< The actual view of this render target
 		ID3D11ShaderResourceView* resource_; //!< When used as a normal render target, use this to store the texture
     SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
-		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
+		//SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
 
