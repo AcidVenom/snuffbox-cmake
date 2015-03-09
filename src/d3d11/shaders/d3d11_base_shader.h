@@ -58,6 +58,11 @@ cbuffer Lighting : register(b2)\n\
 \tLight Lights[MAX_LIGHTS];\n\
 }\n\
 \n\
+cbuffer Uniforms : register(b3)\n\
+{\n\
+\n\
+}\n\
+\n\
 struct VOut\n\
 {\n\
 \tfloat4 position : SV_POSITION;\n\

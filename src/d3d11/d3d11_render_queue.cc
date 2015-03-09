@@ -6,6 +6,7 @@
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_material.h"
 #include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_uniforms.h"
 #include "../d3d11/elements/d3d11_text_element.h"
 
 #include <algorithm>
@@ -96,6 +97,8 @@ namespace snuffbox
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
 		constant_buffer->Set(1);
+
+		element->uniforms()->Apply();
 
     D3D11VertexBuffer* buffer = element->vertex_buffer();
 		if (buffer == nullptr)

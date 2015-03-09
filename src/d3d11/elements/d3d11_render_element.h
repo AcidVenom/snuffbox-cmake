@@ -7,6 +7,7 @@ namespace snuffbox
 {
   class D3D11VertexBuffer;
 	class D3D11Material;
+	class D3D11Uniforms;
 
   /**
   * @class snuffbox::D3D11RenderElement
@@ -140,6 +141,11 @@ namespace snuffbox
 		*/
 		const float& alpha() const;
 
+		/**
+		* @return snuffbox::D3D11Uniforms The uniforms buffer of this element
+		*/
+		D3D11Uniforms* uniforms();
+
     /**
     * @brief Sets the translation of this render element
     * @param[in] x (const float&) The new x position
@@ -251,6 +257,7 @@ namespace snuffbox
 		bool billboarding_; //!< Should this render element billboard towards the camera?
 		XMFLOAT3 blend_; //!< The blend of this render element
 		float alpha_; //!< The alpha of this render element
+		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -275,6 +282,7 @@ namespace snuffbox
 		static void JSSetAlpha(JS_ARGS args);
 		static void JSAlpha(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
+		static void JSSetUniform(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
 		static void JSDestroy(JS_ARGS args);
   };

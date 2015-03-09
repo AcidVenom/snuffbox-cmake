@@ -20,6 +20,11 @@ cbuffer PerObject : register(b1)
 	float Alpha;
 }
 
+cbuffer Uniforms : register(b3)
+{
+
+}
+
 struct VOut
 {
 	float4 position : SV_POSITION;

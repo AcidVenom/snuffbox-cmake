@@ -18,6 +18,11 @@ cbuffer PerObject : register(b1)\n\
 \tfloat Alpha;\n\
 }\n\
 \n\
+cbuffer Uniforms : register(b3)\n\
+{\n\
+\n\
+}\n\
+\n\
 struct VOut\n\
 {\n\
 \tfloat4 position : SV_POSITION;\n\

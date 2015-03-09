@@ -5,6 +5,11 @@ cbuffer Global : register(b0)
 	float4x4 Projection;
 }
 
+cbuffer Uniforms : register(b3)
+{
+
+}
+
 struct VOut
 {
 	float4 position : SV_POSITION;

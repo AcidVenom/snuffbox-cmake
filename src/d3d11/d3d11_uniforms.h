@@ -13,7 +13,7 @@ namespace snuffbox
 	* @brief A class to manage uniforms to be sent to the shader
 	* @author Daniël Konings
 	*/
-	class D3D11Uniforms
+	class D3D11Uniforms : public JSObject
 	{
 	public:
 		/**
@@ -53,7 +53,7 @@ namespace snuffbox
 		void Apply();
 
 		/// Default destructor
-		~D3D11Uniforms();
+		virtual ~D3D11Uniforms();
 
 	private:
 		typedef std::map<std::string, XMFLOAT4> Uniforms;

@@ -15,6 +15,7 @@
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
 #include "../d3d11/d3d11_line.h"
+#include "../d3d11/d3d11_uniforms.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
@@ -480,6 +481,7 @@ namespace snuffbox
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
+		target->uniforms()->Apply();
 		D3D11Effect* effect = target->post_processing();
 
 		if (effect != nullptr && effect->is_valid())

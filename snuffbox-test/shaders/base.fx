@@ -55,6 +55,11 @@ cbuffer Lighting : register(b2)
 	Light Lights[MAX_LIGHTS];
 }
 
+cbuffer Uniforms : register(b3)
+{
+	float4 Test;
+}
+
 struct VOut
 {
 	float4 position : SV_POSITION;
@@ -216,11 +221,10 @@ float4 PS(VOut input) : SV_TARGET
 	normal_map = (normal_map * 2.0f - 1.0f) * Material.NormalScale;
 
 	LightResult result = ComputeLighting(view, input.world_pos, normal);
-	LightResult normal_mapped = ComputeLighting(view, input.world_pos, normal_map.xyz);
 
 	float4 emissive = Material.Emissive * TexLight.Sample(Sampler, input.texcoord);
 	float4 ambient = Material.Ambient * AmbientColour;
-	float4 diffuse = saturate(normal_mapped.Diffuse + result.Diffuse) * Material.Diffuse;
+	float4 diffuse = result.Diffuse * Material.Diffuse;
 	float4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, input.texcoord);
 	float4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);
 

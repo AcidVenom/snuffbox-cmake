@@ -6,6 +6,7 @@
 #include "../../d3d11/d3d11_material.h"
 #include "../../d3d11/d3d11_render_settings.h"
 #include "../../d3d11/d3d11_camera.h"
+#include "../../d3d11/d3d11_uniforms.h"
 
 #include "../../content/content_manager.h"
 
@@ -27,7 +28,7 @@ namespace snuffbox
 		blend_(1.0f, 1.0f, 1.0f),
 		alpha_(1.0f)
   {
-
+		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -46,6 +47,8 @@ namespace snuffbox
 		blend_(1.0f, 1.0f, 1.0f),
 		alpha_(1.0f)
 	{
+		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+
 		JSWrapper wrapper(args);
 		wrapper.set_error_checks(false);
 
@@ -228,6 +231,12 @@ namespace snuffbox
 		return layer_type_;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Uniforms* D3D11RenderElement::uniforms()
+	{
+		return uniforms_.get();
+	}
+
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)
   {
@@ -345,6 +354,7 @@ namespace snuffbox
 			{ "blend", JSBlend },
 			{ "setAlpha", JSSetAlpha },
 			{ "alpha", JSAlpha },
+			{ "setUniform", JSSetUniform },
       { "destroy", JSDestroy }
     };
 
@@ -644,6 +654,28 @@ namespace snuffbox
 		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
 		wrapper.ReturnValue<float>(self->alpha());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetUniform(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		if (wrapper.Check("NSN") == true)
+		{
+			float buffer[4] = {
+				wrapper.GetValue<float>(2, 0.0f),
+				wrapper.GetValue<float>(3, 0.0f),
+				wrapper.GetValue<float>(4, 0.0f),
+				wrapper.GetValue<float>(5, 0.0f),
+			};
+
+			self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
+				wrapper.GetValue<int>(0, 1)),
+				wrapper.GetValue<std::string>(1, "undefined"),
+				buffer);
+		}
 	}
 
   //-------------------------------------------------------------------------------------------

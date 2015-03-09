@@ -16,8 +16,8 @@
 	"ambient" : [0, 0, 0, 1],
 	"specular" : [1, 1, 1, 1],
 	"specular_intensity" : 256,
-	"reflectivity" : 0, 
-	"normal_scale" : 1,
+	"reflectivity" : 1, 
+	"normal_scale" : 0,
 
 	"effect" : "test.effect"
 }
