@@ -53,9 +53,11 @@ namespace snuffbox
 		* @brief Maps a world coordinate to indices
 		* @param[in] x (const float&) The x position
 		* @param[in] y (const float&) The y position
+    * @param[out] in_bounds_x (bool*) Is the x coordinate in bounds?
+    * @param[out] in_bounds_y (bool*) Is the y coordinate in bounds?
 		* @return snuffbox::D3D11Terrain::Indices The converted indices
 		*/
-		Indices WorldToIndex(const float& x, const float& y);
+    Indices WorldToIndex(const float& x, const float& y, bool* in_bounds_x, bool* in_bounds_y);
 
 		/**
 		* @brief Maps indices to world coordinates

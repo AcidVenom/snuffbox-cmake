@@ -1,6 +1,8 @@
 #include "../../d3d11/elements/d3d11_terrain_element.h"
 #include "../../d3d11/d3d11_vertex_buffer.h"
 
+#undef max
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -65,39 +67,39 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	D3D11Terrain::Indices D3D11Terrain::WorldToIndex(const float& x, const float& y)
+	D3D11Terrain::Indices D3D11Terrain::WorldToIndex(const float& x, const float& y, bool* in_bounds_x, bool* in_bounds_y)
 	{
-		XMFLOAT4 pos;
-		XMStoreFloat4(&pos, translation());
+    *in_bounds_x = true;
+    *in_bounds_y = true;
 
-		XMFLOAT4 scaling;
-		XMStoreFloat4(&scaling, scale());
+    float xx = x;
+    float yy = y;
 
-		float xx = x;
-		float yy = y;
-		xx -= std::floor(pos.x * scaling.x);
-		yy -= std::floor(pos.y * scaling.z);
+    XMVECTOR p = XMVectorSet(xx, 0.0f, yy, 1.0f);
 
-		int inf = std::numeric_limits<int>::infinity();
+    p = XMVector3Transform(p, XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), world_matrix()));
+    xx = XMVectorGetX(p);
+    yy = XMVectorGetZ(p);
+
 		if (xx > width_ - 1)
 		{
-			xx = static_cast<float>(inf);
+      *in_bounds_x = false;
 		}
 		else if (xx < 0)
 		{
-			xx = static_cast<float>(inf);
+      *in_bounds_x = false;
 		}
 
 		if (yy > height_ - 1)
 		{
-			yy = static_cast<float>(inf);
+      *in_bounds_y = false;
 		}
 		else if (yy < 0)
 		{
-			yy = static_cast<float>(inf);
+      *in_bounds_y = false;
 		}
 
-		return Indices{ static_cast<int>(xx), static_cast<int>(yy) };
+    return Indices{ static_cast<int>(xx), static_cast<int>(yy) };
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -109,13 +111,17 @@ namespace snuffbox
 		XMFLOAT4 scaling;
 		XMStoreFloat4(&scaling, scale());
 
+    XMFLOAT4 offsetting;
+    XMStoreFloat4(&offsetting, offset());
+
 		float xx = static_cast<float>(x);
 		float yy = static_cast<float>(y);
 
-		xx += pos.x * scaling.x;
-		yy += pos.y * scaling.y;
+    XMVECTOR p = XMVectorSet(xx, 0.0f, yy, 1.0f);
 
-		return WorldCoordinates{ xx, yy };
+    p = XMVector3Transform(p, world_matrix());
+
+		return WorldCoordinates{ XMVectorGetX(p), XMVectorGetZ(p) };
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -123,7 +129,11 @@ namespace snuffbox
 	{
 		std::vector<Indices> indices;
 
-		Indices v1 = WorldToIndex(x, y);
+    bool in_bounds_x;
+    bool in_bounds_y;
+
+    Indices v1 = WorldToIndex(x, y, &in_bounds_x, &in_bounds_y);
+
 		Indices v2 = { v1.x + 1, v1.y };
 		Indices v3 = { v1.x, v1.y + 1 };
 		Indices v4 = { v1.x + 1, v1.y + 1 };
@@ -169,7 +179,7 @@ namespace snuffbox
 			}
 		};
 
-		for (unsigned int i = 0; i < indices_.size(); ++i)
+		for (unsigned int i = 0; i < indices.size(); ++i)
 		{
 			clamp(indices.at(i));
 		}
@@ -338,17 +348,19 @@ namespace snuffbox
 
 		if (wrapper.Check("NN") == true)
 		{
-			Indices indices = self->WorldToIndex(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f));
+      bool in_bounds_x;
+      bool in_bounds_y;
+
+			Indices indices = self->WorldToIndex(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), &in_bounds_x, &in_bounds_y);
 
 			v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
-			int inf = std::numeric_limits<int>::infinity();
-			
-			if (indices.x != inf)
+
+      if (in_bounds_x == true)
 			{
 				JSWrapper::SetObjectValue(obj, "x", indices.x);
 			}
 			
-			if (indices.y != inf)
+      if (in_bounds_y == true)
 			{
 				JSWrapper::SetObjectValue(obj, "y", indices.y);
 			}
@@ -395,8 +407,10 @@ namespace snuffbox
 				JSWrapper::SetObjectValue(v, "x", index.x);
 				JSWrapper::SetObjectValue(v, "y", index.y);
 
-				JSWrapper::SetObjectValue(v, std::to_string(i), v);
+				JSWrapper::SetObjectValue(obj, std::to_string(i), v);
 			}
+
+      wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
 		}
 	}
 

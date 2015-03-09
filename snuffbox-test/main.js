@@ -47,8 +47,8 @@ Game.Initialise = function()
 
 	Game.terrain = new Terrain();
 	Game.terrain.create(128, 128);
-	Game.terrain.setScale(0.5, 0, 0.5);
 	Game.terrain.setTranslation(10, 0, 20);
+	Game.terrain.setScale(0.5, 1, 0.5);
 	Game.terrain.spawn("Default");
 }
 
@@ -109,9 +109,25 @@ Game.Update = function(dt)
 	var ix = unprojA.x - f * (unprojB.x - unprojA.x);
 	var iz = unprojA.z - f * (unprojB.z - unprojA.z);
 
-	var point = Game.terrain.worldToIndex(ix, iz);
+	var points = Game.terrain.nearestVertices(ix, iz);
 
-	Log.fatal("x " + point.x + " | y " + point.y);
+	var p1 = Game.terrain.indexToWorld(points[0].x, points[0].y);
+	var p2 = Game.terrain.indexToWorld(points[1].x, points[1].y);
+	var p3 = Game.terrain.indexToWorld(points[2].x, points[2].y);
+
+	var s = 0.05;
+	Line.draw(p1.x, s, p1.z, 1, 0, 0, p2.x, s, p2.z, 1, 0, 0)
+	Line.draw(p2.x, s, p2.z, 1, 0, 0, p3.x, s, p3.z, 1, 0, 0)
+	Line.draw(p3.x, s, p3.z, 1, 0, 0, p1.x, s, p1.z, 1, 0, 0)
+
+	if (Mouse.isDown(MouseButton.Middle))
+	{
+		Game.terrain.setHeight(points[0].x, points[0].y, 10);
+		Game.terrain.setHeight(points[1].x, points[1].y, 10);
+		Game.terrain.setHeight(points[2].x, points[2].y, 10);
+
+		Game.terrain.flush();
+	}
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
