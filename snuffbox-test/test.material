@@ -1,6 +1,7 @@
 {
 	"diffuse_map" : "metal.png",
 	"normal_map" : "metal_normal.png",
+	"specular_map" : "metal_specular.png",
 
 	"cube_map" : {
 		"left" : "cube_map_left.png",
@@ -15,9 +16,9 @@
 	"diffuse" : [1, 1, 1, 1],
 	"ambient" : [0, 0, 0, 1],
 	"specular" : [1, 1, 1, 1],
-	"specular_intensity" : 256,
-	"reflectivity" : 1, 
-	"normal_scale" : 0,
+	"specular_intensity" : 6,
+	"reflectivity" : 0.75, 
+	"normal_scale" : 0.2,
 
 	"effect" : "test.effect"
 }

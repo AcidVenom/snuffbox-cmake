@@ -725,6 +725,12 @@ namespace snuffbox
     return default_depth_state_.get();
   }
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Viewport* D3D11RenderDevice::viewport_render_target()
+	{
+		return viewport_.get();
+	}
+
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(const int& type)
   {

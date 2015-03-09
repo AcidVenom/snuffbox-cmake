@@ -150,6 +150,15 @@ namespace snuffbox
 		*/
 		void RotateBy(const float& x, const float& y, const float& z);
 
+		/**
+		* @brief Unprojects 2 points onto a camera plane
+		* @param[in] px (const float&) The x position
+		* @param[in] py (const float&) The y position
+		* @param[in] plane (const float&) The plane to unproject on
+		* @return XMFLOAT3 The unprojected coordinates in 3D space
+		*/
+		XMFLOAT3 Unproject(const float& px, const float& py, const float& plane);
+
 		/// Default destructor
 		virtual ~D3D11Camera();
 
@@ -188,5 +197,6 @@ namespace snuffbox
 		static void JSFarPlane(JS_ARGS args);
 		static void JSSetFov(JS_ARGS args);
 		static void JSFov(JS_ARGS args);
+		static void JSUnproject(JS_ARGS args);
 	};
 }

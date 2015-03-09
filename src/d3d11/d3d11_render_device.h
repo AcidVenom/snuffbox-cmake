@@ -207,6 +207,11 @@ namespace snuffbox
     */
     D3D11BlendState* default_blend_state();
 
+		/**
+		* @return snuffbox::D3D11Viewport* The viewport a render target uses
+		*/
+		D3D11Viewport* viewport_render_target();
+
     /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (const int&) The type to set

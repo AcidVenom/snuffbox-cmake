@@ -70,6 +70,28 @@ namespace snuffbox
 			bool double_clicked; //!< Was this button double clicked last frame?
 		};
 
+		/**
+		* @enum snuffbox::MousePosition
+		* @brief An enumeration for the different types of mouse mouse positions
+		* @author Daniël Konings
+		*/
+		enum MousePosition
+		{
+			kScreen,
+			kRelative,
+			kAbsolute
+		};
+
+		/**
+		* @struct snuffbox::Mouse::float2
+		* @brief Just a basic float2
+		* @author Daniël Konings
+		*/
+		struct float2
+		{
+			float x, y;
+		};
+
 	public:
 		/// Default constructor
 		Mouse();
@@ -124,6 +146,13 @@ namespace snuffbox
 		const bool& IsDoubleClicked(const MouseButton& button) const;
 
 		/**
+		* @brief Retrieves the position of the mouse, given a type
+		* @param[in] type (const snuffbox::Mouse::MousePosition&) The type of position to retrieve
+		* @return snuffbox::Mouse::Position The retrieved position
+		*/
+		float2 Position(const MousePosition& type);
+
+		/**
 		* @brief Was there a mouse wheel down?
 		* @return const bool& The boolean value
 		*/
@@ -167,8 +196,8 @@ namespace snuffbox
 		int										prev_x_; //!< The previous x position
 		int										prev_y_; //!< The previous y position
 
-		/// Enumerates all buttons to a 'Button' enumeration
-		static void JSEnumerateButtons();
+		/// Enumerates all mouse used enumerations
+		static void JSEnumerate();
 	public:
 		JS_NAME("Mouse");
 		static void RegisterJS(JS_SINGLETON obj);

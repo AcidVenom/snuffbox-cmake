@@ -4,12 +4,13 @@ Game.targets = Game.targets || {
 
 Game.Initialise = function()
 {
-	RenderSettings.setResolution(1366, 768);
+	RenderSettings.setResolution(640, 480);
 	ContentManager.load("texture", "wood.png");
 	ContentManager.load("texture", "wood_normal.png");
 
 	ContentManager.load("texture", "metal.png");
 	ContentManager.load("texture", "metal_normal.png");
+	ContentManager.load("texture", "metal_specular.png");
 
 	ContentManager.load("texture", "cube_map_left.png");
 	ContentManager.load("texture", "cube_map_right.png");
