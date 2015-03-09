@@ -5,27 +5,7 @@ Game.targets = Game.targets || {
 Game.Initialise = function()
 {
 	RenderSettings.setResolution(640, 480);
-	ContentManager.load("texture", "wood.png");
-	ContentManager.load("texture", "wood_normal.png");
-
-	ContentManager.load("texture", "metal.png");
-	ContentManager.load("texture", "metal_normal.png");
-	ContentManager.load("texture", "metal_specular.png");
-
-	ContentManager.load("texture", "cube_map_left.png");
-	ContentManager.load("texture", "cube_map_right.png");
-	ContentManager.load("texture", "cube_map_top.png");
-	ContentManager.load("texture", "cube_map_bottom.png");
-	ContentManager.load("texture", "cube_map_front.png");
-	ContentManager.load("texture", "cube_map_back.png");
-
-	ContentManager.load("shader", "shaders/skybox.fx");
-
-	ContentManager.load("effect", "test.effect");
-	ContentManager.load("material", "test.material");
-
-	ContentManager.load("model", "axew.fbx");
-	ContentManager.load("model", "skybox.fbx");
+	ContentManager.load("box", "test.box");
 
 	Game.camera = new Camera(CameraType.Perspective);
 

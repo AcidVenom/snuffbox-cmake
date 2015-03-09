@@ -161,9 +161,9 @@ namespace snuffbox
 			return;
 		}
 		CalculateDeltaTime();
+    UpdateConsole();
 		UpdateInput();
 		Update();
-		UpdateConsole();
 		Draw();
 	}
 

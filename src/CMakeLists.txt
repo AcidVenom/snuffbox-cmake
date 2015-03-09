@@ -163,6 +163,8 @@ SET (ContentSources
 	content/content.cc
 	content/content_manager.h
 	content/content_manager.cc
+	content/content_box.h
+	content/content_box.cc
 )
 
 SET (IOSources

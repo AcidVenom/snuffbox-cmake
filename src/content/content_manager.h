@@ -25,6 +25,7 @@ namespace snuffbox
 		kModel,
 		kSound,
 		kCustom,
+    kBox,
     kUnknown
 	};
 

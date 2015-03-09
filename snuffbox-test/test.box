@@ -1,0 +1,66 @@
+[
+	{
+		"type" : "texture",
+		"path" : "wood.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "wood_normal.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "metal.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "metal_normal.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "metal_specular.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_left.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_right.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_top.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_bottom.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_front.png"
+	},
+	{
+		"type" : "texture",
+		"path" : "cube_map_back.png"
+	},
+	{
+		"type" : "shader",
+		"path" : "shaders/skybox.fx"
+	},
+	{
+		"type" : "effect",
+		"path" : "test.effect"
+	},
+	{
+		"type" : "material",
+		"path" : "test.material"
+	},
+	{
+		"type" : "model",
+		"path" : "axew.fbx"
+	},
+	{
+		"type" : "model",
+		"path" : "skybox.fbx"
+	}
+]

@@ -24,6 +24,8 @@ namespace snuffbox
 		{
 			return false;
 		}
+
+    fin.close();
 		
 		valid_ = true;
 		return true;
@@ -42,6 +44,8 @@ namespace snuffbox
 		{
 			contents += ch;
 		}
+
+    fin.close();
 		
 		return contents;
 	}

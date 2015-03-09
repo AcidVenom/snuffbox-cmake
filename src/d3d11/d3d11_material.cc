@@ -161,10 +161,30 @@ namespace snuffbox
 		D3D11Texture* default_tex = render_device->default_texture();
 		std::vector<ID3D11ShaderResourceView*> resources;
 
-		resources.push_back(diffuse_ == nullptr || diffuse_->texture() == nullptr ? default_tex->texture() : diffuse_->texture());
-		resources.push_back(normal_ == nullptr || normal_->texture() == nullptr ? default_tex->texture() : normal_->texture());
-		resources.push_back(specular_ == nullptr || specular_->texture() == nullptr ? default_tex->texture() : specular_->texture());
-		resources.push_back(light_map_ == nullptr || light_map_->texture() == nullptr ? default_tex->texture() : light_map_->texture());
+    if (diffuse_ != nullptr && (diffuse_->is_valid() == false || diffuse_->texture() == nullptr))
+    {
+      diffuse_ = nullptr;
+    }
+
+    if (normal_ != nullptr && (normal_->is_valid() == false || normal_->texture() == nullptr))
+    {
+      normal_ = nullptr;
+    }
+
+    if (specular_ != nullptr && (specular_->is_valid() == false || specular_->texture() == nullptr))
+    {
+      specular_ = nullptr;
+    }
+
+    if (light_map_ != nullptr && (light_map_->is_valid() == false || light_map_->texture() == nullptr))
+    {
+      light_map_ = nullptr;
+    }
+
+		resources.push_back(diffuse_ == nullptr ? default_tex->texture() : diffuse_->texture());
+    resources.push_back(normal_ == nullptr ? default_tex->texture() : normal_->texture());
+    resources.push_back(specular_ == nullptr ? default_tex->texture() : specular_->texture());
+    resources.push_back(light_map_ == nullptr ? default_tex->texture() : light_map_->texture());
 
 		D3D11Texture::SetMultipleTextures(1, static_cast<int>(resources.size()), resources);
 

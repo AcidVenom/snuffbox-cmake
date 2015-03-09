@@ -1,5 +1,6 @@
 #include "../content/content_manager.h"
 #include "../content/content.h"
+#include "../content/content_box.h"
 
 #include "../platform/platform_file_watch.h"
 
@@ -84,6 +85,10 @@ namespace snuffbox
 			{
 				content = AllocatedMemory::Instance().Construct<FBXModel>();
 			}
+      else if (type == ContentTypes::kBox)
+      {
+        content = AllocatedMemory::Instance().Construct<Box>();
+      }
 			else
 			{
 				SNUFF_LOG_WARNING("No content loader was specified for the content type of '" + path + "'");
@@ -107,9 +112,15 @@ namespace snuffbox
 			JSStateWrapper::Instance()->CompileAndRun(path, true);
 			return;
 		}
+    else if (type == ContentTypes::kBox)
+    {
+      SNUFF_LOG_INFO("Edited box file '" + path + "', reload this box to load its contents");
+      return;
+    }
 		else if (type == ContentTypes::kCustom)
 		{
 			SNUFF_LOG_INFO("Hot reloaded custom file '" + path + "'");
+      return;
 		}
 
 		loaded_content_.find(path)->second->Load(path);
@@ -119,6 +130,15 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::Unload(const ContentTypes& type, const std::string& path)
 	{
+    if (type == ContentTypes::kBox)
+    {
+      SNUFF_LOG_INFO("Unloading box '" + path + "'");
+      loaded_content_.erase(path);
+      FileWatch::Instance()->Remove(path);
+      SNUFF_LOG_INFO("Unloaded box '" + path + "'");
+      return;
+    }
+
 		SNUFF_LOG_INFO("Unloading file '" + path + "'");
 		std::map<std::string, SharedPtr<Content>>::iterator it = loaded_content_.find(path);
 		if (it != loaded_content_.end())
@@ -154,14 +174,14 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void ContentManager::UnloadAll()
 	{
-		while (to_unload_.empty() == false)
+    while (to_unload_.empty() == false)
 		{
-			const std::string& top = to_unload_.front();
+      const std::string& top = to_unload_.front();
 
 			loaded_content_.erase(loaded_content_.find(top));
 			FileWatch::Instance()->Remove(top);
 
-			to_unload_.pop();
+      to_unload_.pop();
 		}
 	}
 
@@ -191,6 +211,10 @@ namespace snuffbox
     else if (type == "sound")
     {
       return ContentTypes::kSound;
+    }
+    else if (type == "box")
+    {
+      return ContentTypes::kBox;
     }
     else
     {
