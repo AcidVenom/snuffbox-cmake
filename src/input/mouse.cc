@@ -3,6 +3,12 @@
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
 
+#include "../platform/platform_window.h"
+#include "../d3d11/d3d11_render_device.h"
+#include "../d3d11/d3d11_viewport.h"
+#include "../d3d11/d3d11_render_settings.h"
+#include "../application/game.h"
+
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
@@ -127,6 +133,79 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	Mouse::float2 Mouse::Position(const Mouse::MousePosition& type)
+	{
+		float2 p;
+		float px = static_cast<float>(x());
+		float py = static_cast<float>(y());
+
+		if (type == MousePosition::kAbsolute)
+		{
+			p.x = px;
+			p.y = py;
+			return p;
+		}
+
+		Window* window = Game::Instance()->window();
+
+		float w = static_cast<float>(window->width());
+		float h = static_cast<float>(window->height());
+
+		D3D11Viewport* vp = D3D11RenderDevice::Instance()->viewport_render_target();
+		
+		float x1 = vp->x();
+		float y1 = vp->y();
+		float x2 = vp->width();
+		float y2 = vp->height();
+
+		float xx = (px - x1) / x2;
+		float yy = (py - y1) / y2;
+
+		xx = xx * 2 - 1;
+		yy = yy * 2 - 1;
+
+		if (xx < -1)
+		{
+			xx = -1;
+		}
+
+		if (yy < -1)
+		{
+			yy = -1;
+		}
+
+		if (xx > 1)
+		{
+			xx = 1;
+		}
+
+		if (yy > 1)
+		{
+			yy = 1;
+		}
+
+		if (type == MousePosition::kScreen)
+		{
+			p.x = xx;
+			p.y = yy;
+
+			return p;
+		}
+		else if (type == MousePosition::kRelative)
+		{
+			const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+			p.x = xx * res.x / 2.0f;
+			p.y = yy * res.y / 2.0f;
+			return p;
+		}
+
+		p.x = 0.0f;
+		p.y = 0.0f;
+
+		return p;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	const bool& Mouse::wheel_down() const
 	{
 		return wheel_down_;
@@ -169,7 +248,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Mouse::JSEnumerateButtons()
+	void Mouse::JSEnumerate()
 	{
 		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
 
@@ -178,6 +257,14 @@ namespace snuffbox
 		JSWrapper::SetObjectValue<double>(obj, "Middle", Mouse::MouseButton::kMiddle);
 
 		JSStateWrapper::Instance()->RegisterGlobal("MouseButton", obj);
+
+		obj = JSWrapper::CreateObject();
+
+		JSWrapper::SetObjectValue<double>(obj, "Absolute", Mouse::MousePosition::kAbsolute);
+		JSWrapper::SetObjectValue<double>(obj, "Screen", Mouse::MousePosition::kScreen);
+		JSWrapper::SetObjectValue<double>(obj, "Relative", Mouse::MousePosition::kRelative);
+
+		JSStateWrapper::Instance()->RegisterGlobal("MousePosition", obj);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -194,7 +281,7 @@ namespace snuffbox
 			{ "movement", JSMovement }
 		};
 
-		JSEnumerateButtons();
+		JSEnumerate();
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
 	}
@@ -263,14 +350,16 @@ namespace snuffbox
 		JSWrapper wrapper(args);
 		Mouse* self = Mouse::Instance();
 
-		int x = self->x();
-		int y = self->y();
+		if (wrapper.Check("N") == true)
+		{
+			Mouse::float2 p = self->Position(static_cast<Mouse::MousePosition>(wrapper.GetValue<int>(0, 0)));
 
-		v8::Handle<v8::Object> obj = wrapper.CreateObject();
-		JSWrapper::SetObjectValue(obj, "x", static_cast<double>(x));
-		JSWrapper::SetObjectValue(obj, "y", static_cast<double>(y));
+			v8::Handle<v8::Object> obj = wrapper.CreateObject();
+			JSWrapper::SetObjectValue(obj, "x", static_cast<double>(p.x));
+			JSWrapper::SetObjectValue(obj, "y", static_cast<double>(p.y));
 
-		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+			wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------

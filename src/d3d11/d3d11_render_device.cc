@@ -14,12 +14,20 @@
 #include "../d3d11/d3d11_lighting.h"
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
+#include "../d3d11/d3d11_line.h"
+#include "../d3d11/d3d11_uniforms.h"
 
 #include "../application/game.h"
 #include "../platform/platform_window.h"
 
 #include "../cvar/cvar.h"
 #include "../content/content_manager.h"
+#include "../io/io_manager.h"
+
+#include "../d3d11/shaders/d3d11_base_shader.h"
+#include "../d3d11/shaders/d3d11_post_processing_shader.h"
+#include "../d3d11/shaders/d3d11_ui_shader.h"
+#include "../d3d11/shaders/d3d11_text_shader.h"
 
 #include <comdef.h>
 
@@ -78,10 +86,6 @@ namespace snuffbox
 
     sampler_linear_->Set();
 
-    global_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-		lighting_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-    per_object_buffer_ = AllocatedMemory::Instance().Construct<D3D11ConstantBuffer>();
-
     default_blend_state_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 
 		default_blend_state_->CreateFromJson(std::string("{}"));
@@ -92,10 +96,6 @@ namespace snuffbox
 		default_depth_state_->CreateFromJson(std::string("{}"));
 		default_depth_state_->Set();
 
-		global_buffer_->Create();
-		per_object_buffer_->Create();
-		lighting_buffer_->Create();
-
     default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
     default_texture_->Validate();
@@ -104,6 +104,9 @@ namespace snuffbox
 		CreateDepthStencilView();
 
 		lighting_ = D3D11Lighting::Instance();
+		line_ = D3D11Line::Instance();
+		constant_buffer_ = D3D11ConstantBuffer::Instance();
+		constant_buffer_->Create();
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 render device");
 
@@ -197,6 +200,37 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::LoadBaseShaders()
   {
+		IOManager* io = IOManager::Instance();
+
+		if (io->DirectoryExists("shaders") == false)
+		{
+			io->CreateDir("shaders");
+		}
+
+		bool exists = IOManager::Instance()->Exists("shaders/base.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/base.fx", D3D11_BASE_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/post_processing.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/post_processing.fx", D3D11_POST_PROCESSING_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/ui.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/ui.fx", D3D11_UI_SHADER);
+		}
+
+		exists = IOManager::Instance()->Exists("shaders/text.fx");
+		if (exists == false)
+		{
+			IOManager::Instance()->Write("shaders/text.fx", D3D11_TEXT_SHADER);
+		}
+
     ContentManager* content_manager = ContentManager::Instance();
     content_manager->Load(ContentTypes::kShader, "shaders/base.fx");
     content_manager->Load(ContentTypes::kShader, "shaders/post_processing.fx");
@@ -273,6 +307,14 @@ namespace snuffbox
 
     pass.sampling = D3D11SamplerState::SamplerTypes::kPoint;
     pass.shader = content_manager->Get<D3D11Shader>("shaders/text.fx");
+		pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+
+		pass.blend_state->CreateFromJson(std::string("{\
+			\"SrcBlend\" : \"SrcAlpha\",\
+			\"DestBlend\" : \"InvSrcAlpha\",\
+			\"SrcBlendAlpha\" : \"InvDestAlpha\",\
+			\"DestBlendAlpha\" : \"One\"\
+	}"));
 
     technique.name = "Text";
     technique.passes = { pass };
@@ -295,6 +337,17 @@ namespace snuffbox
     attributes.specular_intensity = 0.0f;
 
     default_material_->Validate();
+
+		default_post_processing_ = AllocatedMemory::Instance().Construct<D3D11Effect>();
+		
+		pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
+		pass.shader = content_manager->Get<D3D11Shader>("shaders/post_processing.fx");
+
+		technique.name = "Default";
+		technique.passes = { pass };
+
+		default_post_processing_->AddTechnique(technique);
+		default_post_processing_->Validate();
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -374,7 +427,7 @@ namespace snuffbox
       return;
     }
 
-		lighting_->Update(lighting_buffer_.get());
+		lighting_->Update(constant_buffer_);
 		
 		back_buffer_->Clear(context_);
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -405,6 +458,9 @@ namespace snuffbox
 		default_depth_state_->Set();
     target->Set(context_, camera_->type() == D3D11Camera::CameraTypes::kPerspective ? depth_stencil_view_ : nullptr);
     target->Draw(context_);
+
+		MapGlobalBuffer();
+		line_->Draw();
 		
 		sampler_linear_->Set();
     back_buffer_->Set(context_);
@@ -417,6 +473,7 @@ namespace snuffbox
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
+		//target->uniforms()->Apply();
 		D3D11Effect* effect = target->post_processing();
 
 		if (effect != nullptr && effect->is_valid())
@@ -530,14 +587,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::MapGlobalBuffer()
 	{
-		global_buffer_->Map({
+		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
 			camera_->view(),
 			camera_->projection(),
 			camera_->translation()
 		});
-
-		global_buffer_->Set(0);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -547,14 +602,12 @@ namespace snuffbox
 
     XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -9999999.0f, 9999999.0f);
 
-		global_buffer_->Map({
+		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
 			XMMatrixIdentity(),
 			projection,
 			XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)
 		});
-
-		global_buffer_->Set(0);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -607,9 +660,9 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	D3D11ConstantBuffer* D3D11RenderDevice::per_object_buffer()
+	D3D11ConstantBuffer* D3D11RenderDevice::constant_buffer()
 	{
-		return per_object_buffer_.get();
+		return constant_buffer_;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -648,6 +701,12 @@ namespace snuffbox
     return default_effect_.get();
   }
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Effect* D3D11RenderDevice::default_post_processing()
+	{
+		return default_post_processing_.get();
+	}
+
   //-------------------------------------------------------------------------------------------
   D3D11Material* D3D11RenderDevice::default_material()
   {
@@ -665,6 +724,12 @@ namespace snuffbox
   {
     return default_depth_state_.get();
   }
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Viewport* D3D11RenderDevice::viewport_render_target()
+	{
+		return viewport_.get();
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(const int& type)

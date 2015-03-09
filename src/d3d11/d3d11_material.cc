@@ -15,7 +15,9 @@ namespace snuffbox
 		Content(ContentTypes::kMaterial),
 		effect_(nullptr),
 		diffuse_(nullptr),
-		normal_(nullptr)
+		normal_(nullptr),
+		specular_(nullptr),
+		light_map_(nullptr)
 	{
 		
 	}
@@ -81,6 +83,8 @@ namespace snuffbox
 
 		GetTexture(obj, "diffuse_map", &diffuse_);
 		GetTexture(obj, "normal_map", &normal_);
+		GetTexture(obj, "specular_map", &specular_);
+		GetTexture(obj, "light_map", &light_map_);
 
 		Local<Value> cube = obj->Get(String::NewFromUtf8(isolate, "cube_map"));
 
@@ -153,23 +157,16 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Material::Apply()
 	{
-		if (diffuse_ != nullptr && diffuse_->is_valid())
-		{
-			diffuse_->Set(1);
-		}
-		else
-		{
-			diffuse_ = nullptr;
-		}
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		D3D11Texture* default_tex = render_device->default_texture();
+		std::vector<ID3D11ShaderResourceView*> resources;
 
-		if (normal_ != nullptr && normal_->is_valid())
-		{
-			normal_->Set(2);
-		}
-		else
-		{
-			normal_ = nullptr;
-		}
+		resources.push_back(diffuse_ == nullptr || diffuse_->texture() == nullptr ? default_tex->texture() : diffuse_->texture());
+		resources.push_back(normal_ == nullptr || normal_->texture() == nullptr ? default_tex->texture() : normal_->texture());
+		resources.push_back(specular_ == nullptr || specular_->texture() == nullptr ? default_tex->texture() : specular_->texture());
+		resources.push_back(light_map_ == nullptr || light_map_->texture() == nullptr ? default_tex->texture() : light_map_->texture());
+
+		D3D11Texture::SetMultipleTextures(1, static_cast<int>(resources.size()), resources);
 
 		if (cube_map_ != nullptr)
 		{

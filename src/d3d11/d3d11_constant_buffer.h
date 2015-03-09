@@ -48,6 +48,16 @@ namespace snuffbox
 	};
 
 	/**
+	* @struct snuffbox::CbUniforms
+	* @brief A per-object/per-render-target uniforms buffer
+	* @author Daniël Konings
+	*/
+	__declspec(align(16)) struct CbUniforms
+	{
+		XMFLOAT4 Uniforms[1024];
+	};
+
+	/**
 	* @class snuffbox::D3D11ConstantBuffer
 	* @brief A wrapper around D3D11 constant buffers, used for per-shader variables
 	* @author Daniël Konings
@@ -57,6 +67,12 @@ namespace snuffbox
 	public:
 		/// Default constructor
 		D3D11ConstantBuffer();
+
+		/**
+		* @brief Retrieves the singleton instance of this class
+		* @return snuffbox::D3D11ConstantBuffer* The pointer to the singleton instance of this class
+		*/
+		static D3D11ConstantBuffer* Instance();
 
 		/// Creates the constant buffer
 		void Create();
@@ -80,10 +96,13 @@ namespace snuffbox
 		void Map(const CbPerObject& cb);
 
 		/**
-		* @brief Sets the constant buffer at a given index
-		* @param[in] index (const int&) The index to map the buffer to
+		* @brief Maps the constant buffer with uniforms information
+		* @param[in] const snuffbox::CbUniforms& The uniforms buffer
 		*/
-		void Set(const int& index);
+		void Map(const CbUniforms& cb, const int& num_uniforms);
+
+		/// Sets the constant buffer at a given index
+		void Set();
 
 		/// Default denstructor
 		~D3D11ConstantBuffer();
@@ -93,6 +112,6 @@ namespace snuffbox
 		ID3D11Buffer* global_buffer_; //!< The global constant buffer
 		ID3D11Buffer* per_object_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* lighting_buffer_; //!< The per-object constant buffer
-		ID3D11Buffer* mapped_; //!< What kind of constant buffer is this?
+		ID3D11Buffer* uniforms_buffer_; //!< The uniforms constant buffer
 	};
 }

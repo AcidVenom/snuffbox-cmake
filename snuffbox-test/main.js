@@ -4,12 +4,13 @@ Game.targets = Game.targets || {
 
 Game.Initialise = function()
 {
-	RenderSettings.setResolution(1920, 1080);
+	RenderSettings.setResolution(640, 480);
 	ContentManager.load("texture", "wood.png");
 	ContentManager.load("texture", "wood_normal.png");
 
 	ContentManager.load("texture", "metal.png");
 	ContentManager.load("texture", "metal_normal.png");
+	ContentManager.load("texture", "metal_specular.png");
 
 	ContentManager.load("texture", "cube_map_left.png");
 	ContentManager.load("texture", "cube_map_right.png");
@@ -18,25 +19,20 @@ Game.Initialise = function()
 	ContentManager.load("texture", "cube_map_front.png");
 	ContentManager.load("texture", "cube_map_back.png");
 
-	ContentManager.load("shader", "shaders/ui.fx");
-	ContentManager.load("shader", "shaders/text.fx");
 	ContentManager.load("shader", "shaders/skybox.fx");
 
 	ContentManager.load("effect", "test.effect");
-	ContentManager.load("effect", "post_processing.effect");
 	ContentManager.load("material", "test.material");
 
 	ContentManager.load("model", "axew.fbx");
 	ContentManager.load("model", "skybox.fbx");
 
-	Game.targets.default.setPostProcessing("post_processing.effect");
-
 	Game.camera = new Camera(CameraType.Perspective);
 
 	Game.light = new Light(LightType.Directional);
 
-	Game.camera.setTranslation(-2.5, -22, 16);
-	Game.camera.setRotation(0.66, -2.2, 0);
+	Game.camera.setTranslation(0, 0, 0);
+	Game.camera.setRotation(0, 0, 0);
 	
 	Game.model = new Model("axew.fbx");
 	Game.model.spawn("Default");
@@ -44,23 +40,16 @@ Game.Initialise = function()
 
 	Game.skybox = new Model("skybox.fbx");
 	Game.skybox.spawn("Default");
-	Game.skybox.setTechnique("Skybox");
 	Game.skybox.setMaterial("test.material");
-
-	Game.text = new Text();
-	Game.text.setText("Snuffbox - Work In Progress");
-	Game.text.setFontSize(32);
-	Game.text.setAlignment(TextAlignment.Right);
-	Game.text.setTranslation(1920 / 2 - 20, 1080 / 2 - 20 - Game.text.metrics().h);
-	Game.text.spawn("Default");
-	Game.text.setShadowOffset(1, 1);
-	Game.text.setShadowColour(0, 0, 0, 0.1);
-	Game.text.setAlpha(0.25);
-
+	Game.skybox.setTechnique("Skybox");
+	
 	Game.model.setScale(10, 10, 10);
-	Game.skybox.setScale(5, 5, 5);
 
-	Game.camera.setFarPlane(99999);
+	Game.terrain = new Terrain();
+	Game.terrain.create(128, 128);
+	Game.terrain.setScale(0.5, 0, 0.5);
+	Game.terrain.setTranslation(10, 0, 20);
+	Game.terrain.spawn("Default");
 }
 
 Game.Update = function(dt)
@@ -107,7 +96,22 @@ Game.Update = function(dt)
 	Game.model.rotateBy(0, dt, 0);
 
 	var t = Game.camera.translation();
-	Game.skybox.setTranslation(t.x, -t.y, t.z);
+	Game.skybox.setTranslation(t.x, t.y, t.z);
+
+	var p = Mouse.position(MousePosition.Relative);
+	p.x = (p.x + RenderSettings.resolution().w / 2);
+	p.y = (p.y + RenderSettings.resolution().h / 2);
+
+	var unprojA = Game.camera.unproject(p.x, p.y, Game.camera.nearPlane());
+	var unprojB = Game.camera.unproject(p.x, p.y, Game.camera.farPlane());
+	
+	var f = unprojA.y / (unprojB.y - unprojA.y);
+	var ix = unprojA.x - f * (unprojB.x - unprojA.x);
+	var iz = unprojA.z - f * (unprojB.z - unprojA.z);
+
+	var point = Game.terrain.worldToIndex(ix, iz);
+
+	Log.fatal("x " + point.x + " | y " + point.y);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)

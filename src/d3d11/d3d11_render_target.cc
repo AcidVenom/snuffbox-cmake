@@ -1,6 +1,7 @@
 #include "../d3d11/d3d11_render_target.h"
 #include "../d3d11/d3d11_render_queue.h"
 #include "../d3d11/d3d11_effect.h"
+#include "../d3d11/d3d11_uniforms.h"
 
 #include "../content/content_manager.h"
 
@@ -70,6 +71,8 @@ namespace snuffbox
 		}
 		else if (type == RenderTargets::kRenderTarget)
 		{
+			post_processing_ = D3D11RenderDevice::Instance()->default_post_processing();
+
 			if (resource_ != nullptr)
 			{
 				SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::Create::resource_");
@@ -111,7 +114,9 @@ namespace snuffbox
 		{
 			return;
 		}
-	
+		
+		//uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+
 		type_ = type;
 		valid_ = true;
 	}
@@ -233,6 +238,12 @@ namespace snuffbox
 		return technique_;
 	}
 
+	////---------------------------------------------------------------------------------------------------------
+	//D3D11Uniforms* D3D11RenderTarget::uniforms()
+	//{
+	//	return uniforms_.get();
+	//}
+
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_post_processing(const std::string& path)
 	{
@@ -263,7 +274,8 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = {
 			{ "clear", JSClear },
 			{ "setPostProcessing", JSSetPostProcessing },
-			{ "setTechnique", JSSetTechnique }
+			{ "setTechnique", JSSetTechnique },
+			{ "setUniform", JSSetUniform }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -299,6 +311,28 @@ namespace snuffbox
 		if (wrapper.Check("S"))
 		{
 			self->set_technique(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSSetUniform(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		if (wrapper.Check("NSN") == true)
+		{
+			float buffer[4] = {
+				wrapper.GetValue<float>(2, 0.0f),
+				wrapper.GetValue<float>(3, 0.0f),
+				wrapper.GetValue<float>(4, 0.0f),
+				wrapper.GetValue<float>(5, 0.0f),
+			};
+
+			/*self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
+				wrapper.GetValue<int>(0, 1)),
+				wrapper.GetValue<std::string>(1, "undefined"),
+				buffer);*/
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "../d3d11/d3d11_render_device.h"
 #include "../content/content.h"
 
+#include <vector>
+
 namespace snuffbox
 {
 	/**
@@ -64,6 +66,14 @@ namespace snuffbox
 		* @param[in] slot (const int&) The slot to store the texture in
 		*/
 		void Set(const int& slot);
+
+		/**
+		* @brief Sets multiple textures to the register of the shader
+		* @param[in] start (const int&) The start slot to register from
+		* @param[in] num (const int&) The number of textures to register
+		* @param[in] resources (const std::vector<ID3D11ShaderResourceView*>& The textures to register
+		*/
+		static void SetMultipleTextures(const int& start, const int& num, const std::vector<ID3D11ShaderResourceView*>& resources);
 
 		/**
 		* @return const int& The width of the texture

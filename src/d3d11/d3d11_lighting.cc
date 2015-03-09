@@ -1,9 +1,35 @@
 #include "../d3d11/d3d11_lighting.h"
 #include "../d3d11/d3d11_light.h"
 #include "../d3d11/d3d11_constant_buffer.h"
+#include "../d3d11/d3d11_camera.h"
+
+#include <algorithm>
 
 namespace snuffbox
 {
+	//---------------------------------------------------------------------------------------------------------
+	bool D3D11Lighting::LightSorter::operator()(D3D11Light* a, D3D11Light* b)
+	{
+		const XMFLOAT4& p1 = a->attributes().translation;
+		const XMFLOAT4& p2 = b->attributes().translation;
+
+		const XMVECTOR& p3 = D3D11RenderDevice::Instance()->camera()->translation();
+
+		float cx = XMVectorGetX(p3);
+		float cy = XMVectorGetY(p3);
+		float cz = XMVectorGetZ(p3);
+
+		float dx1 = cx - p1.x;
+		float dy1 = cy - p1.y;
+		float dz1 = cz - p1.z;
+
+		float dx2 = cx - p2.x;
+		float dy2 = cy - p2.y;
+		float dz2 = cz - p2.z;
+
+		return std::sqrt(dx1 * dx1 + dy1 * dy1 + dz1 * dz1) < std::sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2);
+	}
+
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Lighting::D3D11Lighting() :
 		ambient_colour_(1.0f, 1.0f, 1.0f, 1.0f)
@@ -54,8 +80,16 @@ namespace snuffbox
 		D3D11Light* light = nullptr;
 		std::vector<D3D11Light::Attributes> data;
 
+		std::sort(lights_.begin(), lights_.end(), LightSorter());
+		
+		int count = 0;
 		for (int i = static_cast<int>(lights_.size() - 1); i >= 0; --i)
 		{
+			if (count >= MAX_LIGHTS)
+			{
+				break;
+			}
+
 			light = lights_.at(i);
 
 			if (light == nullptr)
@@ -68,6 +102,8 @@ namespace snuffbox
 			{
 				data.push_back(light->attributes());
 			}
+
+			++count;
 		}
 
 		CbLighting lights;
@@ -82,8 +118,6 @@ namespace snuffbox
 		}
 		
 		buffer->Map(lights, s);
-
-		buffer->Set(2);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

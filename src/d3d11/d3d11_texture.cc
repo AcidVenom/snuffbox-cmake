@@ -245,6 +245,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11Texture::SetMultipleTextures(const int& start, const int& num, const std::vector<ID3D11ShaderResourceView*>& resources)
+	{
+		D3D11RenderDevice::Instance()->context()->PSSetShaderResources(start, num, &resources[0]);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	const int& D3D11Texture::width() const
 	{
 		return width_;

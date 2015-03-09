@@ -6,6 +6,7 @@
 namespace snuffbox
 {
   class D3D11RenderQueue;
+	class D3D11Uniforms;
 
 	/**
 	* @class snuffbox::D3D11RenderTarget
@@ -108,6 +109,11 @@ namespace snuffbox
 		const std::string& technique();
 
 		/**
+		* @return snuffbox::D3D11Uniforms* The uniforms buffer of this render target
+		*/
+		//D3D11Uniforms* uniforms();
+
+		/**
 		* @brief Sets the post processing effect of this render target
 		* @param[in] path (const std::string&) The path to the effect file
 		*/
@@ -136,6 +142,7 @@ namespace snuffbox
 		ID3D11RenderTargetView* view_; //!< The actual view of this render target
 		ID3D11ShaderResourceView* resource_; //!< When used as a normal render target, use this to store the texture
     SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
+		//SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
 
@@ -145,5 +152,6 @@ namespace snuffbox
 		static void JSClear(JS_ARGS args);
 		static void JSSetPostProcessing(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
+		static void JSSetUniform(JS_ARGS args);
 	};
 }

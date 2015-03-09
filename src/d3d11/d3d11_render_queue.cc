@@ -6,6 +6,7 @@
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_material.h"
 #include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_uniforms.h"
 #include "../d3d11/elements/d3d11_text_element.h"
 
 #include <algorithm>
@@ -80,7 +81,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::DrawElement(ID3D11DeviceContext* context, D3D11RenderElement* element)
   {
-		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->per_object_buffer();
+		D3D11ConstantBuffer* constant_buffer = D3D11RenderDevice::Instance()->constant_buffer();
 
 		D3D11Material::Attributes attributes;
 
@@ -95,7 +96,8 @@ namespace snuffbox
 			element->alpha(),
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()
 		});
-		constant_buffer->Set(1);
+
+		element->uniforms()->Apply();
 
     D3D11VertexBuffer* buffer = element->vertex_buffer();
 		if (buffer == nullptr)

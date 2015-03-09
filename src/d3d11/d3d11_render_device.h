@@ -31,6 +31,7 @@ namespace snuffbox
 	class D3D11Shader;
 	class D3D11Lighting;
   class D3D11Material;
+	class D3D11Line;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -152,9 +153,9 @@ namespace snuffbox
     const int& vertex_buffer_type() const;
 
 		/**
-		* @return snuffbox::D3D11ConstantBuffer* The per-object constant buffer
+		* @return snuffbox::D3D11ConstantBuffer* The global constant buffer
 		*/
-		D3D11ConstantBuffer* per_object_buffer();
+		D3D11ConstantBuffer* constant_buffer();
 
 		/**
 		* @return snuffbox::D3D11Camera* The camera currently in use
@@ -186,6 +187,11 @@ namespace snuffbox
     */
     D3D11Effect* default_effect();
 
+		/**
+		* @return snuffbox::D3D11Texture* The default post processing effect
+		*/
+		D3D11Effect* default_post_processing();
+
     /**
     * @return snuffbox::D3D11Texture* The default material
     */
@@ -200,6 +206,11 @@ namespace snuffbox
     * @return snuffbox::D3D11BlendState* The default blend state
     */
     D3D11BlendState* default_blend_state();
+
+		/**
+		* @return snuffbox::D3D11Viewport* The viewport a render target uses
+		*/
+		D3D11Viewport* viewport_render_target();
 
     /**
     * @brief Sets the current vertex buffer type
@@ -248,9 +259,7 @@ namespace snuffbox
 
 		D3D11Camera* camera_; //!< The current camera
 
-		SharedPtr<D3D11ConstantBuffer> global_buffer_; //!< The global constant buffer
-		SharedPtr<D3D11ConstantBuffer> lighting_buffer_; //!< The lighting constant buffer
-		SharedPtr<D3D11ConstantBuffer> per_object_buffer_; //!< The per-object constant buffer
+		D3D11ConstantBuffer* constant_buffer_; //!< The global constant buffer
 
     SharedPtr<D3D11BlendState> default_blend_state_; //!< The default blend state
 		SharedPtr<D3D11DepthState> default_depth_state_; //!< The default depth state
@@ -262,9 +271,11 @@ namespace snuffbox
 		D3D11Shader* current_shader_; //!< The currently set shaders
 
 		D3D11Lighting* lighting_; //!< The lighting system
+		D3D11Line* line_; //!< The line system
 
     SharedPtr<D3D11Texture> default_texture_; //!< The default texture
     SharedPtr<D3D11Effect> default_effect_; //!< The default effect
+		SharedPtr<D3D11Effect> default_post_processing_; //!< The default effect
     SharedPtr<D3D11Material> default_material_; //!< The default material
 	};
 }

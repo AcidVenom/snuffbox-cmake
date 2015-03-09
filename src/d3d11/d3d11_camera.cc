@@ -139,7 +139,8 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Camera::set_translation(const float& x, const float& y, const float& z)
 	{
-		translation_ = XMVectorSet(x, y, z, 1.0f);
+		float yy = D3D11RenderSettings::Instance()->invert_y() == false ? -y : y;
+		translation_ = XMVectorSet(x, yy, z, 1.0f);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -190,6 +191,16 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT3 D3D11Camera::Unproject(const float& px, const float& py, const float& plane)
+	{
+		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+
+		XMVECTOR coords = XMVector3Unproject(XMVectorSet(px, res.y - py, plane, 0.0f), 0.0f, 0.0f, res.x, res.y, near_plane_, far_plane_, projection_, view_, XMMatrixIdentity());
+	
+		return XMFLOAT3(XMVectorGetX(coords), XMVectorGetY(coords), XMVectorGetZ(coords));
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11Camera::~D3D11Camera()
 	{
 
@@ -223,7 +234,8 @@ namespace snuffbox
 			{ "setFarPlane", JSSetFarPlane },
 			{ "farPlane", JSFarPlane },
 			{ "setFov", JSSetFov },
-			{ "fov", JSFov }
+			{ "fov", JSFov },
+			{ "unproject", JSUnproject }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -270,8 +282,9 @@ namespace snuffbox
 		float y = XMVectorGetY(v);
 		float z = XMVectorGetZ(v);
 
+		float yy = D3D11RenderSettings::Instance()->invert_y() == false ? -y : y;
 		JSWrapper::SetObjectValue(obj, "x", x);
-		JSWrapper::SetObjectValue(obj, "y", y);
+		JSWrapper::SetObjectValue(obj, "y", yy);
 		JSWrapper::SetObjectValue(obj, "z", z);
 
 		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
@@ -376,5 +389,24 @@ namespace snuffbox
 		D3D11Camera* self = wrapper.GetPointer<D3D11Camera>(args.This());
 
 		wrapper.ReturnValue<float>(self->fov());
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Camera::JSUnproject(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Camera* self = wrapper.GetPointer<D3D11Camera>(args.This());
+
+		if (wrapper.Check("NNN") == true)
+		{
+			const XMFLOAT3& p = self->Unproject(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f), wrapper.GetValue<float>(2, 0.0f));
+			
+			v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+			JSWrapper::SetObjectValue(obj, "x", p.x);
+			JSWrapper::SetObjectValue(obj, "y", p.y);
+			JSWrapper::SetObjectValue(obj, "z", p.z);
+
+			wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+		}
 	}
 }

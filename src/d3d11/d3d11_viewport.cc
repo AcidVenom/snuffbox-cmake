@@ -64,6 +64,30 @@ namespace snuffbox
     D3D11RenderDevice::Instance()->context()->RSSetViewports(1, &viewport_);
   }
 
+	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Viewport::x() const
+	{
+		return viewport_.TopLeftX;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Viewport::y() const
+	{
+		return viewport_.TopLeftY;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Viewport::width() const
+	{
+		return viewport_.Width;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Viewport::height() const
+	{
+		return viewport_.Height;
+	}
+
   //---------------------------------------------------------------------------------------------------------
   D3D11Viewport::~D3D11Viewport()
   {

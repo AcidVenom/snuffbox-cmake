@@ -1,7 +1,8 @@
 {
 	"diffuse_map" : "metal.png",
 	"normal_map" : "metal_normal.png",
-	
+	"specular_map" : "metal_specular.png",
+
 	"cube_map" : {
 		"left" : "cube_map_left.png",
 		"right" : "cube_map_right.png",
@@ -13,11 +14,11 @@
 
 	"emissive" : [0, 0, 0, 1],
 	"diffuse" : [1, 1, 1, 1],
-	"ambient" : [0.9, 0.8, 0.5, 1],
+	"ambient" : [0, 0, 0, 1],
 	"specular" : [1, 1, 1, 1],
-	"specular_intensity" : 16,
-	"reflectivity" : 1, 
-	"normal_scale" : 0,
+	"specular_intensity" : 6,
+	"reflectivity" : 0.75, 
+	"normal_scale" : 0.2,
 
 	"effect" : "test.effect"
 }
