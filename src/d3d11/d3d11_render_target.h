@@ -80,6 +80,15 @@ namespace snuffbox
 		/// Clears the render target of render elements
 		void Clear();
 
+    /**
+    * @brief Remaps the default viewport of this render target
+    * @param[in] x (const float&) The x position of the viewport
+    * @param[in] y (const float&) The y position of the viewport
+    * @param[in] w (const float&) The width of the viewport
+    * @param[in] h (const float&) The height of the viewport
+    */
+    void SetViewport(const float& x, const float& y, const float& w, const float& h);
+
 		/// Releases all referenced D3D11 com objects
 		void Release();
 
@@ -111,7 +120,12 @@ namespace snuffbox
 		/**
 		* @return snuffbox::D3D11Uniforms* The uniforms buffer of this render target
 		*/
-		//D3D11Uniforms* uniforms();
+		D3D11Uniforms* uniforms();
+
+    /**
+    * @return snuffbox::D3D11Viewport* The viewport to be overrided from JavaScript
+    */
+    D3D11Viewport* viewport();
 
 		/**
 		* @brief Sets the post processing effect of this render target
@@ -142,7 +156,8 @@ namespace snuffbox
 		ID3D11RenderTargetView* view_; //!< The actual view of this render target
 		ID3D11ShaderResourceView* resource_; //!< When used as a normal render target, use this to store the texture
     SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
-		//SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
+		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
+    SharedPtr<D3D11Viewport> viewport_; //!< The viewport that can be overrided from JavaScript
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
 
@@ -153,5 +168,6 @@ namespace snuffbox
 		static void JSSetPostProcessing(JS_ARGS args);
 		static void JSSetTechnique(JS_ARGS args);
 		static void JSSetUniform(JS_ARGS args);
+    static void JSSetViewport(JS_ARGS args);
 	};
 }

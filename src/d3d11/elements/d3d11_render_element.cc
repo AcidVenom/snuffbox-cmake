@@ -71,7 +71,9 @@ namespace snuffbox
   {
 		if (spawned_ == false)
 		{
-			D3D11RenderDevice::Instance()->GetTarget(target)->queue()->Add(this);
+      D3D11RenderTarget* t = D3D11RenderDevice::Instance()->GetTarget(target);
+			t->queue()->Add(this);
+      target_ = t;
 			spawned_ = true;
 		}
   }
@@ -80,6 +82,7 @@ namespace snuffbox
   void D3D11RenderElement::Destroy()
   {
     spawned_ = false;
+    target_ = nullptr;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -236,6 +239,12 @@ namespace snuffbox
 	{
 		return uniforms_.get();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  D3D11RenderTarget* D3D11RenderElement::target()
+  {
+    return target_;
+  }
 
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)

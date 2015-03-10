@@ -56,6 +56,11 @@ namespace snuffbox
     */
     const float& height() const;
 
+    /**
+    * @return const bool& Is this viewport valid?
+    */
+    const bool& valid() const;
+
     /// Default destructor
     ~D3D11Viewport();
 

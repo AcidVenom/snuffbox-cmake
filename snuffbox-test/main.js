@@ -30,19 +30,6 @@ Game.Initialise = function()
 	Game.terrain.setTranslation(10, 0, 20);
 	Game.terrain.setScale(0.5, 1, 0.5);
 	Game.terrain.spawn("Default");
-
-	Game.widget = new Widget();
-	Game.widget.setSize(64, 64);
-	Game.widget.setBlend(1, 0, 0);
-	Game.widget.spawn("Default");
-
-	var func1 = function()
-	{
-		Log.debug("A");
-	}
-
-	Game.mouseArea = new MouseArea(Game.widget);
-	Game.mouseArea.setOnDown(func1);
 }
 
 Game.Update = function(dt)

@@ -436,7 +436,6 @@ namespace snuffbox
     for (unsigned int i = 0; i < render_targets_.size(); ++i)
     {
       it = render_targets_.at(i);
-			MapGlobalBuffer();
       DrawRenderTarget(it);
     }
 
@@ -454,6 +453,17 @@ namespace snuffbox
 		current_target_ = target;
 
     viewport_render_target_->Set();
+    D3D11Viewport* vp = target->viewport();
+    if (vp->valid() == true)
+    {
+      D3D11Viewport projected;
+      const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+      projected.Create(vp->x(), vp->y(), vp->width() * viewport_render_target_->width() / res.x, vp->height() * viewport_render_target_->height() / res.y);
+      projected.Set();
+    }
+
+    MapGlobalBuffer();
+
 		D3D11Shader* shader = ContentManager::Instance()->Get<D3D11Shader>("shaders/base.fx");
 		shader->Set();
     target->Clear(context_);
@@ -475,7 +485,7 @@ namespace snuffbox
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
-		//target->uniforms()->Apply();
+		target->uniforms()->Apply();
 		D3D11Effect* effect = target->post_processing();
 
 		if (effect != nullptr && effect->is_valid())
@@ -633,9 +643,15 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::MapUIBuffer()
 	{
-		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+    D3D11_VIEWPORT vp;
+    UINT num = 1;
+    D3D11RenderDevice::Instance()->context()->RSGetViewports(&num, &vp);
 
-    XMMATRIX projection = XMMatrixOrthographicRH(res.x, res.y, -9999999.0f, 9999999.0f);
+
+    const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+    float ratio_x = viewport_render_target_->width() / vp.Width;
+    float ratio_y = viewport_render_target_->height() / vp.Height;
+    XMMATRIX projection = XMMatrixOrthographicRH(res.x / ratio_x, res.y / ratio_y, -9999999.0f, 9999999.0f);
 
 		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),

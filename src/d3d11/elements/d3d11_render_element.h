@@ -147,6 +147,11 @@ namespace snuffbox
 		D3D11Uniforms* uniforms();
 
     /**
+    * @return snuffbox::D3D11RenderTarget The current render target of this element
+    */
+    D3D11RenderTarget* target();
+
+    /**
     * @brief Sets the translation of this render element
     * @param[in] x (const float&) The new x position
     * @param[in] y (const float&) The new y position
@@ -258,6 +263,7 @@ namespace snuffbox
 		XMFLOAT3 blend_; //!< The blend of this render element
 		float alpha_; //!< The alpha of this render element
 		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer of this render element
+    D3D11RenderTarget* target_; //!< The target of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);

@@ -2,6 +2,8 @@
 #include "../d3d11/d3d11_render_queue.h"
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_uniforms.h"
+#include "../d3d11/d3d11_viewport.h"
+#include "../d3d11/d3d11_render_settings.h"
 
 #include "../content/content_manager.h"
 
@@ -40,6 +42,7 @@ namespace snuffbox
 		Create(RenderTargets::kRenderTarget, render_device->swap_chain(), render_device->device());
 
 		render_device->AddRenderTarget(this);
+    viewport_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -115,7 +118,7 @@ namespace snuffbox
 			return;
 		}
 		
-		//uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
 		type_ = type;
 		valid_ = true;
@@ -190,6 +193,13 @@ namespace snuffbox
 		queue_->Clear();
 	}
 
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::SetViewport(const float& x, const float& y, const float& w, const float& h)
+  {
+    const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+    viewport_->Create(x, y, w, h);
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Release()
 	{
@@ -238,11 +248,17 @@ namespace snuffbox
 		return technique_;
 	}
 
-	////---------------------------------------------------------------------------------------------------------
-	//D3D11Uniforms* D3D11RenderTarget::uniforms()
-	//{
-	//	return uniforms_.get();
-	//}
+	//---------------------------------------------------------------------------------------------------------
+	D3D11Uniforms* D3D11RenderTarget::uniforms()
+	{
+		return uniforms_.get();
+	}
+
+  //---------------------------------------------------------------------------------------------------------
+  D3D11Viewport* D3D11RenderTarget::viewport()
+  {
+    return viewport_.get();
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_post_processing(const std::string& path)
@@ -276,7 +292,8 @@ namespace snuffbox
 			{ "clear", JSClear },
 			{ "setPostProcessing", JSSetPostProcessing },
 			{ "setTechnique", JSSetTechnique },
-			{ "setUniform", JSSetUniform }
+			{ "setUniform", JSSetUniform },
+      { "setViewport", JSSetViewport }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -330,10 +347,26 @@ namespace snuffbox
 				wrapper.GetValue<float>(5, 0.0f),
 			};
 
-			/*self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
+			self->uniforms()->SetUniform(static_cast<D3D11Uniforms::UniformTypes>(
 				wrapper.GetValue<int>(0, 1)),
 				wrapper.GetValue<std::string>(1, "undefined"),
-				buffer);*/
+				buffer);
 		}
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::JSSetViewport(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+    if (wrapper.Check("NNNN") == true)
+    {
+      self->SetViewport(
+        wrapper.GetValue<float>(0, 0.0f), 
+        wrapper.GetValue<float>(1, 0.0f), 
+        wrapper.GetValue<float>(2, 640.0f), 
+        wrapper.GetValue<float>(3, 480.0f));
+    }
+  }
 }

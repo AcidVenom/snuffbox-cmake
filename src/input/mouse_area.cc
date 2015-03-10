@@ -1,5 +1,8 @@
 #include "../input/mouse_area.h"
 
+#include "../d3d11/d3d11_render_target.h"
+#include "../d3d11/d3d11_viewport.h"
+
 #include "../d3d11/elements/d3d11_widget_element.h"
 #include "../d3d11/d3d11_render_settings.h"
 
@@ -41,11 +44,32 @@ namespace snuffbox
     }
 
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+    D3D11Viewport* vp = nullptr;
+
+    if (parent_->target() != nullptr && parent_->target()->viewport()->valid() == true)
+    {
+      vp = parent_->target()->viewport();
+    }
 
     XMMATRIX proj = XMMatrixOrthographicRH(res.x, res.y, 0.0f, 1.0f);
     XMMATRIX wp = parent_->world_matrix() * proj;
 
-    Mouse::float2 screen = mouse->Position(Mouse::MousePosition::kScreen);
+    Mouse::float2 relative = mouse->Position(Mouse::MousePosition::kRelative);
+    
+    relative.x += vp == nullptr ? 0 : -vp->x() + vp->width() / 2.0f;
+    relative.y += vp == nullptr ? 0 : (-res.y / 2.0f + vp->y()) + vp->height() / 2.0f;
+
+    Mouse::float2 screen;
+    screen.x = relative.x / res.x * 2.0f;
+    screen.y = relative.y / res.y * 2.0f;
+
+    float ratio_x = vp->width() / res.x;
+    float ratio_y = vp->height() / res.y;
+
+    if (screen.x > ratio_x || screen.x < -ratio_x || screen.y > ratio_y || screen.y < -ratio_y)
+    {
+      return false;
+    }
 
     XMVECTOR deter;
     XMVECTOR p1 = XMVector2Transform(XMVectorSet(screen.x, screen.y, 0.0f, 1.0f), XMMatrixInverse(&deter, wp));
