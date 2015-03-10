@@ -266,6 +266,7 @@ namespace snuffbox
 	D3D11RenderTarget::~D3D11RenderTarget()
 	{
 		Release();
+    D3D11RenderDevice::Instance()->RemoveTarget(this);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

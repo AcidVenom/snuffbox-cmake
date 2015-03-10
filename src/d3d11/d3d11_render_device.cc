@@ -432,10 +432,12 @@ namespace snuffbox
 		back_buffer_->Clear(context_);
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+    D3D11RenderTarget* it = nullptr;
+    for (unsigned int i = 0; i < render_targets_.size(); ++i)
     {
+      it = render_targets_.at(i);
 			MapGlobalBuffer();
-      DrawRenderTarget(it->second);
+      DrawRenderTarget(it);
     }
 
     ID3D11ShaderResourceView *const null_resource[1] = { NULL };
@@ -528,9 +530,12 @@ namespace snuffbox
 		CreateBackBuffer();
 		CreateDepthStencilView();
 
-		for (std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+
+    D3D11RenderTarget* it = nullptr;
+    for (unsigned int i = 0; i < render_targets_.size(); ++i)
 		{
-			it->second->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, swap_chain_, device_);
+      it = render_targets_.at(i);
+			it->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, swap_chain_, device_);
 		}
 
     CreateBaseViewport();
@@ -557,15 +562,24 @@ namespace snuffbox
   void D3D11RenderDevice::AddRenderTarget(D3D11RenderTarget* target)
 	{
 		const std::string& name = target->name();
-		std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.find(name);
+    bool found = false;
 
-		if (it != render_targets_.end())
+    for (unsigned int i = 0; i < render_targets_.size(); ++i)
+    {
+      if (render_targets_.at(i)->name() == name)
+      {
+        found = true;
+        break;
+      }
+    }
+
+		if (found == true)
 		{
 			SNUFF_LOG_WARNING("Attempted to add a render target with an already existing name '" + name + "'");
 			return;
 		}
 
-		render_targets_.emplace(name, target);
+    render_targets_.push_back(target);
 
 		SNUFF_LOG_INFO("Added render target '" + name + "'");
 	}
@@ -573,15 +587,36 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   D3D11RenderTarget* D3D11RenderDevice::GetTarget(const std::string& name)
   {
-    std::map<std::string, D3D11RenderTarget*>::iterator it = render_targets_.find(name);
-
-    if (it != render_targets_.end())
+    D3D11RenderTarget* it = nullptr;
+    for (unsigned int i = 0; i < render_targets_.size(); ++i)
     {
-      return it->second;
+      if (render_targets_.at(i)->name() == name)
+      {
+        it = render_targets_.at(i);
+        break;
+      }
+    }
+
+    if (it != nullptr)
+    {
+      return it;
     }
 
     SNUFF_LOG_WARNING("Attempted to retrieve a non-existant render target '" + name + "'");
     return nullptr;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::RemoveTarget(D3D11RenderTarget* target)
+  {
+    for (unsigned int i = 0; i < render_targets_.size(); ++i)
+    {
+      if (render_targets_.at(i) == target)
+      {
+        render_targets_.erase(render_targets_.begin() + i);
+        break;
+      }
+    }
   }
 
 	//-------------------------------------------------------------------------------------------

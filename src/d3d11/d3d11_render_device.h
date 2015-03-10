@@ -8,7 +8,7 @@
 #include <xnamath.h>
 
 #include <string>
-#include <map>
+#include <vector>
 
 #include "../platform/platform_render_device_base.h"
 #include "../memory/shared_ptr.h"
@@ -133,6 +133,12 @@ namespace snuffbox
     */
     D3D11RenderTarget* GetTarget(const std::string& name);
 
+    /**
+    * @brief Removes a given render target from the device
+    * @param[in] target (snuffbox::D3D11RenderTarget*) The target to remove
+    */
+    void RemoveTarget(D3D11RenderTarget* target);
+
 		/**
 		* @return snuffbox::D3D11RenderTarget* The swap chain of this device
 		*/
@@ -248,7 +254,7 @@ namespace snuffbox
 		ID3D11DeviceContext* context_; //!< The device context
 
 		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
-		std::map<std::string, D3D11RenderTarget*> render_targets_; //!< The map of render targets
+		std::vector<D3D11RenderTarget*> render_targets_; //!< The map of render targets
 		D3D11RenderTarget* current_target_; //!< The current target being rendered
 
     SharedPtr<D3D11VertexBuffer> screen_quad_; //!< The vertex buffer of the screen quad
