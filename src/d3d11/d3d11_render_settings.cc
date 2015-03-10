@@ -75,7 +75,8 @@ namespace snuffbox
 			{ "setResolution", JSSetResolution },
 			{ "resolution", JSResolution },
 			{ "setInvertY", JSSetInvertY },
-			{ "invertY", JSInvertY }
+			{ "invertY", JSInvertY },
+      { "setFullscreen", JSSetFullscreen }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -91,7 +92,10 @@ namespace snuffbox
 			SNUFF_LOG_WARNING("Unspecified value, defaulting to 'false'");
 		}
 
-		D3D11RenderSettings::Instance()->set_vsync(wrapper.GetValue<bool>(0, false));
+    bool v = wrapper.GetValue<bool>(0, false);
+		D3D11RenderSettings::Instance()->set_vsync(v);
+
+    SNUFF_LOG_INFO("Changed vertical sync to " + std::to_string(v));
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -109,10 +113,15 @@ namespace snuffbox
 
 		if (wrapper.Check("NN") == true)
 		{
+      float w = wrapper.GetValue<float>(0, 640.0f);
+      float h = wrapper.GetValue<float>(1, 480.0f);
+
 			D3D11RenderSettings::Instance()->set_resolution(
-				wrapper.GetValue<float>(0, 640.0),
-				wrapper.GetValue<float>(1, 480.0)
+				w,
+				h
 				);
+
+      SNUFF_LOG_INFO("Changed the resolution to " + std::to_string(w) + "x" + std::to_string(h));
 		}
 	}
 
@@ -140,7 +149,10 @@ namespace snuffbox
 			SNUFF_LOG_WARNING("Unspecified value, defaulting to 'false'");
 		}
 
-		D3D11RenderSettings::Instance()->set_invert_y(wrapper.GetValue<bool>(0, false));
+    bool v = wrapper.GetValue<bool>(0, false);
+		D3D11RenderSettings::Instance()->set_invert_y(v);
+
+    SNUFF_LOG_INFO("Changed invert Y to " + std::to_string(v));
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -150,4 +162,15 @@ namespace snuffbox
 
 		wrapper.ReturnValue<bool>(D3D11RenderSettings::Instance()->invert_y());
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderSettings::JSSetFullscreen(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+
+    bool v = wrapper.GetValue<bool>(0, false);
+    D3D11RenderDevice::Instance()->SetFullscreen(v);
+
+    SNUFF_LOG_INFO("Set fullscreen to " + std::to_string(v));
+  }
 }

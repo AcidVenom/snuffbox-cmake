@@ -105,6 +105,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   Box::~Box()
   {
+    if (Game::Instance()->started() == false)
+    {
+      return;
+    }
+
     ContentManager* content_manager = ContentManager::Instance();
     for (ContentMap::iterator it = files_.begin(); it != files_.end(); ++it)
     {

@@ -232,10 +232,10 @@ namespace snuffbox
 		}
 
     ContentManager* content_manager = ContentManager::Instance();
-    content_manager->Load(ContentTypes::kShader, "shaders/base.fx");
-    content_manager->Load(ContentTypes::kShader, "shaders/post_processing.fx");
-    content_manager->Load(ContentTypes::kShader, "shaders/ui.fx");
-    content_manager->Load(ContentTypes::kShader, "shaders/text.fx");
+    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/base.fx");
+    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/post_processing.fx");
+    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/ui.fx");
+    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/text.fx");
   }
 
   //-------------------------------------------------------------------------------------------
@@ -628,6 +628,12 @@ namespace snuffbox
 			break;
 		}
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::SetFullscreen(const bool& fullscreen)
+  {
+    swap_chain_->SetFullscreenState(fullscreen, NULL);
+  }
 
   //-------------------------------------------------------------------------------------------
 	IDXGISwapChain* D3D11RenderDevice::swap_chain()

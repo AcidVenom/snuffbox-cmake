@@ -122,6 +122,12 @@ namespace snuffbox
 		void SetSampler(const int& type);
 
     /**
+    * @brief Sets the fullscreen state of the render device
+    * @param[in] fullscreen (const bool&) The boolean value
+    */
+    void SetFullscreen(const bool& fullscreen);
+
+    /**
     * @brief Retrieves a render target by name
     * @param[in] name (const std::string&) The name of the render target to retrieve
     */

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace snuffbox
 {
 	/**
@@ -15,6 +17,19 @@ namespace snuffbox
 		
 		/// Shows a window
 		virtual void Show() = 0;
+
+    /**
+    * @brief Sets the size of the window
+    * @param[in] w (const int&) The window width
+    * @param[in] h (const int&) The window height
+    */
+    virtual void SetSize(const int& w, const int& h) = 0;
+
+    /**
+    * @brief Sets the name of the window
+    * @param[in] name (const std::string&) The name to set
+    */
+    virtual void SetName(const std::string& name) = 0;
 
 		/// Process the message queue, send to the input handlers
 		virtual void ProcessMessages() = 0;

@@ -7,6 +7,7 @@
 #include "../input/mouse.h"
 
 #include "../platform/platform_render_device.h"
+#include "../platform/platform_window.h"
 
 #define SNUFF_WINDOW_CLASS "WIN32_WIN_CLASS"
 
@@ -171,6 +172,35 @@ namespace snuffbox
 		ShowWindow(handle_, SW_SHOWNORMAL);
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::SetSize(const int& w, const int& h)
+  {
+    RECT client;
+    client.left = client.top = 0;
+    client.right = w;
+    client.bottom = h;
+
+    int style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX;
+
+    AdjustWindowRect(&client, style, FALSE);
+    unsigned int width = client.right - client.left;
+    unsigned int height = client.bottom - client.top;
+
+    width_ = width;
+    height_ = height;
+
+    SetWindowPos(handle_, HWND_TOP, (GetSystemMetrics(SM_CXSCREEN) - width) / 2, (GetSystemMetrics(SM_CYSCREEN) - height) / 2, width, height, NULL);
+
+    D3D11RenderDevice::Instance()->ResizeBuffers(w, h);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::SetName(const std::string& name)
+  {
+    SetWindowTextA(handle_, name.c_str());
+    name_ = name;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void Win32Window::ProcessMessages()
 	{
@@ -330,6 +360,12 @@ namespace snuffbox
 		return height_;
 	}
 
+  //-------------------------------------------------------------------------------------------
+  const std::string& Win32Window::name() const
+  {
+    return name_;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	HWND Win32Window::handle()
 	{
@@ -362,4 +398,64 @@ namespace snuffbox
 		UnregisterClassA(SNUFF_WINDOW_CLASS, instance_);
 		SNUFF_LOG_INFO("Destroyed the window with name '" + name_ + "'");
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::RegisterJS(JS_SINGLETON obj)
+  {
+    JSFunctionRegister funcs[] = {
+      { "setSize", JSSetSize },
+      { "size", JSSize },
+      { "setName", JSSetName },
+      { "name", JSName }
+    };
+
+    JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::JSSetSize(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    Window* self = Game::Instance()->window();
+
+    if (wrapper.Check("NN") == true)
+    {
+      self->SetSize(wrapper.GetValue<int>(0, 640), wrapper.GetValue<int>(1, 480));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::JSSize(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    Window* self = Game::Instance()->window();
+
+    v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+
+    JSWrapper::SetObjectValue(obj, "w", self->width());
+    JSWrapper::SetObjectValue(obj, "h", self->height());
+
+    wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::JSName(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    Window* self = Game::Instance()->window();
+
+    wrapper.ReturnValue<std::string>(self->name());
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::JSSetName(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    Window* self = Game::Instance()->window();
+
+    if (wrapper.Check("S") == true)
+    {
+      self->SetName(wrapper.GetValue<std::string>(0, self->name()));
+    }
+  }
 }

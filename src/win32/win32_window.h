@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../platform/platform_window_base.h"
+#include "../js/js_object.h"
 
 #include <string>
 #include <Windows.h>
@@ -14,7 +15,7 @@ namespace snuffbox
 	* @brief A Windows window for use with the engine
 	* @author Daniël Konings
 	*/
-	class Win32Window : public IWindowBase
+	class Win32Window : public IWindowBase, public JSObject
 	{
 	public:
 		/**
@@ -33,13 +34,19 @@ namespace snuffbox
 		/// Initialises the window
 		void Initialise();
 
-		/// @see snuffbox::IWindowBase
+		/// @see snuffbox::IWindowBase::Show
 		void Show();
 
-		/// @see snuffbox::IWindowBase
+    /// @see snuffbox::IWindowBase::SetSize
+    void SetSize(const int& w, const int& h);
+
+    /// @see snuffbox::IWindowBase::SetName
+    void SetName(const std::string& name);
+
+		/// @see snuffbox::IWindowBase::ProcessMessages
 		void ProcessMessages();
 
-		/// @see snuffbox::IWindowBase
+		/// @see snuffbox::IWindowBase::SendQuitMessage
 		void SendQuitMessage();
 
 		/**
@@ -131,6 +138,11 @@ namespace snuffbox
 		*/
 		const int& height() const;
 
+    /**
+    * @return const std::string& The name of this window
+    */
+    const std::string& name() const;
+
 		/**
 		* @return HWND The handle to this window
 		*/
@@ -163,5 +175,13 @@ namespace snuffbox
 		HINSTANCE instance_; //!< The window instance
 		bool focussed_; //!< Is the window focussed?
 		POINT mouse_position_; //!< The mouse position
+
+  public:
+    JS_NAME("Window");
+    static void RegisterJS(JS_SINGLETON obj);
+    static void JSSetSize(JS_ARGS args);
+    static void JSSize(JS_ARGS args);
+    static void JSSetName(JS_ARGS args);
+    static void JSName(JS_ARGS args);
 	};
 }

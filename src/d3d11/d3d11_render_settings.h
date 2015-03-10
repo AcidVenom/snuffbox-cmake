@@ -68,5 +68,6 @@ namespace snuffbox
 		static void JSResolution(JS_ARGS args);
 		static void JSSetInvertY(JS_ARGS args);
 		static void JSInvertY(JS_ARGS args);
+    static void JSSetFullscreen(JS_ARGS args);
 	};
 }
