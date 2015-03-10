@@ -36,7 +36,13 @@ Game.Initialise = function()
 	Game.widget.setBlend(1, 0, 0);
 	Game.widget.spawn("Default");
 
+	var func1 = function()
+	{
+		Log.debug("A");
+	}
+
 	Game.mouseArea = new MouseArea(Game.widget);
+	Game.mouseArea.setOnDown(func1);
 }
 
 Game.Update = function(dt)

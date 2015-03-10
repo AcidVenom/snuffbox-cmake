@@ -35,6 +35,12 @@ namespace snuffbox
 		bool Set(const std::string& obj, const std::string& field);
 
     /**
+    * @brief Sets the callback from a provided function
+    * @param[in] cb (const v8::Handle<v8::Value>&) The callback to set
+    */
+    void Set(const v8::Handle<v8::Value>& cb);
+
+    /**
     * @brief Pushes a value into the value array, to pass to the call of the callback
     * @param[in] arg (const T&) The argument to push
     */
@@ -157,6 +163,15 @@ namespace snuffbox
     valid_ = true;
 
     return true;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  template<typename ... Args>
+  inline void JSCallback<Args...>::Set(const v8::Handle<v8::Value>& cb)
+  {
+    v8::Handle<v8::Value> value = cb;
+    callback_.Reset(JSStateWrapper::Instance()->isolate(), value.As<v8::Function>());
+    valid_ = true;
   }
 
   //-------------------------------------------------------------------------------------------

@@ -12,6 +12,12 @@
 
 namespace snuffbox
 {
+  //-------------------------------------------------------------------------------------------
+  bool Mouse::MouseAreaSorter::operator()(MouseArea* a, MouseArea* b)
+  {
+    return a->GetZ() > b->GetZ();
+  }
+
 	//-------------------------------------------------------------------------------------------
 	Mouse::Mouse() :
 		x_(0),
@@ -108,9 +114,12 @@ namespace snuffbox
 		prev_x_ = x_;
 		prev_y_ = y_;
 
+    std::sort(mouse_areas_.begin(), mouse_areas_.end(), MouseAreaSorter());
+
+    bool do_callback = true;
     for (unsigned int i = 0; i < mouse_areas_.size(); ++i)
     {
-      mouse_areas_.at(i)->Check(this);
+      do_callback = !mouse_areas_.at(i)->Check(this, do_callback);
     }
 	}
 

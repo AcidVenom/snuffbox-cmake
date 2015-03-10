@@ -94,6 +94,16 @@ namespace snuffbox
 			float x, y;
 		};
 
+    /**
+    * @struct snuffbox::Mouse::MouseAreaSorter
+    * @brief Used to sort mouse areas by Z
+    * @author Daniël Konings
+    */
+    struct MouseAreaSorter
+    {
+      bool operator()(MouseArea* a, MouseArea* b);
+    };
+
 	public:
 		/// Default constructor
 		Mouse();
