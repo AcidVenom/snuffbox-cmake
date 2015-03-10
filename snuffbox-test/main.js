@@ -24,12 +24,6 @@ Game.Initialise = function()
 	Game.skybox.setTechnique("Skybox");
 	
 	Game.model.setScale(10, 10, 10);
-
-	Game.terrain = new Terrain();
-	Game.terrain.create(128, 128);
-	Game.terrain.setTranslation(10, 0, 20);
-	Game.terrain.setScale(0.5, 1, 0.5);
-	Game.terrain.spawn("Default");
 }
 
 Game.Update = function(dt)
@@ -77,39 +71,6 @@ Game.Update = function(dt)
 
 	var t = Game.camera.translation();
 	Game.skybox.setTranslation(t.x, t.y, t.z);
-
-	var p = Mouse.position(MousePosition.Relative);
-	p.x = (p.x + RenderSettings.resolution().w / 2);
-	p.y = (p.y + RenderSettings.resolution().h / 2);
-
-	var unprojA = Game.camera.unproject(p.x, p.y, Game.camera.nearPlane());
-	var unprojB = Game.camera.unproject(p.x, p.y, Game.camera.farPlane());
-	
-	var f = unprojA.y / (unprojB.y - unprojA.y);
-	var ix = unprojA.x - f * (unprojB.x - unprojA.x);
-	var iz = unprojA.z - f * (unprojB.z - unprojA.z);
-
-	var points = Game.terrain.nearestVertices(ix, iz);
-
-	var p1 = Game.terrain.indexToWorld(points[0].x, points[0].y);
-	var p2 = Game.terrain.indexToWorld(points[1].x, points[1].y);
-	var p3 = Game.terrain.indexToWorld(points[2].x, points[2].y);
-
-	var s = 0.05;
-	Line.draw(p1.x, s, p1.z, 1, 0, 0, p2.x, s, p2.z, 1, 0, 0)
-	Line.draw(p2.x, s, p2.z, 1, 0, 0, p3.x, s, p3.z, 1, 0, 0)
-	Line.draw(p3.x, s, p3.z, 1, 0, 0, p1.x, s, p1.z, 1, 0, 0)
-
-	if (Mouse.isDown(MouseButton.Middle))
-	{
-		Game.terrain.setHeight(points[0].x, points[0].y, 10);
-		Game.terrain.setHeight(points[1].x, points[1].y, 10);
-		Game.terrain.setHeight(points[2].x, points[2].y, 10);
-
-		Game.terrain.flush();
-	}
-
-	//Game.widget.setScale(2 + Math.sin(Game.time()), 2 + Math.sin(Game.time()));
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
@@ -119,7 +80,7 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 
 Game.Draw = function(dt)
 {
-	Game.render(Game.camera);
+	Game.render(Game.camera, Game.targets.default);
 }
 
 Game.Shutdown = function()

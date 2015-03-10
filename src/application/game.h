@@ -72,8 +72,9 @@ namespace snuffbox
 		/**
 		* @brief Renders to the window from a specified camera
 		* @param[in] camera snuffbox::D3D11Camera* The camera to render from
+    * @param[in] target snuffbox::D3D11RenderTarget* The target to render from
 		*/
-		void Render(D3D11Camera* camera = nullptr);
+    void Render(D3D11Camera* camera, D3D11RenderTarget* target);
 
 		/**
 		* @brief Sends a notification to the game instance

@@ -196,11 +196,13 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Draw()
 	{
+    render_device_->StartDraw();
 		js_draw_.Call(delta_time_);
+    render_device_->Draw();
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Game::Render(D3D11Camera* camera)
+	void Game::Render(D3D11Camera* camera, D3D11RenderTarget* target)
 	{
 		if (started_ == false)
 		{
@@ -210,10 +212,12 @@ namespace snuffbox
 		if (camera == nullptr)
 		{
 			SNUFF_LOG_WARNING("No camera was set from rendering, rendering non-ui elements will fail");
-		}
+    }
+    D3D11RenderDevice::RenderCommand cmd;
+    cmd.camera = camera;
+    cmd.target = target;
 
-		render_device_->set_camera(camera);
-		render_device_->Draw();
+    render_device_->ReceiveCommand(cmd);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -389,9 +393,9 @@ namespace snuffbox
 	void Game::JSRender(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
-		wrapper.Check("O");
+		wrapper.Check("OO");
 
-		Game::Instance()->Render(wrapper.GetPointer<D3D11Camera>(0));
+    Game::Instance()->Render(wrapper.GetPointer<D3D11Camera>(0), wrapper.GetPointer<D3D11RenderTarget>(1));
 	}
 
   //-------------------------------------------------------------------------------------------

@@ -100,6 +100,12 @@ namespace snuffbox
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
     default_texture_->Validate();
 
+    default_cube_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    D3D11Texture::Cube cube;
+    cube.left = cube.right = cube.top = cube.bottom = cube.back = cube.front = default_texture_.get();
+    default_cube_map_->CreateCubeMap(cube);
+    default_cube_map_->Validate();
+
     CreateDefaultMaterial();
 		CreateDepthStencilView();
 
@@ -420,22 +426,39 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-	void D3D11RenderDevice::Draw()
-	{
-    if (input_layout_ == nullptr || camera_ == nullptr)
+  void D3D11RenderDevice::StartDraw()
+  {
+    if (input_layout_ == nullptr)
     {
       return;
     }
 
-		lighting_->Update(constant_buffer_);
-		
-		back_buffer_->Clear(context_);
-		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    lighting_->Update(constant_buffer_);
+
+    back_buffer_->Clear(context_);
+    context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::ReceiveCommand(const RenderCommand& command)
+  {
+    commands_.push_back(command);
+  }
+
+  //-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::Draw()
+	{
+    if (input_layout_ == nullptr)
+    {
+      return;
+    }
 
     D3D11RenderTarget* it = nullptr;
-    for (unsigned int i = 0; i < render_targets_.size(); ++i)
+    for (unsigned int i = 0; i < commands_.size(); ++i)
     {
-      it = render_targets_.at(i);
+      RenderCommand& command = commands_.at(i);
+      it = command.target;
+      camera_ = command.camera;
       DrawRenderTarget(it);
     }
 
@@ -445,11 +468,18 @@ namespace snuffbox
 		swap_chain_->Present(D3D11RenderSettings::Instance()->vsync(), 0);
 
 		camera_ = nullptr;
+    commands_.clear();
 	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::DrawRenderTarget(D3D11RenderTarget* target)
   {
+    if (target == nullptr)
+    {
+      SNUFF_LOG_WARNING("Attempted to render an invalid render target");
+      return;
+    }
+
 		current_target_ = target;
 
     viewport_render_target_->Set();
@@ -750,6 +780,12 @@ namespace snuffbox
   D3D11Texture* D3D11RenderDevice::default_texture()
   {
     return default_texture_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11Texture* D3D11RenderDevice::default_cube_map()
+  {
+    return default_cube_map_.get();
   }
 
   //-------------------------------------------------------------------------------------------

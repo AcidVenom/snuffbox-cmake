@@ -15,6 +15,9 @@ namespace snuffbox
 		*/
 		virtual bool Initialise() = 0;
 
+    /// Start drawing
+    virtual void StartDraw() = 0;
+
 		/// Render to the window
 		virtual void Draw() = 0;
 

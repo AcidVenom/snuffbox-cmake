@@ -40,6 +40,18 @@ namespace snuffbox
 	*/
 	class D3D11RenderDevice : public IRenderDeviceBase
 	{
+  public:
+    /**
+    * @struct D3D11RenderDevice::RenderCommand
+    * @brief Used to render a given target with a given camera
+    * @author Daniël Konings
+    */
+    struct RenderCommand
+    {
+      D3D11Camera* camera = nullptr;
+      D3D11RenderTarget* target = nullptr;
+    };
+
 	public:
 		/// Default constructor
 		D3D11RenderDevice();
@@ -87,6 +99,15 @@ namespace snuffbox
 
 		/// Finds the default adapter to use
 		void FindAdapter();
+
+    /**
+    * @brief Receives a render command
+    * @param[in] command (const snuffbox::D3D11Renderdevice::RenderCommand&) The command to receive
+    */
+    void ReceiveCommand(const RenderCommand& command);
+
+    /// @see snuffbox::IRenderDeviceBase::StartDraw
+    void StartDraw();
 
 		/// @see snuffbox::IRenderDeviceBase::Draw
 		void Draw();
@@ -195,6 +216,11 @@ namespace snuffbox
     D3D11Texture* default_texture();
 
     /**
+    * @return snuffbox::D3D11Texture* The default cube map
+    */
+    D3D11Texture* default_cube_map();
+
+    /**
     * @return snuffbox::D3D11Texture* The default effect
     */
     D3D11Effect* default_effect();
@@ -255,6 +281,7 @@ namespace snuffbox
 
 		SharedPtr<D3D11RenderTarget> back_buffer_; //!< The backbuffer of this render device
 		std::vector<D3D11RenderTarget*> render_targets_; //!< The map of render targets
+    std::vector<RenderCommand> commands_; //!< The commands for drawing
 		D3D11RenderTarget* current_target_; //!< The current target being rendered
 
     SharedPtr<D3D11VertexBuffer> screen_quad_; //!< The vertex buffer of the screen quad
@@ -286,6 +313,7 @@ namespace snuffbox
 		D3D11Line* line_; //!< The line system
 
     SharedPtr<D3D11Texture> default_texture_; //!< The default texture
+    SharedPtr<D3D11Texture> default_cube_map_; //!< The default cube map
     SharedPtr<D3D11Effect> default_effect_; //!< The default effect
 		SharedPtr<D3D11Effect> default_post_processing_; //!< The default effect
     SharedPtr<D3D11Material> default_material_; //!< The default material
