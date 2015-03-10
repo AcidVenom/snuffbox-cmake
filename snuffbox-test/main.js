@@ -37,24 +37,24 @@ Game.Update = function(dt)
 		mx = 0,
 		rx = 0,
 		ry = 0,
-		speed = 20;
+		speed = 20 * dt;
 
 	if (Keyboard.isDown(Key.W))
 	{
-		mz = -dt * speed;
+		mz = -speed;
 	}
 	else if (Keyboard.isDown(Key.S))
 	{
-		mz = dt * speed;
+		mz = speed;
 	}
 
 	if (Keyboard.isDown(Key.A))
 	{
-		mx = -dt * speed;
+		mx = -speed;
 	}
 	else if (Keyboard.isDown(Key.D))
 	{
-		mx = dt * speed;
+		mx = speed;
 	}
 
 	if (Mouse.isDown(MouseButton.Left))
@@ -64,7 +64,7 @@ Game.Update = function(dt)
 		ry = -movement.x / 100;
 	}
 
-	Game.camera.translateBy(mx, 0, mz);
+	Game.camera.translateBy(mx, 0, mz, 0);
 	Game.camera.rotateBy(rx, ry, 0);
 
 	Game.model.rotateBy(0, dt, 0);

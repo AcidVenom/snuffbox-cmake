@@ -265,7 +265,7 @@ namespace snuffbox
 				wrapper.GetValue<float>(0, 0.0f), 
 				wrapper.GetValue<float>(1, 0.0f), 
 				wrapper.GetValue<float>(2, 0.0f), 
-				static_cast<CameraTransformation>(wrapper.GetValue<int>(0, 0)));
+				static_cast<CameraTransformation>(wrapper.GetValue<int>(3, 0)));
 		}
 	}
 
