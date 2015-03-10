@@ -194,5 +194,6 @@ namespace snuffbox
 		static void JSFixedStep(JS_ARGS args);
 		static void JSSetFixedStep(JS_ARGS args);
 		static void JSRender(JS_ARGS args);
+    static void JSCleanUp(JS_ARGS args);
 	};
 }

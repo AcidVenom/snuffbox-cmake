@@ -138,6 +138,8 @@ SET (InputSources
 	input/keyboard.cc
 	input/mouse.h
 	input/mouse.cc
+	input/mouse_area.h
+	input/mouse_area.cc
 )
 
 SET (JavaScriptSources

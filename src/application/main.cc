@@ -129,6 +129,6 @@ int main(int argc, char** argv)
 	}
 
 	SNUFF_LOG_INFO("Shutting down");
-
+  render_device->Dispose();
 	return 0;
 }

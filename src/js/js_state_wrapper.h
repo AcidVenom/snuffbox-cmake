@@ -86,8 +86,11 @@ namespace snuffbox
 		*/
 		void RegisterToObject(const v8::Handle<v8::Object>& obj, const std::string& name, const v8::Handle<v8::Value>& value);
 
-		/// Destroys the state wrapper and disposes V8
+		/// Destroys the state wrapper
 		void Destroy();
+
+    /// Disposes V8
+    void Dispose();
 
     /**
     * @brief Retrieves the isolate running on this thread

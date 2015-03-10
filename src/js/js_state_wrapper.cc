@@ -210,6 +210,23 @@ namespace snuffbox
 		context_.Reset();
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void JSStateWrapper::Dispose()
+  {
+    Destroy();
+
+    isolate_->LowMemoryNotification();
+    isolate_->Exit();
+    isolate_->Dispose();
+
+    V8::Dispose();
+
+    delete platform_;
+    platform_ = nullptr;
+
+    running_ = false;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	Isolate* JSStateWrapper::isolate()
 	{
@@ -237,18 +254,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
 	{
-		Destroy();
-
-		isolate_->LowMemoryNotification();
-		isolate_->Exit();
-		isolate_->Dispose();
-
-		V8::Dispose();
-
-		delete platform_;
-		platform_ = nullptr;
-
-		running_ = false;
+    Dispose();
 	}
 
 	//-------------------------------------------------------------------------------------------

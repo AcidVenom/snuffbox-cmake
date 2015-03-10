@@ -6,6 +6,8 @@
 
 namespace snuffbox
 {
+  class MouseArea;
+
 	/**
 	* @class snuffbox::Mouse
 	* @brief This class handles all mouse input
@@ -152,6 +154,18 @@ namespace snuffbox
 		*/
 		float2 Position(const MousePosition& type);
 
+    /**
+    * @brief Adds a mouse area
+    * @param[in] area (snuffbox::MouseArea*) The mouse area to add
+    */
+    void AddMouseArea(MouseArea* area);
+
+    /**
+    * @brief Removes a mouse area
+    * @param[in] area (snuffbox::MouseArea*) The mouse area to remove
+    */
+    void RemoveMouseArea(MouseArea* area);
+
 		/**
 		* @brief Was there a mouse wheel down?
 		* @return const bool& The boolean value
@@ -195,6 +209,7 @@ namespace snuffbox
 		int										dy_; //!< The y movement since last frame
 		int										prev_x_; //!< The previous x position
 		int										prev_y_; //!< The previous y position
+    std::vector<MouseArea*> mouse_areas_; //!< A list of mouse areas to check
 
 		/// Enumerates all mouse used enumerations
 		static void JSEnumerate();

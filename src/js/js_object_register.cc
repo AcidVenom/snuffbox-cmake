@@ -7,6 +7,7 @@
 
 #include "../input/keyboard.h"
 #include "../input/mouse.h"
+#include "../input/mouse_area.h"
 
 #include "../content/content_manager.h"
 
@@ -52,6 +53,8 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void JSRegister::RegisterConstructables()
   {
+    JSObjectRegister<MouseArea>::Register();
+
 		JSObjectRegister<D3D11RenderTarget>::Register();
 		JSObjectRegister<D3D11Camera>::Register();
 		JSObjectRegister<D3D11Light>::Register();

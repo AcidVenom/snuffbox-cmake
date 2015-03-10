@@ -236,7 +236,6 @@ namespace snuffbox
 		SNUFF_LOG_INFO("Received quit message");
 		js_shutdown_.Call();
 
-		render_device_->Dispose();
 		started_ = false;
 	}
 
@@ -343,7 +342,8 @@ namespace snuffbox
 			{ "setTime", JSSetTime },
 			{ "fixedStep", JSFixedStep },
 			{ "setFixedStep", JSSetFixedStep },
-			{ "render", JSRender }
+			{ "render", JSRender },
+      { "cleanUp", JSCleanUp }
 		};
 		
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -393,4 +393,10 @@ namespace snuffbox
 
 		Game::Instance()->Render(wrapper.GetPointer<D3D11Camera>(0));
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void Game::JSCleanUp(JS_ARGS args)
+  {
+    JSStateWrapper::Instance()->isolate()->LowMemoryNotification();
+  }
 }

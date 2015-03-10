@@ -1,4 +1,5 @@
 #include "../input/mouse.h"
+#include "../input/mouse_area.h"
 
 #include "../memory/allocated_memory.h"
 #include "../memory/shared_ptr.h"
@@ -106,6 +107,11 @@ namespace snuffbox
 
 		prev_x_ = x_;
 		prev_y_ = y_;
+
+    for (unsigned int i = 0; i < mouse_areas_.size(); ++i)
+    {
+      mouse_areas_.at(i)->Check(this);
+    }
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -204,6 +210,28 @@ namespace snuffbox
 
 		return p;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void Mouse::AddMouseArea(MouseArea* area)
+  {
+    mouse_areas_.push_back(area);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Mouse::RemoveMouseArea(MouseArea* area)
+  {
+    MouseArea* it = nullptr;
+
+    for (unsigned int i = 0; i < mouse_areas_.size(); ++i)
+    {
+      it = mouse_areas_.at(i);
+
+      if (it == area)
+      {
+        mouse_areas_.erase(mouse_areas_.begin() + i);
+      }
+    }
+  }
 
 	//-------------------------------------------------------------------------------------------
 	const bool& Mouse::wheel_down() const
