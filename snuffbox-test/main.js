@@ -82,6 +82,7 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 Game.Draw = function(dt)
 {
 	Game.render(Game.camera, Game.targets.default);
+	Game.render(Game.camera, Game.targets.test);
 }
 
 Game.Shutdown = function()

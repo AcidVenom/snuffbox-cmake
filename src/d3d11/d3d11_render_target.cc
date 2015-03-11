@@ -197,7 +197,7 @@ namespace snuffbox
   void D3D11RenderTarget::SetViewport(const float& x, const float& y, const float& w, const float& h)
   {
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
-    viewport_->Create(x, y, w, h);
+    viewport_->Create(x, res.y / 2.0f - y, w, h);
   }
 
 	//---------------------------------------------------------------------------------------------------------

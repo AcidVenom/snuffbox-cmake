@@ -68,6 +68,15 @@ namespace snuffbox
 
     if (screen.x > ratio_x || screen.x < -ratio_x || screen.y > ratio_y || screen.y < -ratio_y)
     {
+      if (entered_ == true)
+      {
+        entered_ = false;
+
+        if (callback == true)
+        {
+          OnLeave();
+        }
+      }
       return false;
     }
 
