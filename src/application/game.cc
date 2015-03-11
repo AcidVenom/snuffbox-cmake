@@ -292,6 +292,12 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	const double& Game::delta_time() const
+	{
+		return delta_time_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void Game::set_window(Window* window)
 	{
 		SNUFF_ASSERT_NOTNULL(window, "Game::set_window");

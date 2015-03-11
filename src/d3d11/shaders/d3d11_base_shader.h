@@ -218,18 +218,21 @@ float4 Reflection(float3 view, float3 normal)\n\
 \n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
+\tfloat x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;\n\
+\tfloat y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;\n\
+\tfloat2 coords = float2(x, y);\n\
 \tfloat3 view = normalize(input.view.xyz);\n\
 \tfloat3 normal = normalize(input.normal);\n\
-\tfloat4 normal_map = TexNormal.Sample(Sampler, input.texcoord);\n\
+\tfloat4 normal_map = TexNormal.Sample(Sampler, coords);\n\
 \tnormal_map = (normal_map * 2.0f - 1.0f) * Material.NormalScale;\n\
 \n\
 \tLightResult result = ComputeLighting(view, input.world_pos, normal);\n\
 \n\
-\tfloat4 emissive = Material.Emissive * TexLight.Sample(Sampler, input.texcoord);\n\
+\tfloat4 emissive = Material.Emissive * TexLight.Sample(Sampler, coords);\n\
 \tfloat4 ambient = Material.Ambient * AmbientColour;\n\
 \tfloat4 diffuse = result.Diffuse * Material.Diffuse;\n\
-\tfloat4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, input.texcoord);\n\
-\tfloat4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);\n\
+\tfloat4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, coords);\n\
+\tfloat4 diffuse_map = TexDiffuse.Sample(Sampler, coords);\n\
 \n\
 \tfloat4 r = Reflection(view, normal - normal_map.xyz);\n\
 \tdiffuse_map = lerp(diffuse_map, r, Material.Reflectivity);\n\

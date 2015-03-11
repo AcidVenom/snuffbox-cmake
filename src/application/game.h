@@ -126,6 +126,11 @@ namespace snuffbox
 		const double& time() const;
 
 		/**
+		* @return const double& The current delta time
+		*/
+		const double& delta_time() const;
+
+		/**
 		* @brief Sets the window of this object
 		* @param[in] window (snuffbox::Window*) The window to be associated with this instance of the engine
 		*/

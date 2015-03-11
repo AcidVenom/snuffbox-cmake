@@ -11,6 +11,7 @@
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
 #include "../fbx/fbx_model.h"
+#include "../animation/anim.h"
 
 namespace snuffbox
 {
@@ -89,6 +90,10 @@ namespace snuffbox
       {
         content = AllocatedMemory::Instance().Construct<Box>();
       }
+			else if (type == ContentTypes::kAnim)
+			{
+				content = AllocatedMemory::Instance().Construct<Anim>();
+			}
 			else
 			{
 				SNUFF_LOG_WARNING("No content loader was specified for the content type of '" + path + "'");
@@ -216,6 +221,10 @@ namespace snuffbox
     {
       return ContentTypes::kBox;
     }
+		else if (type == "anim")
+		{
+			return ContentTypes::kAnim;
+		}
     else
     {
       SNUFF_LOG_WARNING("Tried to load unknown content type '" + type + "'");

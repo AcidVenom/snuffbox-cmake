@@ -13,17 +13,20 @@ Game.Initialise = function()
 
 	Game.camera.setTranslation(0, 0, 0);
 	Game.camera.setRotation(0, 0, 0);
-	
-	Game.model = new Model("axew.fbx");
-	Game.model.spawn("Default");
-	Game.model.setMaterial("test.material");
 
 	Game.skybox = new Model("skybox.fbx");
 	Game.skybox.spawn("Default");
 	Game.skybox.setMaterial("test.material");
 	Game.skybox.setTechnique("Skybox");
-	
-	Game.model.setScale(10, 10, 10);
+
+	Game.quad = new Quad();
+	Game.quad.spawn("Default");
+	Game.quad.setMaterial("quad.material");
+
+	Game.anim = new SpriteAnimation("test.anim", "sheet.png");
+	Game.anim.play();
+
+	Game.quad.setAnimation(Game.anim);
 }
 
 Game.Update = function(dt)
@@ -66,8 +69,6 @@ Game.Update = function(dt)
 
 	Game.camera.translateBy(mx, 0, mz, 0);
 	Game.camera.rotateBy(rx, ry, 0);
-
-	Game.model.rotateBy(0, dt, 0);
 
 	var t = Game.camera.translation();
 	Game.skybox.setTranslation(t.x, t.y, t.z);

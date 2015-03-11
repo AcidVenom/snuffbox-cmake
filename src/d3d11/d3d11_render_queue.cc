@@ -8,6 +8,7 @@
 #include "../d3d11/d3d11_render_target.h"
 #include "../d3d11/d3d11_uniforms.h"
 #include "../d3d11/elements/d3d11_text_element.h"
+#include "../application/game.h"
 
 #include <algorithm>
 
@@ -86,12 +87,19 @@ namespace snuffbox
 		D3D11Material::Attributes attributes;
 
 		D3D11Material* material = element->material();
+
+		Animation* animation = element->animation();
+
+		if (animation != nullptr)
+		{
+			animation->Animate(static_cast<float>(Game::Instance()->delta_time()));
+		}
 		
 		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
 			XMMatrixTranspose(XMMatrixInverse(&deter, element->world_matrix())),
-			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
+			element->animation_coordinates(),
 			element->blend(),
 			element->alpha(),
 			material == nullptr || material->is_valid() == false ? attributes : material->attributes()

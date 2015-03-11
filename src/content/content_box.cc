@@ -11,7 +11,7 @@ namespace snuffbox
   Box::Box() :
     Content(ContentTypes::kBox)
   {
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 10; ++i)
     {
       files_.emplace(static_cast<ContentTypes>(i), std::vector<std::string>());
     }

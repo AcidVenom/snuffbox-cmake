@@ -57,7 +57,7 @@ cbuffer Lighting : register(b2)
 
 cbuffer Uniforms : register(b3)
 {
-	float4 Test;
+
 }
 
 struct VOut
@@ -215,18 +215,21 @@ float4 Reflection(float3 view, float3 normal)
 
 float4 PS(VOut input) : SV_TARGET
 {
+	float x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;
+	float y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;
+	float2 coords = float2(x, y);
 	float3 view = normalize(input.view.xyz);
 	float3 normal = normalize(input.normal);
-	float4 normal_map = TexNormal.Sample(Sampler, input.texcoord);
+	float4 normal_map = TexNormal.Sample(Sampler, coords);
 	normal_map = (normal_map * 2.0f - 1.0f) * Material.NormalScale;
 
 	LightResult result = ComputeLighting(view, input.world_pos, normal);
 
-	float4 emissive = Material.Emissive * TexLight.Sample(Sampler, input.texcoord);
+	float4 emissive = Material.Emissive * TexLight.Sample(Sampler, coords);
 	float4 ambient = Material.Ambient * AmbientColour;
 	float4 diffuse = result.Diffuse * Material.Diffuse;
-	float4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, input.texcoord);
-	float4 diffuse_map = TexDiffuse.Sample(Sampler, input.texcoord);
+	float4 specular = result.Specular * Material.Specular * TexSpecular.Sample(Sampler, coords);
+	float4 diffuse_map = TexDiffuse.Sample(Sampler, coords);
 
 	float4 r = Reflection(view, normal - normal_map.xyz);
 	diffuse_map = lerp(diffuse_map, r, Material.Reflectivity);

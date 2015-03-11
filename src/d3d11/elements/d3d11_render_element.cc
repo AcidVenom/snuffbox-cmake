@@ -9,6 +9,7 @@
 #include "../../d3d11/d3d11_uniforms.h"
 
 #include "../../content/content_manager.h"
+#include "../../animation/animation_base.h"
 
 namespace snuffbox
 {
@@ -26,7 +27,9 @@ namespace snuffbox
 		technique_("Default"),
 		layer_type_(LayerType::kWorld),
 		blend_(1.0f, 1.0f, 1.0f),
-		alpha_(1.0f)
+		alpha_(1.0f),
+		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
+		animation_(nullptr)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -45,7 +48,9 @@ namespace snuffbox
 		technique_("Default"),
 		layer_type_(LayerType::kWorld),
 		blend_(1.0f, 1.0f, 1.0f),
-		alpha_(1.0f)
+		alpha_(1.0f),
+		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
+		animation_(nullptr)
 	{
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
@@ -155,6 +160,25 @@ namespace snuffbox
 		}
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::AddChild(D3D11RenderElement* child)
+	{
+		children_.push_back(child);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::RemoveChild(D3D11RenderElement* child)
+	{
+		for (unsigned int i = 0; i < children_.size(); ++i)
+		{
+			if (children_.at(i) == child)
+			{
+				children_.erase(children_.begin() + i);
+				break;
+			}
+		}
+	}
+
   //-------------------------------------------------------------------------------------------
   const XMVECTOR& D3D11RenderElement::translation() const
   {
@@ -246,6 +270,18 @@ namespace snuffbox
     return target_;
   }
 
+	//-------------------------------------------------------------------------------------------
+	const XMFLOAT4& D3D11RenderElement::animation_coordinates() const
+	{
+		return animation_coordinates_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	Animation* D3D11RenderElement::animation()
+	{
+		return animation_;
+	}
+
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)
   {
@@ -298,6 +334,11 @@ namespace snuffbox
 	void D3D11RenderElement::set_parent(D3D11RenderElement* parent)
 	{
 		parent_ = parent;
+
+		if (parent_ != nullptr)
+		{
+			parent_->AddChild(this);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -332,10 +373,54 @@ namespace snuffbox
 		alpha_ = a;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_animation_coordinates(SpriteAnimation::Frame* frame, D3D11Texture* texture)
+	{
+		if (frame == nullptr || texture == nullptr)
+		{
+			return;
+		}
+
+		float width = static_cast<float>(frame->w) / static_cast<float>(texture->width());
+		float height = static_cast<float>(frame->h) / static_cast<float>(texture->height());
+
+		float offset_x = static_cast<float>(frame->x) / static_cast<float>(texture->width());
+		float offset_y = static_cast<float>(frame->y) / static_cast<float>(texture->height());
+
+		animation_coordinates_.x = offset_x;
+		animation_coordinates_.y = offset_y;
+		animation_coordinates_.z = width;
+		animation_coordinates_.w = height;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_animation(Animation* animation)
+	{
+		animation_ = animation;
+		
+		if (animation_ != nullptr)
+		{
+			animation_->set_parent(this);
+		}
+	}
+
   //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
   {
+		for (unsigned int i = 0; i < children_.size(); ++i)
+		{
+			children_.at(i)->set_parent(nullptr);
+		}
 
+		if (parent_ != nullptr)
+		{
+			parent_->RemoveChild(this);
+		}
+
+		if (animation_ != nullptr)
+		{
+			animation_->set_parent(nullptr);
+		}
   }
 
   //-------------------------------------------------------------------------------------------
@@ -364,6 +449,7 @@ namespace snuffbox
 			{ "setAlpha", JSSetAlpha },
 			{ "alpha", JSAlpha },
 			{ "setUniform", JSSetUniform },
+			{ "setAnimation", JSSetAnimation },
       { "destroy", JSDestroy }
     };
 
@@ -698,6 +784,18 @@ namespace snuffbox
       self->Spawn(wrapper.GetValue<std::string>(0, "undefined"));
     }
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetAnimation(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+		if (wrapper.Check("O") == true)
+		{
+			self->set_animation(wrapper.GetPointer<Animation>(0));
+		}
+	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::JSSpawned(JS_ARGS args)

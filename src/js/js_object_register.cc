@@ -29,6 +29,8 @@
 #include "../d3d11/elements/d3d11_text_element.h"
 #include "../d3d11/elements/d3d11_polygon_element.h"
 
+#include "../js/js_object_register.h"
+
 #include "../platform/platform_window.h"
 
 namespace snuffbox
@@ -66,6 +68,8 @@ namespace snuffbox
 		JSObjectRegister<D3D11Billboard>::Register();
     JSObjectRegister<D3D11Text>::Register();
     JSObjectRegister<D3D11Polygon>::Register();
+
+		JSObjectRegister<SpriteAnimation>::Register();
   }
 
   //-------------------------------------------------------------------------------------------

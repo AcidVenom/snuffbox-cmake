@@ -54,7 +54,10 @@ SamplerState Sampler;\n\
 \n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
-\tfloat4 diffuse = TexDiffuse.Sample(Sampler, input.texcoord);\n\
+\tfloat x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;\n\
+\tfloat y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;\n\
+\tfloat2 coords = float2(x, y);\n\
+\tfloat4 diffuse = TexDiffuse.Sample(Sampler, coords);\n\
 \tdiffuse.rgb *= input.colour.rgb * Blend;\n\
 \tdiffuse.a *= Alpha;\n\
 \treturn diffuse;\n\

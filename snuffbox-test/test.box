@@ -1,6 +1,10 @@
 [
 	{
 		"type" : "texture",
+		"path" : "sheet.png"
+	},
+	{
+		"type" : "texture",
 		"path" : "wood.png"
 	},
 	{
@@ -62,5 +66,13 @@
 	{
 		"type" : "model",
 		"path" : "skybox.fbx"
+	},
+	{
+		"type" : "anim",
+		"path" : "test.anim"
+	},
+	{
+		"type" : "material",
+		"path" : "quad.material"
 	}
 ]

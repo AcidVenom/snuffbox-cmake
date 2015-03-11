@@ -2,12 +2,14 @@
 
 #include "../../js/js_object.h"
 #include "../../d3d11/d3d11_render_device.h"
+#include "../../animation/sprite_animation.h"
 
 namespace snuffbox
 {
   class D3D11VertexBuffer;
 	class D3D11Material;
 	class D3D11Uniforms;
+	class Animation;
 
   /**
   * @class snuffbox::D3D11RenderElement
@@ -70,6 +72,18 @@ namespace snuffbox
 		* @param[in] invert_y (const bool&) Should the Y axis be inverted? Default = false
 		*/
 		void CalculateWorldMatrix(XMMATRIX* world, const bool& invert_y = false);
+
+		/**
+		* @brief Adds a child to this render element
+		* @param[in] child (snuffbox::D3D11RenderElement*) The child to add
+		*/
+		void AddChild(D3D11RenderElement* child);
+
+		/**
+		* @brief Removes a child of this render element
+		* @param[in] child (snuffbox::D3D11RenderElement*) The child to remove
+		*/
+		void RemoveChild(D3D11RenderElement* child);
 
     /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
@@ -150,6 +164,16 @@ namespace snuffbox
     * @return snuffbox::D3D11RenderTarget The current render target of this element
     */
     D3D11RenderTarget* target();
+
+		/**
+		* @return const XMFLOAT4& The animation coordinates of this render element
+		*/
+		const XMFLOAT4& animation_coordinates() const;
+
+		/**
+		* @return snuffbox::Animation* The animation of this render element
+		*/
+		Animation* animation();
 
     /**
     * @brief Sets the translation of this render element
@@ -247,6 +271,19 @@ namespace snuffbox
 		*/
 		void set_alpha(const float& a);
 
+		/**
+		* @brief Sets the animation coordinates of a specific frame
+		* @param[in] frame (SpriteAnimation::Frame*) The frame to set the coordinates from 
+		* @param[in] texture (D3D11Texture*) The texture to adjust to
+		*/
+		void set_animation_coordinates(SpriteAnimation::Frame* frame, D3D11Texture* texture);
+
+		/**
+		* @brief Sets the animation of this render element
+		* @param[in] animation (snuffbox::Animation*) The animation to set
+		*/
+		void set_animation(Animation* animation);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -264,6 +301,9 @@ namespace snuffbox
 		float alpha_; //!< The alpha of this render element
 		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer of this render element
     D3D11RenderTarget* target_; //!< The target of this render element
+		XMFLOAT4 animation_coordinates_; //!< The animation coordinates of this render element
+		Animation* animation_; //!< The animation of this render element
+		std::vector<D3D11RenderElement*> children_; //!< The children of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -289,6 +329,7 @@ namespace snuffbox
 		static void JSAlpha(JS_ARGS args);
     static void JSSpawn(JS_ARGS args);
 		static void JSSetUniform(JS_ARGS args);
+		static void JSSetAnimation(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
 		static void JSDestroy(JS_ARGS args);
   };
