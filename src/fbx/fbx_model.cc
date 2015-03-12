@@ -24,8 +24,6 @@ namespace snuffbox
 			data.vertices,
 			data.indices
 			);
-
-		vertex_buffer_->set_topology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	//----------------------------------------------------------------------------------------

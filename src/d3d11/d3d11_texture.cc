@@ -128,7 +128,7 @@ namespace snuffbox
 
 		D3D11VertexBuffer vb(D3D11VertexBuffer::VertexBufferType::kOther);
 		std::vector<int> indices({
-			0, 1, 2, 3
+      0, 1, 2, 3, 2, 1
 		});
 
 		vb.Create({
@@ -179,7 +179,7 @@ namespace snuffbox
 
 		vb.Set();
 
-		D3D11Shader* pp = ContentManager::Instance()->Get<D3D11Shader>("shaders/post_processing.fx");
+		D3D11Shader* pp = ContentManager::Instance()->Get<D3D11Shader>("shaders/cube_map.fx");
 		pp->Set();
 
 		for (unsigned int i = 0; i < 6; ++i)

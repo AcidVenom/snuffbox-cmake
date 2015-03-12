@@ -158,7 +158,8 @@ namespace snuffbox
 	void D3D11Material::Apply()
 	{
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
-		D3D11Texture* default_tex = render_device->default_texture();
+    D3D11Texture* default_tex = render_device->default_texture();
+    D3D11Texture* default_normal = render_device->default_normal();
 		std::vector<ID3D11ShaderResourceView*> resources;
 
     if (diffuse_ != nullptr && (diffuse_->is_valid() == false || diffuse_->texture() == nullptr))
@@ -182,7 +183,7 @@ namespace snuffbox
     }
 
 		resources.push_back(diffuse_ == nullptr ? default_tex->texture() : diffuse_->texture());
-    resources.push_back(normal_ == nullptr ? default_tex->texture() : normal_->texture());
+    resources.push_back(normal_ == nullptr ? default_normal->texture() : normal_->texture());
     resources.push_back(specular_ == nullptr ? default_tex->texture() : specular_->texture());
     resources.push_back(light_map_ == nullptr ? default_tex->texture() : light_map_->texture());
 

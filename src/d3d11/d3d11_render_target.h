@@ -89,6 +89,19 @@ namespace snuffbox
     */
     void SetViewport(const float& x, const float& y, const float& w, const float& h);
 
+    /**
+    * @brief Adds a multi render target to this render target
+    * @param[in] snuffbox::D3D11RenderTarget* The target to add
+    */
+    void AddMultiTarget(D3D11RenderTarget* multi);
+
+    /**
+    * @brief Sets the shader resources of this render target and multi targets
+    * @param[in] ID3D11DeviceContext* The immediate context to set the shader resources from
+    * @param[in] ID3D11ShaderResourceView* The depth stencil view resource used for deferred rendering
+    */
+    void SetResources(ID3D11DeviceContext* context, ID3D11ShaderResourceView* depth_stencil_resource);
+
 		/// Releases all referenced D3D11 com objects
 		void Release();
 
@@ -101,6 +114,11 @@ namespace snuffbox
     * @return ID3D11ShaderResourceView* The texture resource of a normal render target
     */
     ID3D11ShaderResourceView* resource();
+
+    /**
+    * @return ID3D11RenderTargetView* The view of this render target
+    */
+    ID3D11RenderTargetView* view();
 
     /**
     * @return snuffbox::D3D11RenderQueue* The render queue of this render target
@@ -160,6 +178,7 @@ namespace snuffbox
     SharedPtr<D3D11Viewport> viewport_; //!< The viewport that can be overrided from JavaScript
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
+    std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
 
 	public:
 		JS_NAME("RenderTarget");
@@ -169,5 +188,6 @@ namespace snuffbox
 		static void JSSetTechnique(JS_ARGS args);
 		static void JSSetUniform(JS_ARGS args);
     static void JSSetViewport(JS_ARGS args);
+    static void JSAddMultiTarget(JS_ARGS args);
 	};
 }

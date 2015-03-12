@@ -28,19 +28,10 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 	return output;
 }
 
-Texture2D TexColour : register(t0);
-Texture2D TexNormal : register(t1);
-Texture2D TexDepth : register(t2);
+Texture2D Tex2D;
 SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	float4 diffuse = TexColour.Sample(Sampler, input.texcoord);
-	float4 normal = TexNormal.Sample(Sampler, input.texcoord);
-	float4 depth = TexDepth.Sample(Sampler, input.texcoord);
-
-	normal = normal * 2.0f - 1.0f;
-	float3 lightDir = float3(0, -1, -1);
-	diffuse.rgb *= saturate(dot(-lightDir, normal.rgb));
-	return diffuse;
+	return Tex2D.Sample(Sampler, input.texcoord);
 }

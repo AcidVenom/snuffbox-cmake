@@ -77,47 +77,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Lighting::Update(D3D11ConstantBuffer* buffer)
 	{
-		D3D11Light* light = nullptr;
-		std::vector<D3D11Light::Attributes> data;
-
-		std::sort(lights_.begin(), lights_.end(), LightSorter());
 		
-		int count = 0;
-		for (int i = static_cast<int>(lights_.size() - 1); i >= 0; --i)
-		{
-			if (count >= MAX_LIGHTS)
-			{
-				break;
-			}
-
-			light = lights_.at(i);
-
-			if (light == nullptr)
-			{
-				lights_.erase(lights_.begin() + i);
-				continue;
-			}
-
-			if (light->attributes().activated == true)
-			{
-				data.push_back(light->attributes());
-			}
-
-			++count;
-		}
-
-		CbLighting lights;
-
-		int s = static_cast<int>(data.size());
-		lights.Ambient = ambient_colour_;
-		lights.NumLights = s;
-		
-		for (int i = 0; i < s; ++i)
-		{
-			lights.Lights[i] = data.at(i);
-		}
-		
-		buffer->Map(lights, s);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

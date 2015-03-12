@@ -216,6 +216,11 @@ namespace snuffbox
     D3D11Texture* default_texture();
 
     /**
+    * @return snuffbox::D3D11Texture* The default texture
+    */
+    D3D11Texture* default_normal();
+
+    /**
     * @return snuffbox::D3D11Texture* The default cube map
     */
     D3D11Texture* default_cube_map();
@@ -305,14 +310,16 @@ namespace snuffbox
 
 		ID3D11DepthStencilView* depth_stencil_view_; //!< The depth stencil view
 		ID3D11Texture2D* depth_stencil_buffer_; //!< The actual depth stencil texture
+    ID3D11ShaderResourceView* depth_stencil_resource_; //!< The actual depth stencil resource
 
-		D3D11Texture* set_textures_[3]; //!< The currently set textures
+		D3D11Texture* set_textures_[8]; //!< The currently set textures
 		D3D11Shader* current_shader_; //!< The currently set shaders
 
 		D3D11Lighting* lighting_; //!< The lighting system
 		D3D11Line* line_; //!< The line system
 
     SharedPtr<D3D11Texture> default_texture_; //!< The default texture
+    SharedPtr<D3D11Texture> default_normal_; //!< The default texture
     SharedPtr<D3D11Texture> default_cube_map_; //!< The default cube map
     SharedPtr<D3D11Effect> default_effect_; //!< The default effect
 		SharedPtr<D3D11Effect> default_post_processing_; //!< The default effect

@@ -35,7 +35,7 @@ namespace snuffbox
     ID3D10Blob* errors = nullptr;
     HRESULT result = S_OK;
 
-    result = D3DX10CompileFromFileA(full_path.c_str(), 0, 0, "VS", "vs_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vs_buffer_, &errors, 0);
+    result = D3DX10CompileFromFileA(full_path.c_str(), 0, 0, "VS", "vs_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR | D3D10_SHADER_ENABLE_STRICTNESS, 0, 0, &vs_buffer_, &errors, 0);
     if (errors != nullptr)
     {
       SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
@@ -45,7 +45,7 @@ namespace snuffbox
 
     SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "D3DX10CompileFromFileA::VS"), "D3D11Shader::Load::" + path);
 
-    result = D3DX10CompileFromFileA(full_path.c_str(), 0, 0, "PS", "ps_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &ps_buffer_, &errors, 0);
+    result = D3DX10CompileFromFileA(full_path.c_str(), 0, 0, "PS", "ps_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR | D3D10_SHADER_ENABLE_STRICTNESS, 0, 0, &ps_buffer_, &errors, 0);
     if (errors != nullptr)
     {
       SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));

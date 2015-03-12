@@ -1,6 +1,6 @@
 #pragma once
 
-#define D3D11_POST_PROCESSING_SHADER "\
+#define D3D11_CUBE_MAP_SHADER "\
 cbuffer Global : register(b0)\n\
 {\n\
 \tfloat Time;\n\
@@ -31,19 +31,10 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 \treturn output;\n\
 }\n\
 \n\
-Texture2D TexColour : register(t0);\n\
-Texture2D TexNormal : register(t1);\n\
-Texture2D TexDepth : register(t2);\n\
+Texture2D Tex2D;\n\
 SamplerState Sampler;\n\
 \n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
-\tfloat4 diffuse = TexColour.Sample(Sampler, input.texcoord);\n\
-\tfloat4 normal = TexNormal.Sample(Sampler, input.texcoord);\n\
-\tfloat4 depth = TexDepth.Sample(Sampler, input.texcoord);\n\
-\n\
-\tnormal = normal * 2.0f - 1.0f;\n\
-\tfloat3 lightDir = float3(0, -1, -1);\n\
-\tdiffuse.rgb *= saturate(dot(-lightDir, normal.rgb));\n\
-\treturn diffuse;\n\
+\treturn Tex2D.Sample(Sampler, input.texcoord);\n\
 }"

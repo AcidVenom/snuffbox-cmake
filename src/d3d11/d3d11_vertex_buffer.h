@@ -16,8 +16,10 @@ namespace snuffbox
     XMFLOAT4 colour; //!< The colour of the vertex
     XMFLOAT2 tex_coords; //!< The texture coordinates of the vertex
     XMFLOAT3 normal; //!< The normal of the vertex
+    XMFLOAT3 tangent; //!< The tangent of this vertex
+    XMFLOAT3 bitangent; //!< The bitangent of this vertex
 
-    static const UINT stride_size = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3);
+    static const UINT stride_size = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3);
   };
 
   /**
@@ -56,6 +58,9 @@ namespace snuffbox
     * @param[in] indices (const std::vector<int>&) The indices to add
     */
     void Create(const std::vector<Vertex>& verts, const std::vector<int>& indices);
+
+    /// Calculates the tangents of the the current vertices
+    void CalculateTangents();
 
     /// Sets the vertex/index buffer
     void Set();

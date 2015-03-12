@@ -157,8 +157,9 @@ namespace snuffbox
 		for (int j = 0; j < 4; ++j)
 		{
 			icon.vertices.push_back(verts[j]);
-			icon.indices.push_back(j);
 		}
+
+    icon.indices = std::vector<int>({ 0, 1, 2, 3, 2, 1 });
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -339,6 +340,7 @@ namespace snuffbox
 
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
 		vertex_buffer_->Create(vertices_, indices_);
+    vertex_buffer_->set_topology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		for (TextIcon& it : icon_buffer_)
 		{

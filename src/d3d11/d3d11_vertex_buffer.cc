@@ -9,7 +9,7 @@ namespace snuffbox
     vertex_buffer_(nullptr),
     index_buffer_(nullptr),
     valid_(false),
-    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
+    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
   {
   
   }
@@ -29,6 +29,8 @@ namespace snuffbox
 
     vertices_ = verts;
     indices_ = indices;
+
+    CalculateTangents();
 
     SNUFF_XASSERT(vertices_.size() > 0, "There are no vertices to create a vertex buffer with", "D3D11VertexBuffer::Create");
     SNUFF_XASSERT(indices_.size() > 0, "There are no indices to create an index buffer with", "D3D11VertexBuffer::Create");
@@ -68,6 +70,40 @@ namespace snuffbox
     SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11VertexBuffer::Create");
 
     valid_ = true;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11VertexBuffer::CalculateTangents()
+  {
+    unsigned int face_count = static_cast<unsigned int>(indices_.size() / 3);
+    std::vector<XMVECTOR> tan;
+    tan.resize(face_count * 3);
+
+    XMVECTOR v1, v2, normal, tangent, bitangent;
+
+    for (unsigned int i = 0; i < vertices_.size(); ++i)
+    {
+      Vertex& v = vertices_.at(i);
+      normal = XMLoadFloat3(&v.normal);
+      v1 = XMVector3Cross(-normal, XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f));
+      v2 = XMVector3Cross(-normal, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+
+      if (XMVectorGetX(XMVector3Length(v1)) > XMVectorGetX(XMVector3Length(v2)))
+      {
+        tangent = v1;
+      }
+      else
+      {
+        tangent = v2;
+      }
+
+      tangent = XMVector3Normalize(tangent);
+
+      bitangent = XMVector3Normalize(XMVector3Cross(normal, tangent));
+
+      XMStoreFloat3(&v.tangent, tangent);
+      XMStoreFloat3(&v.bitangent, bitangent);
+    }
   }
 
   //-------------------------------------------------------------------------------------------

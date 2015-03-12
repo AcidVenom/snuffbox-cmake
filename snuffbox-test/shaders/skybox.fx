@@ -60,8 +60,16 @@ TextureCube TexCube : register(t0);
 Texture2D TexDiffuse : register(t1);
 SamplerState Sampler;
 
-float4 PS(VOut input) : SV_TARGET
+struct PSOut
 {
-    float4 diffuse = TexCube.Sample(Sampler, input.pos);
-    return diffuse;
+    float4 colour : SV_Target0;
+    float4 normal : SV_Target1;
+};
+
+PSOut PS(VOut input)
+{
+    PSOut output;
+    output.colour = TexCube.Sample(Sampler, input.pos);
+    output.normal = float4((input.normal.rgb + 1.0f) / 2.0f, 1.0f);
+    return output;
 }

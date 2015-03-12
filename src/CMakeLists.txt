@@ -118,6 +118,7 @@ SET (D3DShaders
 	d3d11/shaders/d3d11_ui_shader.h
 	d3d11/shaders/d3d11_text_shader.h
 	d3d11/shaders/d3d11_post_processing_shader.h
+	d3d11/shaders/d3d11_cube_map_shader.h
 )
 
 SET (OGLSources

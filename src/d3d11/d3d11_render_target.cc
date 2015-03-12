@@ -48,6 +48,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Create(D3D11RenderTarget::RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device)
 	{
+    mrts_.clear();
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		HRESULT result = S_OK;
 
@@ -119,6 +120,7 @@ namespace snuffbox
 		}
 		
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+    mrts_.push_back(this);
 
 		type_ = type;
 		valid_ = true;
@@ -165,7 +167,10 @@ namespace snuffbox
 		}
 		else if (type_ == RenderTargets::kRenderTarget)
 		{
-			context->ClearRenderTargetView(view_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
+      for (unsigned int i = 0; i < mrts_.size(); ++i)
+      {
+        context->ClearRenderTargetView(mrts_.at(i)->view(), D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
+      }
 		}
 	}
 
@@ -178,7 +183,16 @@ namespace snuffbox
 			return;
 		}
 
-    context->OMSetRenderTargets(1, &view_, depth_stencil);
+    ID3D11RenderTargetView** views = new ID3D11RenderTargetView*[mrts_.size()];
+
+    for (unsigned int i = 0; i < mrts_.size(); ++i)
+    {
+      views[i] = mrts_.at(i)->view();
+    }
+
+    context->OMSetRenderTargets(static_cast<UINT>(mrts_.size()), views, depth_stencil);
+
+    delete[] views;
 	}
 
   //---------------------------------------------------------------------------------------------------------
@@ -198,6 +212,34 @@ namespace snuffbox
   {
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
     viewport_->Create(x, res.y / 2.0f - y, w, h);
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::AddMultiTarget(D3D11RenderTarget* multi)
+  {
+    if (multi == nullptr)
+    {
+      SNUFF_LOG_ERROR("Attempted to add an invalid multi-target to the render target with name '" + name_ + "'");
+      return;
+    }
+    mrts_.push_back(multi);
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::SetResources(ID3D11DeviceContext* context, ID3D11ShaderResourceView* depth_stencil_resource)
+  {
+    ID3D11ShaderResourceView** resources = new ID3D11ShaderResourceView*[mrts_.size() + 1];
+
+    for (unsigned int i = 0; i < mrts_.size(); ++i)
+    {
+      resources[i] = mrts_.at(i)->resource();
+    }
+
+    resources[mrts_.size()] = depth_stencil_resource;
+
+    context->PSSetShaderResources(0, static_cast<UINT>(mrts_.size() + 1), resources);
+
+    delete[] resources;
   }
 
 	//---------------------------------------------------------------------------------------------------------
@@ -228,6 +270,12 @@ namespace snuffbox
   ID3D11ShaderResourceView* D3D11RenderTarget::resource()
   {
     return resource_;
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  ID3D11RenderTargetView* D3D11RenderTarget::view()
+  {
+    return view_;
   }
 
   //---------------------------------------------------------------------------------------------------------
@@ -293,7 +341,8 @@ namespace snuffbox
 			{ "setPostProcessing", JSSetPostProcessing },
 			{ "setTechnique", JSSetTechnique },
 			{ "setUniform", JSSetUniform },
-      { "setViewport", JSSetViewport }
+      { "setViewport", JSSetViewport },
+      { "addMultiTarget", JSAddMultiTarget }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -367,6 +416,18 @@ namespace snuffbox
         wrapper.GetValue<float>(1, 0.0f), 
         wrapper.GetValue<float>(2, 640.0f), 
         wrapper.GetValue<float>(3, 480.0f));
+    }
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::JSAddMultiTarget(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+    if (wrapper.Check("O") == true)
+    {
+      self->AddMultiTarget(wrapper.GetPointer<D3D11RenderTarget>(0));
     }
   }
 }

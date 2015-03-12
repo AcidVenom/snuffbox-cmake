@@ -28,6 +28,7 @@
 #include "../d3d11/shaders/d3d11_post_processing_shader.h"
 #include "../d3d11/shaders/d3d11_ui_shader.h"
 #include "../d3d11/shaders/d3d11_text_shader.h"
+#include "../d3d11/shaders/d3d11_cube_map_shader.h"
 
 #include <comdef.h>
 
@@ -80,9 +81,10 @@ namespace snuffbox
 		sampler_anisotropic_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kAnisotropic);
 		sampler_point_ = AllocatedMemory::Instance().Construct<D3D11SamplerState>(D3D11SamplerState::SamplerTypes::kPoint);
 
-		set_textures_[0] = nullptr;
-		set_textures_[1] = nullptr;
-		set_textures_[2] = nullptr;
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+      set_textures_[i] = nullptr;
+    }
 
     sampler_linear_->Set();
 
@@ -99,6 +101,10 @@ namespace snuffbox
     default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
     default_texture_->Validate();
+
+    default_normal_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    default_normal_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), sizeof(D3DXCOLOR));
+    default_normal_->Validate();
 
     default_cube_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     D3D11Texture::Cube cube;
@@ -191,7 +197,7 @@ namespace snuffbox
   void D3D11RenderDevice::CreateScreenQuad()
   {
 		std::vector<int> indices = {
-			0, 1, 2, 3
+			0, 1, 2, 3, 2, 1
 		};
     screen_quad_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kScreen);
 		screen_quad_->Create({
@@ -237,11 +243,18 @@ namespace snuffbox
 			IOManager::Instance()->Write("shaders/text.fx", D3D11_TEXT_SHADER);
 		}
 
+    exists = IOManager::Instance()->Exists("shaders/cube_map.fx");
+    if (exists == false)
+    {
+      IOManager::Instance()->Write("shaders/cube_map.fx", D3D11_CUBE_MAP_SHADER);
+    }
+
     ContentManager* content_manager = ContentManager::Instance();
     content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/base.fx");
     content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/post_processing.fx");
     content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/ui.fx");
     content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/text.fx");
+    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/cube_map.fx");
   }
 
   //-------------------------------------------------------------------------------------------
@@ -258,7 +271,9 @@ namespace snuffbox
       { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
       { "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
       { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 64, D3D11_INPUT_PER_VERTEX_DATA, 0 }
     }, shader->vs_buffer());
 
     input_layout_->Set();
@@ -369,18 +384,34 @@ namespace snuffbox
 		tex_desc.Height = sc_desc.BufferDesc.Height;
 		tex_desc.MipLevels = 1;
 		tex_desc.ArraySize = 1;
-		tex_desc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+    tex_desc.Format = DXGI_FORMAT_R32_TYPELESS;
 		tex_desc.SampleDesc.Count = 1;
 		tex_desc.SampleDesc.Quality = 0;
 		tex_desc.Usage = D3D11_USAGE_DEFAULT;
-		tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		tex_desc.CPUAccessFlags = 0;
 		tex_desc.MiscFlags = 0;
 
 		result = device_->CreateTexture2D(&tex_desc, NULL, &depth_stencil_buffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "CreateTexture2D"), "D3D11RenderDevice::CreateDepthStencilView");
-		result = device_->CreateDepthStencilView(depth_stencil_buffer_, NULL, &depth_stencil_view_);
+
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
+    ZeroMemory(&dsvd, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+    dsvd.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    dsvd.Texture2D.MipSlice = 0;
+
+    result = device_->CreateDepthStencilView(depth_stencil_buffer_, &dsvd, &depth_stencil_view_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "CreateDepthStencilView"), "D3D11RenderDevice::CreateDepthStencilView");
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
+    srvd.Format = DXGI_FORMAT_R32_FLOAT;
+    srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvd.Texture2D.MipLevels = tex_desc.MipLevels;
+    srvd.Texture2D.MostDetailedMip = 0;
+
+    result = device_->CreateShaderResourceView(depth_stencil_buffer_, &srvd, &depth_stencil_resource_);
+    SNUFF_XASSERT(result == S_OK, HRToString(result, "CreateShaderResourceView"), "D3D11RenderDevice::CreateDepthStencilView");
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -436,7 +467,6 @@ namespace snuffbox
     lighting_->Update(constant_buffer_);
 
     back_buffer_->Clear(context_);
-    context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -460,10 +490,9 @@ namespace snuffbox
       it = command.target;
       camera_ = command.camera;
       DrawRenderTarget(it);
+      ID3D11ShaderResourceView *const null_resource[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+      context_->PSSetShaderResources(0, 8, null_resource);
     }
-
-    ID3D11ShaderResourceView *const null_resource[1] = { NULL };
-    context_->PSSetShaderResources(0, 1, null_resource);
 
 		swap_chain_->Present(D3D11RenderSettings::Instance()->vsync(), 0);
 
@@ -480,6 +509,7 @@ namespace snuffbox
       return;
     }
 
+    context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		current_target_ = target;
 
     viewport_render_target_->Set();
@@ -510,8 +540,7 @@ namespace snuffbox
     viewport_->Set();
     screen_quad_->Set();
 
-    ID3D11ShaderResourceView* resource = target->resource();
-    context_->PSSetShaderResources(0, 1, &resource);
+    target->SetResources(context_, depth_stencil_resource_);
     default_blend_state_->Set();
 		context_->OMSetDepthStencilState(NULL, 1);
 
@@ -542,9 +571,10 @@ namespace snuffbox
 			screen_quad_->Draw();
 		}
 
-		set_textures_[0] = nullptr;
-		set_textures_[1] = nullptr;
-		set_textures_[2] = nullptr;
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+      set_textures_[i] = nullptr;
+    }
 
 		current_shader_ = nullptr;
 		current_target_ = nullptr;
@@ -562,7 +592,8 @@ namespace snuffbox
 
 		back_buffer_->Release();
 		depth_stencil_view_->Release();
-		depth_stencil_buffer_->Release();
+    depth_stencil_buffer_->Release();
+    depth_stencil_resource_->Release();
 
 		HRESULT result = swap_chain_->ResizeBuffers(1, 0, 0, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "ResizeBuffers"), "D3D11RenderDevice::ResizeBuffers");
@@ -593,7 +624,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(device_, "D3D11RenderDevice::Dispose::device_");
 		SNUFF_SAFE_RELEASE(context_, "D3D11RenderDevice::Dispose::context_");
 		SNUFF_SAFE_RELEASE(depth_stencil_view_, "D3D11RenderDevice::Dispose::depth_stencil_view_");
-		SNUFF_SAFE_RELEASE(depth_stencil_buffer_, "D3D11RenderDevice::Dispose::depth_stencil_buffer_");
+    SNUFF_SAFE_RELEASE(depth_stencil_buffer_, "D3D11RenderDevice::Dispose::depth_stencil_buffer_");
+    SNUFF_SAFE_RELEASE(depth_stencil_resource_, "D3D11RenderDevice::Dispose::depth_stencil_resource_");
 
 		SNUFF_LOG_INFO("Disposed the Direct3D 11 render device");
 	}
@@ -780,6 +812,12 @@ namespace snuffbox
   D3D11Texture* D3D11RenderDevice::default_texture()
   {
     return default_texture_.get();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11Texture* D3D11RenderDevice::default_normal()
+  {
+    return default_normal_.get();
   }
 
   //-------------------------------------------------------------------------------------------

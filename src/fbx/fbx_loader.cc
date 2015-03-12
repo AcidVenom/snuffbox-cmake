@@ -145,16 +145,14 @@ namespace snuffbox
 					unsigned int control_point = mesh->GetPolygonVertex(polygon, vertex);
 					Vertex vert;
 					FbxVector4 normal;
-					FbxVector4 tangent = do_tangents ? tangents->GetAt(control_point) : FbxVector4(0, 0, 0);
-					FbxVector4 binormal = do_binormals ? binormals->GetAt(control_point) : FbxVector4(0, 0, 0);
 					mesh->GetPolygonVertexNormal(polygon, vertex, normal);
 					vert.position.x = static_cast<float>(vertices[control_point].mData[0]);
 					vert.position.z = static_cast<float>(-vertices[control_point].mData[1]);
 					vert.position.y = static_cast<float>(-vertices[control_point].mData[2]);
 					vert.position.w = 1.0f;
 					vert.normal.x = static_cast<float>(normal.mData[0]);
-					vert.normal.z = static_cast<float>(-normal.mData[1]);
-					vert.normal.y = static_cast<float>(normal.mData[2]);
+          vert.normal.z = static_cast<float>(-normal.mData[1]);
+          vert.normal.y = static_cast<float>(normal.mData[2]);
 					vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 					verts->push_back(vert);

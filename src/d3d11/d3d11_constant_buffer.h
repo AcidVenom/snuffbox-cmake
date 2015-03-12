@@ -20,18 +20,6 @@ namespace snuffbox
 	};
 
 	/**
-	* @struct snuffbox::CbLighting
-	* @brief A lighting buffer to emulate lights
-	* @author Daniël Konings
-	*/
-	__declspec(align(16)) struct CbLighting
-	{
-		XMFLOAT4 Ambient;
-		int NumLights;
-		D3D11Light::Attributes Lights[64];
-	};
-
-	/**
 	* @struct snuffbox::CbPerObject
 	* @brief A per-object constant buffer that is mapped each time before rendering an element
 	* @author Daniël Konings
@@ -84,12 +72,6 @@ namespace snuffbox
 		void Map(const CbGlobal& cb);
 
 		/**
-		* @brief Maps the constant buffer with lighting information
-		* @param[in] const snuffbox::CbLighting& The lighting buffer
-		*/
-		void Map(const CbLighting& cb, const int& num_lights);
-
-		/**
 		* @brief Maps the constant buffer with per-object information
 		* @param[in] const snuffbox::CbPerObject& The per-object buffer
 		*/
@@ -111,7 +93,6 @@ namespace snuffbox
 		bool valid_; //!< Is this constant buffer valid?
 		ID3D11Buffer* global_buffer_; //!< The global constant buffer
 		ID3D11Buffer* per_object_buffer_; //!< The per-object constant buffer
-		ID3D11Buffer* lighting_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* uniforms_buffer_; //!< The uniforms constant buffer
 	};
 }

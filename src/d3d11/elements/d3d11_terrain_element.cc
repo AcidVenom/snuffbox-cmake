@@ -32,7 +32,6 @@ namespace snuffbox
 		indices_.clear();
 
     vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-		vertex_buffer_->set_topology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		for (int y = 0; y < height_; y++)
 		{

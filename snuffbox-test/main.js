@@ -1,5 +1,6 @@
 Game.targets = Game.targets || {
-	default: new RenderTarget("Default")
+	default: new RenderTarget("Default"),
+	test: new RenderTarget("Test")
 }
 
 Game.Initialise = function()
@@ -19,14 +20,13 @@ Game.Initialise = function()
 	Game.skybox.setMaterial("test.material");
 	Game.skybox.setTechnique("Skybox");
 
+	Game.model = new Model("axew.fbx");
+	Game.model.spawn("Default");
+
 	Game.quad = new Quad();
 	Game.quad.spawn("Default");
-	Game.quad.setMaterial("quad.material");
 
-	Game.anim = new SpriteAnimation("test.anim", "sheet.png");
-	Game.anim.play();
-
-	Game.quad.setAnimation(Game.anim);
+	Game.targets.default.addMultiTarget(Game.targets.test);
 }
 
 Game.Update = function(dt)
@@ -72,6 +72,8 @@ Game.Update = function(dt)
 
 	var t = Game.camera.translation();
 	Game.skybox.setTranslation(t.x, t.y, t.z);
+
+	Game.model.rotateBy(0, dt, 0);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
@@ -82,7 +84,6 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 Game.Draw = function(dt)
 {
 	Game.render(Game.camera, Game.targets.default);
-	Game.render(Game.camera, Game.targets.test);
 }
 
 Game.Shutdown = function()
