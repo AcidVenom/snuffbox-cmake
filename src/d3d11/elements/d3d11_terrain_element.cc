@@ -81,7 +81,7 @@ namespace snuffbox
     xx = XMVectorGetX(p);
     yy = XMVectorGetZ(p);
 
-		if (xx > width_ - 1)
+		if (xx > width_)
 		{
       *in_bounds_x = false;
 		}
@@ -90,7 +90,7 @@ namespace snuffbox
       *in_bounds_x = false;
 		}
 
-		if (yy > height_ - 1)
+		if (yy > height_)
 		{
       *in_bounds_y = false;
 		}
@@ -211,53 +211,54 @@ namespace snuffbox
 			return 0.0f;
 		}
 
-		return vertices_.at(idx).position.y;
+		return -vertices_.at(idx).position.y;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11Terrain::SetNormals(const int& x, const int& y)
 	{
-		int index_a = y * width_ + x;
-		int index_b = (y + 1) * width_ + x;
-		int index_c = (y + 1) * width_ + (x + 1);
+    auto clamp_get = [this, x, y](int xx, int yy)
+    {
+      xx = x + xx;
+      yy = y + yy;
 
-		CalculateNormals(index_a, index_b, index_c);
+      if (xx < 0)
+      {
+        xx = 0;
+      }
 
-		index_c = index_a;
-		index_a = (y - 1) * width_ + x - 1;
-		index_b = y * width_ + x - 1;
+      if (xx >= width_)
+      {
+        xx = width_ - 1;
+      }
 
-		CalculateNormals(index_a, index_b, index_c);
+      if (yy < 0)
+      {
+        yy = 0;
+      }
 
-		index_b = index_c;
-		index_a = (y - 1) * width_ + x;
-		index_c = y * width_ + x + 1;
+      if (yy >= height_)
+      {
+        yy = height_ - 1;
+      }
 
-		CalculateNormals(index_a, index_b, index_c);
-	}
+      return yy * width_ + xx;
+    };
 
-	//-------------------------------------------------------------------------------------------
-	void D3D11Terrain::CalculateNormals(const int& index_a, const int& index_b, const int& index_c)
-	{
-		int size = width_ * height_;
-		if (index_a < 0 || index_b < 0 || index_c < 0 || index_a >= size || index_b >= size || index_c >= size)
-		{
-			return;
-		}
+    int index_a = clamp_get(1, 1);
+    int index_b = clamp_get(-1, -1);
+    int index_c = clamp_get(1, -1);
+    int index_d = clamp_get(-1, 1);
 
-		Vertex& vertex_a = vertices_.at(index_a);
-		Vertex& vertex_b = vertices_.at(index_b);
-		Vertex& vertex_c = vertices_.at(index_c);
-		
-		XMVECTOR p1 = XMLoadFloat4(&vertex_a.position);
-		XMVECTOR p2 = XMLoadFloat4(&vertex_b.position);
-		XMVECTOR p3 = XMLoadFloat4(&vertex_c.position);
+    Vertex& va = vertices_.at(index_a);
+    Vertex& vb = vertices_.at(index_b);
+    Vertex& vc = vertices_.at(index_c);
+    Vertex& vd = vertices_.at(index_d);
 
-		XMVECTOR cross_a = XMVectorSubtract(p2, p1);
-		XMVECTOR cross_b = XMVectorSubtract(p3, p1);
+    XMVECTOR e1 = XMLoadFloat4(&va.position) - XMLoadFloat4(&vb.position);
+    XMVECTOR e2 = XMLoadFloat4(&vc.position) - XMLoadFloat4(&vd.position);
 
-		XMVECTOR normal = XMVector3Cross(cross_a, cross_b);
-		vertex_a.normal = XMFLOAT3(XMVectorGetX(normal), XMVectorGetY(normal), XMVectorGetZ(normal));
+    XMStoreFloat3(&vertices_.at(y * width_ + x).normal, XMVector3Normalize(XMVector3Cross(e1, e2)));
 	}
 
 	//-------------------------------------------------------------------------------------------

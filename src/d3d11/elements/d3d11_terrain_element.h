@@ -98,14 +98,6 @@ namespace snuffbox
 		*/
 		void SetNormals(const int& x, const int& y);
 
-		/**
-		* @brief Calculates the normals of a triangle
-		* @param[in] index_a (int) The index of the first vertex of the triangle
-		* @param[in] index_b (int) The index of the second vertex of the triangle
-		* @param[in] index_c (int) The index of the third vertex of the triangle
-		*/
-		void CalculateNormals(const int& index_a, const int& index_b, const int& index_c);
-
 		/// Flushes the terrain after modification of heights
 		void Flush();
 
