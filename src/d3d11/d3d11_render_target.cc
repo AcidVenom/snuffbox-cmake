@@ -48,7 +48,6 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Create(D3D11RenderTarget::RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device)
 	{
-    mrts_.clear();
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		HRESULT result = S_OK;
 
@@ -120,7 +119,11 @@ namespace snuffbox
 		}
 		
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
-    mrts_.push_back(this);
+
+    if (mrts_.size() == 0)
+    {
+      mrts_.push_back(this);
+    }
 
 		type_ = type;
 		valid_ = true;
