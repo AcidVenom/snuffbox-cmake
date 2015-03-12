@@ -44,11 +44,13 @@ struct VOut\n\
 \tfloat3 normal : TEXCOORD1;\n\
 \tfloat3 tangent : TEXCOORD2;\n\
 \tfloat3 bitangent : TEXCOORD3;\n\
+\tfloat4 world_pos : TEXCOORD4;\n\
 };\n\
 \n\
 VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TEXCOORD0, float3 normal : NORMAL, float3 tangent : TANGENT, float3 bitangent : BITANGENT)\n\
 {\n\
 \tVOut output;\n\
+\toutput.world_pos = position;\n\
 \toutput.position = mul(position, World);\n\
 \toutput.position = mul(output.position, View);\n\
 \toutput.position = mul(output.position, Projection);\n\
@@ -73,6 +75,13 @@ struct PSOut\n\
 \tfloat4 colour : SV_Target0;\n\
 \tfloat4 normal : SV_Target1;\n\
 };\n\
+float4 Reflection(float4 p, float4 eye, float3 normal)\n\
+{\n\
+\tnormal.y *= -1;\n\
+\tfloat3 i = normalize(p.xyz - eye.xyz);\n\
+\tfloat3 r = reflect(i, normal.xyz);\n\
+\treturn TexCube.Sample(Sampler, r);\n\
+}\n\
 \n\
 PSOut PS(VOut input)\n\
 {\n\
@@ -86,7 +95,9 @@ PSOut PS(VOut input)\n\
 \n\
 \tnormal = float4((normal.x * input.tangent) + (normal.y * input.bitangent) + (normal.z * input.normal), 1.0f);\n\
 \n\
-\toutput.colour = TexDiffuse.Sample(Sampler, coords);\n\
+\tfloat4 r = Reflection(input.world_pos, EyePosition, normal.rgb);\n\
+\n\
+\toutput.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse;\n\
 \toutput.normal = float4((normal.rgb + 1.0f) / 2.0f, 1.0f);\n\
 \n\
 \treturn output;\n\

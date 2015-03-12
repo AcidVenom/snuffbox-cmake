@@ -73,7 +73,7 @@ Game.Update = function(dt)
 	var t = Game.camera.translation();
 	Game.skybox.setTranslation(t.x, t.y, t.z);
 
-	Game.model.rotateBy(0, dt, 0);
+	//Game.model.rotateBy(0, dt, 0);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
