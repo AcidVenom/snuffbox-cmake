@@ -37,11 +37,10 @@ SamplerState Sampler;
 
 float4 Specular(float3 v, float3 l, float3 n, float i)
 {
-	l = -normalize(l);
-	float3 r = reflect(-l, n);
-    float d = max(0, dot(r, v));
+	float3 h = normalize(-l + v);
+    float d = max(0, dot(n, h));
 
-    return i * pow(d, 32);
+    return pow(d, 1);
 }
 
 float4 PS(VOut input) : SV_TARGET
@@ -51,7 +50,7 @@ float4 PS(VOut input) : SV_TARGET
 	float4 depth = TexDepth.Sample(Sampler, input.texcoord);
 
 	float4 position;
-	position.x = input.texcoord.x * 2.0f - 1.0f;
+	position.x = (1 - input.texcoord.x) * 2.0f - 1.0f;
 	position.y = (1 - input.texcoord.y) * 2.0f - 1.0f;
 	position.z = depth.r;
 	position.w = 1.0f;
@@ -72,5 +71,9 @@ float4 PS(VOut input) : SV_TARGET
 	diffuse.rgb *= saturate(dot(-light_dir, normal.rgb));
 	diffuse.rgb += specular.rgb;
 
-	return diffuse;
+	if (depth.r == 1)
+	{
+		return 0;
+	}
+	return specular;
 }
