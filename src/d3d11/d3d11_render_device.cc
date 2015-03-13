@@ -509,7 +509,10 @@ namespace snuffbox
       return;
     }
 
-    context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		if (target->clear_depth() == true)
+		{
+			context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		}
 		current_target_ = target;
 
     viewport_render_target_->Set();
@@ -694,11 +697,15 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::MapGlobalBuffer()
 	{
+		const XMMATRIX& view = camera_->view();
+		const XMMATRIX& proj = camera_->projection();
+
 		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
-			camera_->view(),
-			camera_->projection(),
-			camera_->translation()
+			view,
+			proj,
+			camera_->translation(),
+			XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), view * proj)
 		});
 	}
 

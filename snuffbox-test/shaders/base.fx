@@ -93,9 +93,10 @@ PSOut PS(VOut input)
 	normal = float4((normal.x * input.tangent) + (normal.y * input.bitangent) + (normal.z * input.normal), 1.0f);
 
 	float4 r = Reflection(input.world_pos, EyePosition, normal.rgb);
+	float spec = saturate(Material.SpecularIntensity * TexSpecular.Sample(Sampler, coords).r);
 
 	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse;
-	output.normal = float4((normal.rgb + 1.0f) / 2.0f, 1.0f);
+	output.normal = float4((normal.rgb + 1.0f) / 2.0f, spec);
 
 	return output;
 }

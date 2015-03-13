@@ -17,6 +17,7 @@ namespace snuffbox
 		XMMATRIX View;
 		XMMATRIX Projection;
 		XMVECTOR EyePosition;
+		XMMATRIX InvViewProjection;
 	};
 
 	/**

@@ -146,6 +146,11 @@ namespace snuffbox
     D3D11Viewport* viewport();
 
 		/**
+		* @return const bool& Should the depth buffer be cleared when rendering this target?
+		*/
+		const bool& clear_depth() const;
+
+		/**
 		* @brief Sets the post processing effect of this render target
 		* @param[in] path (const std::string&) The path to the effect file
 		*/
@@ -163,6 +168,12 @@ namespace snuffbox
 		*/
 		void set_technique(const std::string& technique);
 
+		/**
+		* @brief Sets if the depth buffer should be cleared when rendering this target
+		* @param[in] v (const bool&) The boolean value
+		*/
+		void set_clear_depth(const bool& v);
+
 		/// Default destructor
 		virtual ~D3D11RenderTarget();
 
@@ -179,6 +190,7 @@ namespace snuffbox
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
+		bool clear_depth_; //!< Should the depth buffer be cleared for this render target?
 
 	public:
 		JS_NAME("RenderTarget");
@@ -189,5 +201,7 @@ namespace snuffbox
 		static void JSSetUniform(JS_ARGS args);
     static void JSSetViewport(JS_ARGS args);
     static void JSAddMultiTarget(JS_ARGS args);
+		static void JSSetClearDepth(JS_ARGS args);
+		static void JSClearDepth(JS_ARGS args);
 	};
 }

@@ -19,7 +19,8 @@ namespace snuffbox
 		view_(nullptr),
 		resource_(nullptr),
 		post_processing_(nullptr),
-		technique_("Default")
+		technique_("Default"),
+		clear_depth_(false)
 	{
     
 	}
@@ -31,7 +32,8 @@ namespace snuffbox
 		view_(nullptr),
 		resource_(nullptr),
 		post_processing_(nullptr),
-		technique_("Default")
+		technique_("Default"),
+		clear_depth_(false)
 	{
 		JSWrapper wrapper(args);
 		
@@ -92,6 +94,7 @@ namespace snuffbox
 
 			SNUFF_XASSERT(valid == true, "Tried to create a render target without a corresponding back buffer!", "D3D11RenderTarget::Create");
 
+			desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 			result = device->CreateTexture2D(&desc, NULL, &buffer_);
@@ -101,7 +104,7 @@ namespace snuffbox
 			D3D11_SHADER_RESOURCE_VIEW_DESC view_desc;
 
 			view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			view_desc.Texture2D.MipLevels = 1;
 			view_desc.Texture2D.MostDetailedMip = 0;
 
@@ -312,6 +315,12 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------------------------------
+	const bool& D3D11RenderTarget::clear_depth() const
+	{
+		return clear_depth_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_post_processing(const std::string& path)
 	{
 		post_processing_ = ContentManager::Instance()->Get<D3D11Effect>(path);
@@ -330,6 +339,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::set_clear_depth(const bool& v)
+	{
+		clear_depth_ = v;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderTarget::~D3D11RenderTarget()
 	{
 		Release();
@@ -345,7 +360,9 @@ namespace snuffbox
 			{ "setTechnique", JSSetTechnique },
 			{ "setUniform", JSSetUniform },
       { "setViewport", JSSetViewport },
-      { "addMultiTarget", JSAddMultiTarget }
+      { "addMultiTarget", JSAddMultiTarget },
+			{ "setClearDepth", JSSetClearDepth },
+			{ "clearDepth", JSClearDepth }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -433,4 +450,25 @@ namespace snuffbox
       self->AddMultiTarget(wrapper.GetPointer<D3D11RenderTarget>(0));
     }
   }
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSSetClearDepth(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		if (wrapper.Check("B") == true)
+		{
+			self->set_clear_depth(wrapper.GetValue<bool>(0, false));
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSClearDepth(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		wrapper.ReturnValue<bool>(self->clear_depth());
+	}
 }

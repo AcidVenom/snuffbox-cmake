@@ -75,6 +75,7 @@ namespace snuffbox
 		mapped->View = cb.View;
 		mapped->Projection = cb.Projection;
 		mapped->EyePosition = cb.EyePosition;
+		mapped->InvViewProjection = cb.InvViewProjection;
 		ctx->Unmap(global_buffer_, 0);
 		Set();
 	}

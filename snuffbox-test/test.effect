@@ -3,6 +3,9 @@
 		"Default" : {
 			"passes" : [
 				{
+					"blend" : {
+						"BlendEnable" : false
+					},
 					"shader" : "shaders/base.fx",
 					"sampling" : "Anisotropic"
 				}

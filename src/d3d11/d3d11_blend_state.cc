@@ -87,10 +87,6 @@ namespace snuffbox
       {
         desc.AlphaToCoverageEnable = value == "true" ? true : false;
       }
-      else if (field == "IndependentBlendEnable")
-      {
-        desc.IndependentBlendEnable = value == "true" ? true : false;
-      }
       else if (field == "BlendEnable")
       {
         desc.RenderTarget[0].BlendEnable = value == "true" ? true : false;

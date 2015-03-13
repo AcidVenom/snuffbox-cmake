@@ -1,6 +1,7 @@
 Game.targets = Game.targets || {
-	default: new RenderTarget("Default"),
-	test: new RenderTarget("Test")
+	gbuffer: new RenderTarget("G-Buffer"),
+	normals: new RenderTarget("Normals"),
+	directional: new RenderTarget("Directional")
 }
 
 Game.Initialise = function()
@@ -16,17 +17,23 @@ Game.Initialise = function()
 	Game.camera.setRotation(0, 0, 0);
 
 	Game.skybox = new Model("skybox.fbx");
-	Game.skybox.spawn("Default");
+	Game.skybox.spawn("G-Buffer");
 	Game.skybox.setMaterial("test.material");
 	Game.skybox.setTechnique("Skybox");
 
 	Game.model = new Model("axew.fbx");
-	Game.model.spawn("Default");
+	Game.model.spawn("G-Buffer");
+	Game.model.setMaterial("test.material");
 
 	Game.quad = new Quad();
-	Game.quad.spawn("Default");
+	Game.quad.spawn("G-Buffer");
 
-	Game.targets.default.addMultiTarget(Game.targets.test);
+	Game.camera.setNearPlane(1);
+	Game.camera.setFarPlane(1000);
+
+	Game.targets.gbuffer.setClearDepth(true);
+	Game.targets.gbuffer.addMultiTarget(Game.targets.normals);
+	Game.targets.gbuffer.addMultiTarget(Game.targets.directional);
 }
 
 Game.Update = function(dt)
@@ -73,7 +80,7 @@ Game.Update = function(dt)
 	var t = Game.camera.translation();
 	Game.skybox.setTranslation(t.x, t.y, t.z);
 
-	//Game.model.rotateBy(0, dt, 0);
+	Game.model.rotateBy(0, dt, 0);
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
@@ -83,7 +90,7 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 
 Game.Draw = function(dt)
 {
-	Game.render(Game.camera, Game.targets.default);
+	Game.render(Game.camera, Game.targets.gbuffer);
 }
 
 Game.Shutdown = function()

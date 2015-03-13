@@ -71,5 +71,6 @@ PSOut PS(VOut input)
     PSOut output;
     output.colour = TexCube.Sample(Sampler, input.pos);
     output.normal = float4((input.normal.rgb + 1.0f) / 2.0f, 1.0f);
+    
     return output;
 }
