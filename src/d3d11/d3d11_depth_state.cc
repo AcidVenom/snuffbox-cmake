@@ -20,6 +20,7 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateDepthStencilState"), "D3D11DepthState::Create");
 	
 		valid_ = true;
+    desc_ = desc;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -154,8 +155,53 @@ namespace snuffbox
 			SNUFF_LOG_WARNING("Attempted to set an invalid depth state");
 			return;
 		}
-		D3D11RenderDevice::Instance()->context()->OMSetDepthStencilState(depth_state_, 1);
+
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+    if (EqualsTo(render_device->current_depth_state()) == false)
+    {
+      render_device->set_current_depth_state(this);
+      render_device->context()->OMSetDepthStencilState(depth_state_, 1);
+    }
 	}
+
+  //-------------------------------------------------------------------------------------------
+  bool D3D11DepthState::EqualsTo(D3D11DepthState* state)
+  {
+    if (state == nullptr)
+    {
+      return false;
+    }
+
+    const D3D11_DEPTH_STENCIL_DESC& other_desc = state->description();
+
+    if (other_desc.DepthEnable != desc_.DepthEnable ||
+      other_desc.DepthFunc != desc_.DepthFunc ||
+      other_desc.DepthWriteMask != desc_.DepthWriteMask ||
+      other_desc.StencilEnable != desc_.StencilEnable ||
+      other_desc.StencilReadMask != desc_.StencilReadMask ||
+      other_desc.StencilWriteMask != desc_.StencilWriteMask ||
+      other_desc.FrontFace.StencilDepthFailOp != desc_.FrontFace.StencilDepthFailOp ||
+      other_desc.FrontFace.StencilFailOp != desc_.FrontFace.StencilFailOp ||
+      other_desc.FrontFace.StencilFunc != desc_.FrontFace.StencilFunc ||
+      other_desc.FrontFace.StencilPassOp != desc_.FrontFace.StencilPassOp ||
+      other_desc.BackFace.StencilDepthFailOp != desc_.BackFace.StencilDepthFailOp ||
+      other_desc.BackFace.StencilFailOp != desc_.BackFace.StencilFailOp ||
+      other_desc.BackFace.StencilFunc != desc_.BackFace.StencilFunc ||
+      other_desc.BackFace.StencilPassOp != desc_.BackFace.StencilPassOp
+      )
+    {
+      return false;
+    }
+
+    return true;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  const D3D11_DEPTH_STENCIL_DESC& D3D11DepthState::description() const
+  {
+    return desc_;
+  }
 
 	//-------------------------------------------------------------------------------------------
 	D3D11DepthState::~D3D11DepthState()

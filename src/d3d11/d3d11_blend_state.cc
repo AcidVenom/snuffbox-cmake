@@ -9,7 +9,7 @@ namespace snuffbox
     valid_(false),
     blend_state_(false)
   {
-
+    ZeroMemory(&desc_, sizeof(D3D11_BLEND_DESC));
   }
 
   //-------------------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ namespace snuffbox
 
     SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBlendState"), "D3D11BlendState::Create");
 
+    desc_ = desc;
     valid_ = true;
   }
 
@@ -133,7 +134,46 @@ namespace snuffbox
       return;
     }
 
-    D3D11RenderDevice::Instance()->context()->OMSetBlendState(blend_state_, NULL, 0x000000FF);
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+    if (EqualsTo(render_device->current_blend_state()) == false)
+    {
+      render_device->set_current_blend_state(this);
+      render_device->context()->OMSetBlendState(blend_state_, NULL, 0x000000FF);
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  bool D3D11BlendState::EqualsTo(D3D11BlendState* other)
+  {
+    if (other == nullptr)
+    {
+      return false;
+    }
+
+    const D3D11_BLEND_DESC& other_desc = other->description();
+
+    if (other_desc.AlphaToCoverageEnable != desc_.AlphaToCoverageEnable ||
+      other_desc.IndependentBlendEnable != desc_.IndependentBlendEnable ||
+      other_desc.RenderTarget[0].BlendEnable != desc_.RenderTarget[0].BlendEnable ||
+      other_desc.RenderTarget[0].BlendOp != desc_.RenderTarget[0].BlendOp ||
+      other_desc.RenderTarget[0].SrcBlend != desc_.RenderTarget[0].SrcBlend ||
+      other_desc.RenderTarget[0].DestBlend != desc_.RenderTarget[0].DestBlend ||
+      other_desc.RenderTarget[0].BlendOpAlpha != desc_.RenderTarget[0].BlendOpAlpha ||
+      other_desc.RenderTarget[0].SrcBlendAlpha != desc_.RenderTarget[0].SrcBlendAlpha ||
+      other_desc.RenderTarget[0].DestBlendAlpha != desc_.RenderTarget[0].DestBlendAlpha ||
+      other_desc.RenderTarget[0].RenderTargetWriteMask != desc_.RenderTarget[0].RenderTargetWriteMask)
+    {
+      return false;
+    }
+
+    return true;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  const D3D11_BLEND_DESC& D3D11BlendState::description() const
+  {
+    return desc_;
   }
 
   //-------------------------------------------------------------------------------------------

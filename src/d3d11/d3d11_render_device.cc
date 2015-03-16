@@ -48,7 +48,10 @@ namespace snuffbox
 		depth_stencil_view_(nullptr),
 		current_shader_(nullptr),
 		lighting_(nullptr),
-		current_target_(nullptr)
+		current_target_(nullptr),
+    current_model_(nullptr),
+    current_blend_state_(nullptr),
+    current_depth_state_(nullptr)
 	{
 
 	}
@@ -823,6 +826,24 @@ namespace snuffbox
 		return current_shader_;
 	}
 
+  //-------------------------------------------------------------------------------------------
+  D3D11VertexBuffer* D3D11RenderDevice::current_model()
+  {
+    return current_model_;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11DepthState* D3D11RenderDevice::current_depth_state()
+  {
+    return current_depth_state_;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11BlendState* D3D11RenderDevice::current_blend_state()
+  {
+    return current_blend_state_;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	D3D11RenderTarget* D3D11RenderDevice::current_target()
 	{
@@ -900,6 +921,24 @@ namespace snuffbox
 	{
 		current_shader_ = shader;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::set_current_model(D3D11VertexBuffer* model)
+  {
+    current_model_ = model;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::set_current_blend_state(D3D11BlendState* state)
+  {
+    current_blend_state_ = state;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderDevice::set_current_depth_state(D3D11DepthState* state)
+  {
+    current_depth_state_ = state;
+  }
 
   //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()

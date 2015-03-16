@@ -36,6 +36,18 @@ namespace snuffbox
 		/// Sets this depth state for use
 		void Set();
 
+    /**
+    * @brief Compares this depth state to another depth state to see if it has to be changed
+    * @param[in] state (snuffbox::D3D11DepthState*) The depth state to compare with
+    * @return Is a state change required?
+    */
+    bool EqualsTo(D3D11DepthState* state);
+
+    /**
+    * @return const D3D11_DEPTH_STENCIL_DESC& The description of this depth state 
+    */
+    const D3D11_DEPTH_STENCIL_DESC& description() const;
+
 		/// Default destructor
 		~D3D11DepthState();
 
@@ -63,5 +75,6 @@ namespace snuffbox
 	private:
 		bool valid_; //!< Is this depth state valid?
 		ID3D11DepthStencilState* depth_state_; //!< The actual depth state
+    D3D11_DEPTH_STENCIL_DESC desc_; //!< The description of this depth state
 	};
 }

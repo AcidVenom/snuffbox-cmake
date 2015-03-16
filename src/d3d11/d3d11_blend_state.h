@@ -36,6 +36,18 @@ namespace snuffbox
     /// Sets this blend state
     void Set();
 
+    /**
+    * @brief Compares two blend state to see if a state change is needed
+    * @param[in] other (snuffbox::D3D11BlendState*) The blend state to compare with
+    * @return bool Are the descriptions equal?
+    */
+    bool EqualsTo(D3D11BlendState* other);
+
+    /**
+    * @return const D3D11_BLEND_DESC& The description of this blend state
+    */
+    const D3D11_BLEND_DESC& description() const;
+
     /// Default destructor
     ~D3D11BlendState();
 
@@ -56,5 +68,6 @@ namespace snuffbox
   private:
     bool valid_; //!< Is this blend state valid?
     ID3D11BlendState* blend_state_; //!< The actual blend state
+    D3D11_BLEND_DESC desc_; //!< The description of this blend state
   };
 }

@@ -205,6 +205,21 @@ namespace snuffbox
 		*/
 		D3D11Shader* current_shader();
 
+    /**
+    * @return snuffbox::D3D11VertexBuffer* The currently set model
+    */
+    D3D11VertexBuffer* current_model();
+
+    /**
+    * @return snuffbox::D3D11BlendState* The currently set blend state
+    */
+    D3D11BlendState* current_blend_state();
+
+    /**
+    * @return snuffbox::D3D11DepthState* The currently set depth state
+    */
+    D3D11DepthState* current_depth_state();
+
 		/**
 		* @return snuffbox::D3D11RenderTarget* The current target being rendered to
 		*/
@@ -263,15 +278,33 @@ namespace snuffbox
 
 		/**
 		* @brief Sets the camera to render with
-		* @param[in] camera snuffbox::D3D11Camera* The pointer to the camera
+		* @param[in] camera (snuffbox::D3D11Camera*) The pointer to the camera
 		*/
 		void set_camera(D3D11Camera* camera);
 
 		/**
 		* @brief Sets the current shader
-		* @param[in] snuffbox::D3D11Shader* The shader to set
+		* @param[in] shader (snuffbox::D3D11Shader*) The shader to set
 		*/
 		void set_current_shader(D3D11Shader* shader);
+
+    /**
+    * @brief Sets the vertex buffer of a model as the current vertex buffer
+    * @param[in] model (snuffbox::D3D11VertexBuffer*) The model to set
+    */
+    void set_current_model(D3D11VertexBuffer* model);
+
+    /**
+    * @brief Sets the current depth state
+    * @param[in] state (snuffbox::D3D11DepthState*) The state to set
+    */
+    void set_current_depth_state(D3D11DepthState* state);
+
+    /**
+    * @brief Sets the current blend state
+    * @param[in] state (snuffbox::D3D11BlendState*) The state to set
+    */
+    void set_current_blend_state(D3D11BlendState* state);
 
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
@@ -314,6 +347,9 @@ namespace snuffbox
 
 		D3D11Texture* set_textures_[8]; //!< The currently set textures
 		D3D11Shader* current_shader_; //!< The currently set shaders
+    D3D11VertexBuffer* current_model_; //!< The currently set model
+    D3D11BlendState* current_blend_state_; //!< The currently set blend state
+    D3D11DepthState* current_depth_state_; //!< The currently set depth state
 
 		D3D11Lighting* lighting_; //!< The lighting system
 		D3D11Line* line_; //!< The line system

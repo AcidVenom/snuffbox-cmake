@@ -159,9 +159,24 @@ namespace snuffbox
 
     int type = static_cast<int>(type_);
 		int old = render_device->vertex_buffer_type();
-		if (type_ == VertexBufferType::kOther || old != type)
+    bool set = false;
+
+    if (type_ == VertexBufferType::kOther)
+    {
+      if (render_device->current_model() != this)
+      {
+        set = true;
+      }
+    }
+    else if (old != type)
+    {
+      set = true;
+    }
+
+		if (set == true)
     {
       render_device->set_vertex_buffer_type(type);
+      render_device->set_current_model(this);
 
       UINT offset = 0;
       ctx->IASetVertexBuffers(0, 1, &vertex_buffer_, &Vertex::stride_size, &offset);
