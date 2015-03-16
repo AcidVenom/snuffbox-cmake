@@ -222,31 +222,31 @@ namespace snuffbox
 		bool exists = IOManager::Instance()->Exists("shaders/base.fx");
 		if (exists == false)
 		{
-			IOManager::Instance()->Write("shaders/base.fx", D3D11_BASE_SHADER);
+			IOManager::Instance()->Write("shaders/base.fx", base_shader);
 		}
 
 		exists = IOManager::Instance()->Exists("shaders/post_processing.fx");
 		if (exists == false)
 		{
-			IOManager::Instance()->Write("shaders/post_processing.fx", D3D11_POST_PROCESSING_SHADER);
+			IOManager::Instance()->Write("shaders/post_processing.fx", post_processing_shader);
 		}
 
 		exists = IOManager::Instance()->Exists("shaders/ui.fx");
 		if (exists == false)
 		{
-			IOManager::Instance()->Write("shaders/ui.fx", D3D11_UI_SHADER);
+			IOManager::Instance()->Write("shaders/ui.fx", ui_shader);
 		}
 
 		exists = IOManager::Instance()->Exists("shaders/text.fx");
 		if (exists == false)
 		{
-			IOManager::Instance()->Write("shaders/text.fx", D3D11_TEXT_SHADER);
+			IOManager::Instance()->Write("shaders/text.fx", text_shader);
 		}
 
     exists = IOManager::Instance()->Exists("shaders/cube_map.fx");
     if (exists == false)
     {
-      IOManager::Instance()->Write("shaders/cube_map.fx", D3D11_CUBE_MAP_SHADER);
+      IOManager::Instance()->Write("shaders/cube_map.fx", cube_map_shader);
     }
 
     ContentManager* content_manager = ContentManager::Instance();

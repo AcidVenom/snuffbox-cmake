@@ -78,8 +78,6 @@ namespace snuffbox
 		}
 		else if (type == RenderTargets::kRenderTarget)
 		{
-			post_processing_ = D3D11RenderDevice::Instance()->default_post_processing();
-
 			if (resource_ != nullptr)
 			{
 				SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::Create::resource_");
@@ -87,6 +85,8 @@ namespace snuffbox
 			else
 			{
 				queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>();
+        uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
+        post_processing_ = D3D11RenderDevice::Instance()->default_post_processing();
 			}
 
 			HRESULT result = S_OK;
@@ -122,8 +122,6 @@ namespace snuffbox
 		{
 			return;
 		}
-		
-		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
     if (mrts_.size() == 0)
     {

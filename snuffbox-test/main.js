@@ -47,7 +47,7 @@ var TestSphere = function(x, y, z)
 
 Game.Initialise = function()
 {
-	RenderSettings.setResolution(640, 480);
+	RenderSettings.setResolution(800, 600);
 	ContentManager.load("box", "test.box");
 
 	Game.camera = new Camera(CameraType.Perspective);
@@ -73,9 +73,9 @@ Game.Initialise = function()
 	Game.light.setDirection(0, -1, -1);
 
 	Game.spheres = [];
-	for (var x = 0; x < 5; ++x)
+	for (var x = 0; x < 20; ++x)
 	{
-		for (var y = 0; y < 5; ++y)
+		for (var y = 0; y < 20; ++y)
 		{
 			Game.spheres.push(new TestSphere(x * 12, 0, y * 12));
 		}
@@ -86,6 +86,11 @@ Game.Initialise = function()
 	Game.terrain.setMaterial("test.material");
 	Game.terrain.setTranslation(0, -9, 0);
 	Game.terrain.setOffset(64, 0, 64);
+
+	Game.text = new Text();
+	Game.text.spawn("Default");
+	Game.text.setFontSize(32);
+	Game.text.setText("Dat vind ik niet netjes");
 }
 
 Game.Update = function(dt)

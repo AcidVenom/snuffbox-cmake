@@ -1,4 +1,4 @@
-cbuffer Global : register(b0)
+R"(cbuffer Global : register(b0)
 {
 	float Time;
 	float4x4 View;
@@ -91,4 +91,4 @@ float4 PS(VOut input) : SV_TARGET
 
 	float alpha = colour.a * input.colour.a * Alpha;
 	return float4(colour.rgb * input.colour.rgb * Blend, alpha);
-}
+})"

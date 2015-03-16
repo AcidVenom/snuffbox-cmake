@@ -74,7 +74,6 @@ namespace snuffbox
 
 		float tx, ty, tw, th;
 		int index_offset = static_cast<int>(vertices_.size()) / 4;
-		std::vector<int> new_indices;
 
 		RichTextMarkup markup;
 		markup.font = current_font_;
@@ -117,30 +116,23 @@ namespace snuffbox
 			ty = glyph->tex_coords.bottom;
 
 			Vertex verts[] = {
-				Vertex(XMFLOAT4(x, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, ty), XMFLOAT3(0.0f, 0.0f, 1.0f)),
-				Vertex(XMFLOAT4(x, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, th), XMFLOAT3(0.0f, 0.0f, 1.0f)),
-				Vertex(XMFLOAT4(x + w, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, ty), XMFLOAT3(0.0f, 1.0f, 0.0f)),
-				Vertex(XMFLOAT4(x + w, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, th), XMFLOAT3(0.0f, 1.0f, 0.0f))
+				{ XMFLOAT4(x, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, th), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ XMFLOAT4(x, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tx, ty), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ XMFLOAT4(x + w, y, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, th), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+				{ XMFLOAT4(x + w, y + h, 0.0f, 1.0f), markup.colour, XMFLOAT2(tw, ty), XMFLOAT3(0.0f, 1.0f, 0.0f) }
 			};
 
 			for (int j = 0; j < 4; ++j)
 			{
 				verts[j].position.z -= index_offset;
-				vertices_.push_back(verts[j]);;
-			}
+				vertices_.push_back(verts[j]);
+				indices_.push_back(index_offset * 4 + j);
 
-			new_indices = { 
-				index_offset,
-				index_offset + 1, 
-				index_offset + 3, 
-				index_offset, 
-				index_offset + 3, 
-				index_offset + 2
-			};
-
-			for (unsigned int idx = 0; idx < new_indices.size(); ++idx)
-			{
-				indices_.push_back(new_indices.at(idx));
+				if (j == 3)
+				{
+					indices_.push_back(index_offset * 4 + j);
+					indices_.push_back((index_offset + 1) * 4);
+				}
 			}
 
 			pen_.x += (glyph->x_advance) + spacing_x_;
@@ -156,10 +148,10 @@ namespace snuffbox
 		float y = icon.position.y;
 
 		Vertex verts[] = {
-			Vertex(XMFLOAT4(x, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)),
-			Vertex(XMFLOAT4(x, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)),
-			Vertex(XMFLOAT4(x + size, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)),
-			Vertex(XMFLOAT4(x + size, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f))
+			{ XMFLOAT4(x, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+			{ XMFLOAT4(x, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+			{ XMFLOAT4(x + size, y, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+			{ XMFLOAT4(x + size, y + size, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) }
 		};
 
 		for (int j = 0; j < 4; ++j)
@@ -167,7 +159,7 @@ namespace snuffbox
 			icon.vertices.push_back(verts[j]);
 		}
 
-		icon.indices = std::vector<int>({ 0, 1, 3, 0, 3, 2 });
+    icon.indices = std::vector<int>({ 0, 1, 2, 3, 2, 1 });
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -347,13 +339,13 @@ namespace snuffbox
 		Align(&parsed);
 
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-		vertex_buffer_->Create(vertices_, indices_);
+		vertex_buffer_->Create(vertices_, indices_, false);
     vertex_buffer_->set_topology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		for (TextIcon& it : icon_buffer_)
 		{
 			it.vertex_buffer = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-			it.vertex_buffer->Create(it.vertices, it.indices);
+			it.vertex_buffer->Create(it.vertices, it.indices, false);
 		}
 
 		pen_.x = 0.0f;
