@@ -75,35 +75,47 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11VertexBuffer::CalculateTangents()
   {
-    unsigned int face_count = static_cast<unsigned int>(indices_.size() / 3);
-    std::vector<XMVECTOR> tan;
-    tan.resize(face_count * 3);
+		unsigned int idx1, idx2, idx3;
+		XMVECTOR e1, e2, t1, t2;
+		XMVECTOR p, uv, tangent, bitangent;
+		std::vector<XMVECTOR> tangents;
+		std::vector<XMVECTOR> bitangents;
 
-    XMVECTOR v1, v2, normal, tangent, bitangent;
+		for (unsigned int i = 0; i < indices_.size(); i += 3)
+		{
+			idx1 = i;
+			idx2 = i + 1;
+			idx3 = i + 2;
 
-    for (unsigned int i = 0; i < vertices_.size(); ++i)
-    {
-      Vertex& v = vertices_.at(i);
-      normal = XMLoadFloat3(&v.normal);
-      v1 = XMVector3Cross(-normal, XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f));
-      v2 = XMVector3Cross(-normal, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+			Vertex& v1 = vertices_.at(indices_.at(idx1));
+			Vertex& v2 = vertices_.at(indices_.at(idx2));
+			Vertex& v3 = vertices_.at(indices_.at(idx3));
 
-      if (XMVectorGetX(XMVector3Length(v1)) > XMVectorGetX(XMVector3Length(v2)))
-      {
-        tangent = v1;
-      }
-      else
-      {
-        tangent = v2;
-      }
+			p = XMLoadFloat4(&v1.position);
+			e1 = XMLoadFloat4(&v2.position) - p;
+			e2 = XMLoadFloat4(&v3.position) - p;
 
-      tangent = XMVector3Normalize(tangent);
+			uv = XMLoadFloat2(&v1.tex_coords);
+			t1 = XMLoadFloat2(&v2.tex_coords) - uv;
+			t2 = XMLoadFloat2(&v3.tex_coords) - uv;
 
-      bitangent = XMVector3Normalize(XMVector3Cross(normal, tangent));
+			float r = 1.0f / XMVectorGetX(XMVector2Cross(t1, t2));
+			tangent = (e1 * XMVectorGetY(t2) - e2 * XMVectorGetY(t1)) * r;
+			bitangent = (e2 * XMVectorGetX(t1) - e1 * XMVectorGetX(t2)) * r;
 
-      XMStoreFloat3(&v.tangent, tangent);
-      XMStoreFloat3(&v.bitangent, bitangent);
-    }
+			for (unsigned int j = 0; j < 3; ++j)
+			{
+				tangents.push_back(tangent);
+				bitangents.push_back(bitangent);
+			}
+		}
+
+		for (unsigned int i = 0; i < indices_.size(); ++i)
+		{
+			Vertex& v = vertices_.at(indices_.at(i));
+			XMStoreFloat3(&v.tangent, tangents.at(i));
+			XMStoreFloat3(&v.bitangent, bitangents.at(i));
+		}
   }
 
   //-------------------------------------------------------------------------------------------

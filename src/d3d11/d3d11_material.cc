@@ -106,7 +106,7 @@ namespace snuffbox
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
+			1.0f,
 			1.0f,
 			0.0f,
 			1.0f
@@ -130,7 +130,13 @@ namespace snuffbox
 		GetFloat4("emissive", attributes_.emissive);
 		GetFloat4("diffuse", attributes_.diffuse);
 		GetFloat4("ambient", attributes_.ambient);
-		GetFloat4("specular", attributes_.specular);
+
+		val = obj->Get(String::NewFromUtf8(isolate, "specular_power"));
+
+		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		{
+			attributes_.specular_power = static_cast<float>(val->ToNumber()->Value());
+		}
 
 		val = obj->Get(String::NewFromUtf8(isolate, "specular_intensity"));
 

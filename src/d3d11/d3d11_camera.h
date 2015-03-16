@@ -74,12 +74,6 @@ namespace snuffbox
 		const XMMATRIX& view();
 
 		/**
-		* @brief Calculates the view vector and returns it
-		* @return XMFLOAT3 The view vector of the camera
-		*/
-		XMFLOAT3 view_vector();
-
-		/**
 		* @return const float& The near plane of the camera
 		*/
 		const float& near_plane() const;

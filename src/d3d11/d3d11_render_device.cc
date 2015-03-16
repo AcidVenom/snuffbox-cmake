@@ -354,7 +354,7 @@ namespace snuffbox
     attributes.emissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
     attributes.normal_scale = 0.0f;
     attributes.reflectivity = 0.0f;
-    attributes.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+    attributes.specular_power = 1.0f;
     attributes.specular_intensity = 0.0f;
 
     default_material_->Validate();
@@ -699,12 +699,14 @@ namespace snuffbox
 	{
 		const XMMATRIX& view = camera_->view();
 		const XMMATRIX& proj = camera_->projection();
+		XMVECTOR t = camera_->translation();
 
+		XMVectorSetY(t, std::abs(XMVectorGetY(t)));
 		constant_buffer_->Map({
 			static_cast<float>(Game::Instance()->time()),
 			view,
 			proj,
-			camera_->translation(),
+			t,
 			XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), view * proj)
 		});
 	}

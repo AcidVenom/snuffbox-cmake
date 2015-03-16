@@ -68,6 +68,10 @@
 		"path" : "skybox.fbx"
 	},
 	{
+		"type" : "model",
+		"path" : "sphere.fbx"
+	},
+	{
 		"type" : "anim",
 		"path" : "test.anim"
 	},

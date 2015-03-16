@@ -244,20 +244,32 @@ namespace snuffbox
       return yy * width_ + xx;
     };
 
-    int index_a = clamp_get(1, 1);
-    int index_b = clamp_get(-1, -1);
-    int index_c = clamp_get(1, -1);
-    int index_d = clamp_get(-1, 1);
+		for (int xx = -1; xx <= 1; ++xx)
+		{
+			for (int yy = -1; yy <= 1; ++yy)
+			{
+				CalculateNormals(clamp_get(xx, yy), clamp_get(xx + 1, yy + 1), clamp_get(xx, yy + 1));
+			}
+		}
+	}
 
-    Vertex& va = vertices_.at(index_a);
-    Vertex& vb = vertices_.at(index_b);
-    Vertex& vc = vertices_.at(index_c);
-    Vertex& vd = vertices_.at(index_d);
+	//-------------------------------------------------------------------------------------------
+	void D3D11Terrain::CalculateNormals(const int& a, const int& b, const int& c)
+	{
+		Vertex& va = vertices_.at(a);
+		Vertex& vb = vertices_.at(b);
+		Vertex& vc = vertices_.at(c);
 
-    XMVECTOR e1 = XMLoadFloat4(&va.position) - XMLoadFloat4(&vb.position);
-    XMVECTOR e2 = XMLoadFloat4(&vc.position) - XMLoadFloat4(&vd.position);
+		XMVECTOR e1 = XMLoadFloat4(&vc.position) - XMLoadFloat4(&va.position);
+		XMVECTOR e2 = XMLoadFloat4(&vb.position) - XMLoadFloat4(&va.position);
 
-    XMStoreFloat3(&vertices_.at(y * width_ + x).normal, XMVector3Normalize(XMVector3Cross(e1, e2)));
+		XMFLOAT3 normal;
+		XMStoreFloat3(&normal, XMVector3Normalize(XMVector3Cross(e1, e2)));
+
+		normal.z *= -1;
+		normal.x *= -1;
+
+		va.normal = normal;
 	}
 
 	//-------------------------------------------------------------------------------------------

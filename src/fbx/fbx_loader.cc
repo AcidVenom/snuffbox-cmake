@@ -114,37 +114,18 @@ namespace snuffbox
 
 			unsigned int poly_count = mesh->GetPolygonCount();
 			FbxVector4* vertices = mesh->GetControlPoints();
-
-			FbxLayerElementArrayTemplate<FbxVector4>* binormals;
-			mesh->GetBinormals(&binormals);
-
-			FbxLayerElementArrayTemplate<FbxVector4>* tangents;
-			mesh->GetTangents(&tangents);
-
-			bool do_binormals = true;
-			bool do_tangents = true;
-
-			if (!binormals)
-			{
-				do_binormals = false;
-			}
-
-			if (!tangents)
-			{
-				do_tangents = false;
-			}
+			Vertex vert;
+			FbxVector4 normal;
+			unsigned int control_point;
 
 			for (unsigned int polygon = 0; polygon < poly_count; ++polygon)
 			{
 				unsigned int poly_size = mesh->GetPolygonSize(polygon);
 				SNUFF_XASSERT(poly_size == 3, "You should triangulate the mesh before using it (this is an export option in any Autodesk FBX exporter)", "FBXLoader::GetMeshData");
-
+				
 				for (unsigned int vertex = 0; vertex < poly_size; ++vertex)
 				{
-
-					unsigned int control_point = mesh->GetPolygonVertex(polygon, vertex);
-					Vertex vert;
-					FbxVector4 normal;
+					control_point = mesh->GetPolygonVertex(polygon, vertex);
 					mesh->GetPolygonVertexNormal(polygon, vertex, normal);
 					vert.position.x = static_cast<float>(vertices[control_point].mData[0]);
 					vert.position.z = static_cast<float>(-vertices[control_point].mData[1]);

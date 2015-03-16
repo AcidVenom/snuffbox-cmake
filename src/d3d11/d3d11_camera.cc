@@ -104,15 +104,6 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	XMFLOAT3 D3D11Camera::view_vector()
-	{
-		XMVECTOR view_vec = XMVector3Transform(target_ - translation_, XMMatrixRotationY(0));
-		view_vec = XMVector3Normalize(view_vec);
-
-		return XMFLOAT3(XMVectorGetX(view_vec), XMVectorGetY(view_vec), XMVectorGetZ(view_vec));
-	}
-
-	//---------------------------------------------------------------------------------------------------------
 	const float& D3D11Camera::near_plane() const
 	{
 		return near_plane_;

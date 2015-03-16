@@ -35,12 +35,12 @@ Texture2D TexNormal : register(t1);
 Texture2D TexDepth : register(t3);
 SamplerState Sampler;
 
-float4 Specular(float3 v, float3 l, float3 n, float i)
+float4 Specular(float3 v, float3 l, float3 n, float i, float p)
 {
-	float3 h = normalize(-l + v);
-    float d = max(0, dot(n, h));
+	float3 r = normalize(reflect(normalize(l), normalize(n)));
+    float d = saturate(dot(r, v));
 
-    return pow(d, 1);
+    return i * pow(d, p);
 }
 
 float4 PS(VOut input) : SV_TARGET
@@ -50,8 +50,8 @@ float4 PS(VOut input) : SV_TARGET
 	float4 depth = TexDepth.Sample(Sampler, input.texcoord);
 
 	float4 position;
-	position.x = (1 - input.texcoord.x) * 2.0f - 1.0f;
-	position.y = (1 - input.texcoord.y) * 2.0f - 1.0f;
+	position.x = input.texcoord.x * 2.0f - 1.0f;
+	position.y = input.texcoord.y * 2.0f - 1.0f;
 	position.z = depth.r;
 	position.w = 1.0f;
 
@@ -64,16 +64,15 @@ float4 PS(VOut input) : SV_TARGET
 	float3 view = normalize(EyePosition.xyz - position.xyz);
 
 	float specular_intensity = normal.a;
-	normal = normalize(normal * 2.0f - 1.0f);
+	float specular_power = diffuse.a * 256;
 
-	float4 specular = Specular(view, light_dir, normal.rgb, specular_intensity);
+	normal = normal * 2.0f - 1.0f;
+
+	float4 specular = Specular(view, light_dir, normal.rgb, specular_intensity, specular_power);
 	
-	diffuse.rgb *= saturate(dot(-light_dir, normal.rgb));
-	diffuse.rgb += specular.rgb;
-
-	if (depth.r == 1)
-	{
-		return 0;
-	}
-	return specular;
+	float4 final = diffuse;
+	final.rgb *= saturate(dot(-light_dir, normal.rgb));
+	final.rgb += specular.rgb;
+	final.a = 1.0f;
+	return float4(final.rgb, 1.0f);
 }

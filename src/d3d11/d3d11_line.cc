@@ -15,8 +15,9 @@ namespace snuffbox
 		attributes.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		attributes.emissive = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		attributes.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		attributes.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		
+		attributes.specular_power = 1.0f;
+		attributes.specular_intensity = 0.0f;
+
 		material_->Validate();
 	}
 

@@ -21,12 +21,13 @@ Game.Initialise = function()
 	Game.skybox.setMaterial("test.material");
 	Game.skybox.setTechnique("Skybox");
 
-	Game.model = new Model("axew.fbx");
+	Game.model = new Model("sphere.fbx");
 	Game.model.spawn("G-Buffer");
 	Game.model.setMaterial("test.material");
 
 	Game.quad = new Quad();
 	Game.quad.spawn("G-Buffer");
+	Game.quad.setMaterial("test.material");
 
 	Game.camera.setNearPlane(1);
 	Game.camera.setFarPlane(1000);

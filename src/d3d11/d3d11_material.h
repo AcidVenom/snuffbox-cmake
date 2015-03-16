@@ -19,8 +19,8 @@ namespace snuffbox
 			XMFLOAT4 emissive;
 			XMFLOAT4 diffuse;
 			XMFLOAT4 ambient;
-			XMFLOAT4 specular;
 
+			float specular_power;
 			float specular_intensity;
 			float reflectivity;
 			float normal_scale;

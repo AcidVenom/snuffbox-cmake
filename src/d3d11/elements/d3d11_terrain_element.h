@@ -98,6 +98,8 @@ namespace snuffbox
 		*/
 		void SetNormals(const int& x, const int& y);
 
+		void CalculateNormals(const int& a, const int& b, const int& c);
+
 		/// Flushes the terrain after modification of heights
 		void Flush();
 

@@ -22,7 +22,7 @@ namespace snuffbox
     vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kQuad);
 
 		std::vector<int> indices = {
-      0, 1, 2, 3, 2, 1
+      0, 1, 3, 0, 3, 2
 		};
 
     vertex_buffer_->Create({

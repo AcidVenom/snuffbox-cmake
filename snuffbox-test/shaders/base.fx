@@ -11,7 +11,8 @@ struct Attributes
 	float4 Emissive;
 	float4 Diffuse;
 	float4 Ambient;
-	float4 Specular;
+
+	float SpecularPower;
 	float SpecularIntensity;
 	float Reflectivity;
 	float NormalScale;
@@ -92,10 +93,11 @@ PSOut PS(VOut input)
 
 	normal = float4((normal.x * input.tangent) + (normal.y * input.bitangent) + (normal.z * input.normal), 1.0f);
 
-	float4 r = Reflection(input.world_pos, EyePosition, normal.rgb);
+	float4 r = Reflection(input.world_pos, EyePosition, input.normal.rgb);
 	float spec = saturate(Material.SpecularIntensity * TexSpecular.Sample(Sampler, coords).r);
 
 	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse;
+	output.colour.a = Material.SpecularPower / 256;
 	output.normal = float4((normal.rgb + 1.0f) / 2.0f, spec);
 
 	return output;
