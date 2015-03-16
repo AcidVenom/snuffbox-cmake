@@ -71,9 +71,9 @@ namespace snuffbox
 		* @brief Sets multiple textures to the register of the shader
 		* @param[in] start (const int&) The start slot to register from
 		* @param[in] num (const int&) The number of textures to register
-		* @param[in] resources (const std::vector<ID3D11ShaderResourceView*>& The textures to register
+		* @param[in] textures (const std::vector<D3D11Texture*>& The textures to register
 		*/
-		static void SetMultipleTextures(const int& start, const int& num, const std::vector<ID3D11ShaderResourceView*>& resources);
+    static void SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures);
 
 		/**
 		* @return const int& The width of the texture

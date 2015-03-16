@@ -245,9 +245,34 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Texture::SetMultipleTextures(const int& start, const int& num, const std::vector<ID3D11ShaderResourceView*>& resources)
+	void D3D11Texture::SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures)
 	{
-		D3D11RenderDevice::Instance()->context()->PSSetShaderResources(start, num, &resources[0]);
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+    D3D11Texture** old = render_device->set_textures();
+
+    ID3D11ShaderResourceView** resources = new ID3D11ShaderResourceView*[8];
+    D3D11Texture* current = nullptr;
+
+    bool set = false;
+    for (unsigned int i = 0; i < textures.size(); ++i)
+    {
+      current = textures.at(i);
+      resources[i] = current->texture();
+  
+      if (old[start + i] == nullptr || old[start + i] != textures.at(i))
+      {
+        set = true;
+      }
+
+      old[start + i] = current;
+    }
+
+    if (set == true)
+    {
+      render_device->context()->PSSetShaderResources(start, num, resources);
+    }
+
+    delete[] resources;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
