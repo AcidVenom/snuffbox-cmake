@@ -68,7 +68,8 @@ namespace snuffbox
 		}
 		else
 		{
-			SNUFF_LOG_WARNING("Even though not required, the material '" + path + "' doesn't have an 'effect' field");
+			SNUFF_LOG_WARNING("Even though not required, the material '" + path + "' doesn't have an 'effect' field, defaulting");
+      effect_ = D3D11RenderDevice::Instance()->default_effect();
 		}
 
 		auto GetTexture = [this, isolate](const Local<Object>& v, const std::string& field, D3D11Texture** out)

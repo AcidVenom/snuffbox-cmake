@@ -313,6 +313,10 @@ namespace snuffbox
     ContentManager* content_manager = ContentManager::Instance();
     pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
     pass.shader = content_manager->Get<D3D11Shader>("shaders/base.fx");
+    pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+    pass.blend_state->CreateFromJson(std::string("{\
+      \"BlendEnable\" : \"false\"\
+    }"));
 
     technique.name = "Default";
     technique.passes = { pass };
@@ -335,7 +339,7 @@ namespace snuffbox
 			\"DestBlend\" : \"InvSrcAlpha\",\
 			\"SrcBlendAlpha\" : \"InvDestAlpha\",\
 			\"DestBlendAlpha\" : \"One\"\
-	}"));
+	  }"));
 
     technique.name = "Text";
     technique.passes = { pass };
