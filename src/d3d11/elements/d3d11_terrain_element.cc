@@ -44,6 +44,8 @@ namespace snuffbox
 				vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_, static_cast<float>(y) / height_);
 				vertex.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+				vertex.tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
+				vertex.bitangent = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 				vertices_.push_back(vertex);
 			}
@@ -62,7 +64,7 @@ namespace snuffbox
 			}
 		}
 
-		vertex_buffer_->Create(vertices_, indices_);
+		vertex_buffer_->Create(vertices_, indices_, false);
   }
 
 	//-------------------------------------------------------------------------------------------

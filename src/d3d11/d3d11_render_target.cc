@@ -20,7 +20,8 @@ namespace snuffbox
 		resource_(nullptr),
 		post_processing_(nullptr),
 		technique_("Default"),
-		clear_depth_(false)
+		clear_depth_(false),
+		lighting_enabled_(false)
 	{
     
 	}
@@ -33,7 +34,8 @@ namespace snuffbox
 		resource_(nullptr),
 		post_processing_(nullptr),
 		technique_("Default"),
-		clear_depth_(false)
+		clear_depth_(false),
+		lighting_enabled_(false)
 	{
 		JSWrapper wrapper(args);
 		
@@ -321,6 +323,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	const bool& D3D11RenderTarget::lighting_enabled() const
+	{
+		return lighting_enabled_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_post_processing(const std::string& path)
 	{
 		post_processing_ = ContentManager::Instance()->Get<D3D11Effect>(path);
@@ -345,6 +353,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::set_lighting_enabled(const bool& v)
+	{
+		lighting_enabled_ = v;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderTarget::~D3D11RenderTarget()
 	{
 		Release();
@@ -362,7 +376,9 @@ namespace snuffbox
       { "setViewport", JSSetViewport },
       { "addMultiTarget", JSAddMultiTarget },
 			{ "setClearDepth", JSSetClearDepth },
-			{ "clearDepth", JSClearDepth }
+			{ "clearDepth", JSClearDepth },
+			{ "setLightingEnabled", JSSetLightingEnabled },
+			{ "lightingEnabled", JSLightingEnabled }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -470,5 +486,26 @@ namespace snuffbox
 		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
 
 		wrapper.ReturnValue<bool>(self->clear_depth());
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSSetLightingEnabled(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		if (wrapper.Check("B") == true)
+		{
+			self->set_lighting_enabled(wrapper.GetValue<bool>(0, false));
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11RenderTarget::JSLightingEnabled(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+		wrapper.ReturnValue<bool>(self->lighting_enabled());
 	}
 }

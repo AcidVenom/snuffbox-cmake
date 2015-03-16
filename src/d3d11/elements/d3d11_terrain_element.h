@@ -98,6 +98,12 @@ namespace snuffbox
 		*/
 		void SetNormals(const int& x, const int& y);
 
+		/**
+		* @brief Calculates the normals of 3 given vertices
+		* @param[in] a (const int&) The index of the first vertex
+		* @param[in] b (const int&) The index of the second vertex
+		* @param[in] c (const int&) The index of the third vertex
+		*/
 		void CalculateNormals(const int& a, const int& b, const int& c);
 
 		/// Flushes the terrain after modification of heights

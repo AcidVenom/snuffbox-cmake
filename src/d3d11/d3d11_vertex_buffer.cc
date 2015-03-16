@@ -15,7 +15,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11VertexBuffer::Create(const std::vector<Vertex>& verts, const std::vector<int>& indices)
+	void D3D11VertexBuffer::Create(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents)
   {
     if (valid_ == true)
     {
@@ -30,7 +30,10 @@ namespace snuffbox
     vertices_ = verts;
     indices_ = indices;
 
-    CalculateTangents();
+		if (tangents == true)
+		{
+			CalculateTangents();
+		}
 
     SNUFF_XASSERT(vertices_.size() > 0, "There are no vertices to create a vertex buffer with", "D3D11VertexBuffer::Create");
     SNUFF_XASSERT(indices_.size() > 0, "There are no indices to create an index buffer with", "D3D11VertexBuffer::Create");

@@ -1,7 +1,7 @@
 [
 	{
 		"type" : "texture",
-		"path" : "sheet.png"
+		"path" : "light.png"
 	},
 	{
 		"type" : "texture",
@@ -52,8 +52,20 @@
 		"path" : "shaders/skybox.fx"
 	},
 	{
+		"type" : "shader",
+		"path" : "shaders/diffuse.fx"
+	},
+	{
+		"type" : "shader",
+		"path" : "shaders/default_pp.fx"
+	},
+	{
 		"type" : "effect",
 		"path" : "test.effect"
+	},
+	{
+		"type" : "effect",
+		"path" : "post_processing.effect"
 	},
 	{
 		"type" : "material",

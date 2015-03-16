@@ -16,18 +16,6 @@ namespace snuffbox
 	class D3D11Lighting : public JSObject
 	{
 	public:
-
-		/**
-		* @struct snuffbox::D3D11Lighting::LightSorter
-		* @brief Sorts lights by distance to camera
-		* @author Daniël Konings
-		*/
-		struct LightSorter
-		{
-			bool operator()(D3D11Light* a, D3D11Light* b);
-		};
-
-	public:
 	
 		/// Default constructor
 		D3D11Lighting();
@@ -53,8 +41,9 @@ namespace snuffbox
 		/**
 		* @brief Updates the lighting system
 		* @param[in] buffer (snuffbox::D3D11ConstantBuffer*) The constant buffer to fill
+		* @param[in] vbo (snuffbox::D3D11VertexBuffer*) The screen quad to redraw
 		*/
-		void Update(D3D11ConstantBuffer* buffer);
+		void Update(D3D11ConstantBuffer* buffer, D3D11VertexBuffer* vbo);
 
 		/**
 		* @return const std::vecotr<snuffbox::D3D11Light*>& The vector of lights currently activated
@@ -80,7 +69,7 @@ namespace snuffbox
 	private:
 		std::vector<D3D11Light*> lights_; //!< The list of lights that need to be passed to the constant buffer
 		XMFLOAT4 ambient_colour_; //!< The global ambient colour
-		const int MAX_LIGHTS = 64;
+		SharedPtr<D3D11BlendState> additive_; //!< The additive blend state
 
 	public:
 		JS_NAME("Lighting");

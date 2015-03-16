@@ -82,8 +82,9 @@ namespace snuffbox
     * @brief Creates the vertex/index buffers for use
     * @param[in] verts (const std::vector<snuffbox::Vertex>&) The vertices to add
     * @param[in] indices (const std::vector<int>&) The indices to add
+		* @param[in] tangents (const bool&) Should tangents be calculated? Default = true
     */
-    void Create(const std::vector<Vertex>& verts, const std::vector<int>& indices);
+		void Create(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents = true);
 
     /// Calculates the tangents of the the current vertices
     void CalculateTangents();

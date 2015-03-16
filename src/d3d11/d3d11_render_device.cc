@@ -464,8 +464,6 @@ namespace snuffbox
       return;
     }
 
-    lighting_->Update(constant_buffer_);
-
     back_buffer_->Clear(context_);
   }
 
@@ -561,11 +559,21 @@ namespace snuffbox
 				{
 					effect->Apply(technique, i);
 					screen_quad_->Draw();
+
+					if (target->lighting_enabled() == true)
+					{
+						lighting_->Update(constant_buffer_, screen_quad_.get());
+					}
 				}
 			}
 			else
 			{
 				screen_quad_->Draw();
+
+				if (target->lighting_enabled() == true)
+				{
+					lighting_->Update(constant_buffer_, screen_quad_.get());
+				}
 			}
 		}
 		else

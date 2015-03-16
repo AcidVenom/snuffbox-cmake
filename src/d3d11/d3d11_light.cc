@@ -26,9 +26,7 @@ namespace snuffbox
 		attributes_.translation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		attributes_.direction = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
 		attributes_.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		attributes_.constant_attenuation = 1.0f;
-		attributes_.linear_attenuation = 1.0f;
-		attributes_.quad_attenuation = 1.0f;
+		attributes_.radius = 1.0f;
 		attributes_.spot_angle = XM_PI / 4;
 		attributes_.type = 0;
 		attributes_.activated = true;
@@ -86,21 +84,9 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::set_constant_attenuation(const float& attenuation)
+	void D3D11Light::set_radius(const float& r)
 	{
-		attributes_.constant_attenuation = attenuation;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::set_linear_attenuation(const float& attenuation)
-	{
-		attributes_.linear_attenuation = attenuation;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::set_quadratic_attenuation(const float& attenuation)
-	{
-		attributes_.quad_attenuation = attenuation;
+		attributes_.radius = r;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -142,12 +128,8 @@ namespace snuffbox
 			{ "colour", JSColour },
 			{ "setSpotAngle", JSSetSpotAngle },
 			{ "spotAngle", JSSpotAngle },
-			{ "setConstantAttenuation", JSSetConstantAttenuation },
-			{ "constantAttenuation", JSConstantAttenuation },
-			{ "setLinearAttenuation", JSSetLinearAttenuation },
-			{ "linearAttenuation", JSLinearAttenuation },
-			{ "setQuadraticAttenuation", JSSetQuadraticAttenuation },
-			{ "quadraticAttenuation", JSQuadraticAttenuation },
+			{ "setRadius", JSSetRadius },
+			{ "radius", JSRadius },
 			{ "setActivated", JSSetActivated },
 			{ "activated", JSActivated }
 		};
@@ -297,66 +279,24 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSSetConstantAttenuation(JS_ARGS args)
+	void D3D11Light::JSSetRadius(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
 
 		if (wrapper.Check("N") == true)
 		{
-			self->set_constant_attenuation(wrapper.GetValue<float>(0, 0.0f));
+			self->set_radius(wrapper.GetValue<float>(0, 0.0f));
 		}
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSConstantAttenuation(JS_ARGS args)
+	void D3D11Light::JSRadius(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
 
-		wrapper.ReturnValue<float>(self->attributes().constant_attenuation);
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSSetLinearAttenuation(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
-
-		if (wrapper.Check("N") == true)
-		{
-			self->set_linear_attenuation(wrapper.GetValue<float>(0, 0.0f));
-		}
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSLinearAttenuation(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
-
-		wrapper.ReturnValue<float>(self->attributes().linear_attenuation);
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSSetQuadraticAttenuation(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
-
-		if (wrapper.Check("N") == true)
-		{
-			self->set_quadratic_attenuation(wrapper.GetValue<float>(0, 0.0f));
-		}
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void D3D11Light::JSQuadraticAttenuation(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-		D3D11Light* self = wrapper.GetPointer<D3D11Light>(args.This());
-
-		wrapper.ReturnValue<float>(self->attributes().quad_attenuation);
+		wrapper.ReturnValue<float>(self->attributes().radius);
 	}
 
 	//-------------------------------------------------------------------------------------------

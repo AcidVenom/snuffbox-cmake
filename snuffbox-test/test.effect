@@ -7,39 +7,15 @@
 						"BlendEnable" : false
 					},
 					"shader" : "shaders/base.fx",
-					"sampling" : "Anisotropic"
-				}
-			]
-		},
-
-		"Skybox" : {
-			"passes" : [
-				{
-					"shader" : "shaders/skybox.fx",
-					"sampling" : "Anisotropic"
-				}
-			]
-		},
-
-		"Text" : {
-			"passes" : [
-				{
-					"blend" : {
-						"SrcBlend" : "SrcAlpha",
-						"DestBlend" : "InvSrcAlpha",
-						"SrcBlendAlpha" : "InvDestAlpha",
-						"DestBlendAlpha" : "One"
-					},
-					"shader" : "shaders/text.fx",
 					"sampling" : "Linear"
 				}
 			]
 		},
 
-		"UI" : {
+		"Diffuse" : {
 			"passes" : [
 				{
-					"shader" : "shaders/ui.fx",
+					"shader" : "shaders/diffuse.fx",
 					"sampling" : "Linear"
 				}
 			]

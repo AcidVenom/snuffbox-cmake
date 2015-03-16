@@ -37,13 +37,10 @@ namespace snuffbox
 			XMFLOAT4 colour;
 
 			float spot_angle;
-			float constant_attenuation;
-			float linear_attenuation;
-			float quad_attenuation;
+			float radius;
 
 			int type;
 			bool activated;
-			XMFLOAT2 padding;
 		};
 	public:
 		
@@ -104,22 +101,10 @@ namespace snuffbox
 		void set_spot_angle(const float& angle);
 
 		/**
-		* @brief Sets the constant attenuation of this light
-		* @param[in] attenuation (const float&) The new attenuation
+		* @brief Sets the radius of this light, if it's a point light
+		* @param[in] r (const float&) The new radius
 		*/
-		void set_constant_attenuation(const float& attenuation);
-
-		/**
-		* @brief Sets the linear attenuation of this light
-		* @param[in] attenuation (const float&) The new attenuation
-		*/
-		void set_linear_attenuation(const float& attenuation);
-
-		/**
-		* @brief Sets the qaudratic attenuation of this light
-		* @param[in] attenuation (const float&) The new attenuation
-		*/
-		void set_quadratic_attenuation(const float& attenuation);
+		void set_radius(const float& r);
 
 		/**
 		* @brief Enables or disables this light
@@ -146,12 +131,8 @@ namespace snuffbox
 		static void JSColour(JS_ARGS args);
 		static void JSSetSpotAngle(JS_ARGS args);
 		static void JSSpotAngle(JS_ARGS args);
-		static void JSSetConstantAttenuation(JS_ARGS args);
-		static void JSConstantAttenuation(JS_ARGS args);
-		static void JSSetLinearAttenuation(JS_ARGS args);
-		static void JSLinearAttenuation(JS_ARGS args);
-		static void JSSetQuadraticAttenuation(JS_ARGS args);
-		static void JSQuadraticAttenuation(JS_ARGS args);
+		static void JSSetRadius(JS_ARGS args);
+		static void JSRadius(JS_ARGS args);
 		static void JSSetActivated(JS_ARGS args);
 		static void JSActivated(JS_ARGS args);
 	};

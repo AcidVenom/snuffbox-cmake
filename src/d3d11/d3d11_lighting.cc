@@ -2,38 +2,20 @@
 #include "../d3d11/d3d11_light.h"
 #include "../d3d11/d3d11_constant_buffer.h"
 #include "../d3d11/d3d11_camera.h"
-
-#include <algorithm>
+#include "../d3d11/d3d11_vertex_buffer.h"
+#include "../d3d11/d3d11_blend_state.h"
 
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	bool D3D11Lighting::LightSorter::operator()(D3D11Light* a, D3D11Light* b)
-	{
-		const XMFLOAT4& p1 = a->attributes().translation;
-		const XMFLOAT4& p2 = b->attributes().translation;
-
-		const XMVECTOR& p3 = D3D11RenderDevice::Instance()->camera()->translation();
-
-		float cx = XMVectorGetX(p3);
-		float cy = XMVectorGetY(p3);
-		float cz = XMVectorGetZ(p3);
-
-		float dx1 = cx - p1.x;
-		float dy1 = cy - p1.y;
-		float dz1 = cz - p1.z;
-
-		float dx2 = cx - p2.x;
-		float dy2 = cy - p2.y;
-		float dz2 = cz - p2.z;
-
-		return std::sqrt(dx1 * dx1 + dy1 * dy1 + dz1 * dz1) < std::sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2);
-	}
-
-	//---------------------------------------------------------------------------------------------------------
 	D3D11Lighting::D3D11Lighting() :
 		ambient_colour_(1.0f, 1.0f, 1.0f, 1.0f)
 	{
+		additive_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+		additive_->CreateFromJson(std::string("{\
+			\"SrcBlend\" : \"One\",\
+			\"DestBlend\" : \"One\"\
+		}"));
 		SNUFF_LOG_SUCCESS("Succesfully initialised the Direct3D 11 lighting system");
 	}
 
@@ -75,9 +57,23 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Lighting::Update(D3D11ConstantBuffer* buffer)
+	void D3D11Lighting::Update(D3D11ConstantBuffer* buffer, D3D11VertexBuffer* vbo)
 	{
-		
+		additive_->Set();
+		D3D11Light* light = nullptr;
+		for (unsigned int i = 0; i < lights_.size(); ++i)
+		{
+			light = lights_.at(i);
+
+			if (light->attributes().activated == false)
+			{
+				continue;
+			}
+
+			const D3D11Light::Attributes& a = light->attributes();
+			buffer->Map({ a });
+			vbo->Draw();
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------

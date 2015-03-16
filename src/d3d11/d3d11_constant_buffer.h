@@ -47,6 +47,16 @@ namespace snuffbox
 	};
 
 	/**
+	* @struct snuffbox::CbLight
+	* @brief A per-render-target/per-light light buffer
+	* @author Daniël Konings
+	*/
+	__declspec(align(16)) struct CbLight
+	{
+		D3D11Light::Attributes Attributes;
+	};
+
+	/**
 	* @class snuffbox::D3D11ConstantBuffer
 	* @brief A wrapper around D3D11 constant buffers, used for per-shader variables
 	* @author Daniël Konings
@@ -68,21 +78,28 @@ namespace snuffbox
 		
 		/**
 		* @brief Maps the constant buffer with global information
-		* @param[in] const snuffbox::CbGlobal& The global constant buffer
+		* @param[in] cb (const snuffbox::CbGlobal&) The global constant buffer
 		*/
 		void Map(const CbGlobal& cb);
 
 		/**
 		* @brief Maps the constant buffer with per-object information
-		* @param[in] const snuffbox::CbPerObject& The per-object buffer
+		* @param[in] cb (const snuffbox::CbPerObject&) The per-object buffer
 		*/
 		void Map(const CbPerObject& cb);
 
 		/**
 		* @brief Maps the constant buffer with uniforms information
-		* @param[in] const snuffbox::CbUniforms& The uniforms buffer
+		* @param[in] cb (const snuffbox::CbUniforms&) The uniforms buffer
+		* @param[in] num_uniforms (const int&) The number of uniforms
 		*/
 		void Map(const CbUniforms& cb, const int& num_uniforms);
+
+		/**
+		* @brief Maps the constant buffer with light information
+		* @param[in] cb (const snuffbox::CbUniforms&) The light buffer
+		*/
+		void Map(const CbLight& cb);
 
 		/// Sets the constant buffer at a given index
 		void Set();
@@ -95,5 +112,6 @@ namespace snuffbox
 		ID3D11Buffer* global_buffer_; //!< The global constant buffer
 		ID3D11Buffer* per_object_buffer_; //!< The per-object constant buffer
 		ID3D11Buffer* uniforms_buffer_; //!< The uniforms constant buffer
+		ID3D11Buffer* light_buffer_; //!< The light constant buffer
 	};
 }

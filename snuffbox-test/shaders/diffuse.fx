@@ -60,45 +60,15 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 	return output;
 }
 
-TextureCube TexCube : register(t0);
 Texture2D TexDiffuse : register(t1);
-Texture2D TexNormal : register(t2);
-Texture2D TexSpecular : register(t3);
-Texture2D TexLight : register(t4);
 
 SamplerState Sampler;
 
-struct PSOut
+float4 PS(VOut input) : SV_TARGET
 {
-	float4 colour : SV_Target0;
-	float4 normal : SV_Target1;
-};
-float4 Reflection(float4 p, float4 eye, float3 normal)
-{
-	normal.y *= -1;
-	float3 i = normalize(p.xyz - eye.xyz);
-	float3 r = reflect(i, normal.xyz);
-	return TexCube.Sample(Sampler, r);
-}
-
-PSOut PS(VOut input)
-{
-	PSOut output;
 	float x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;
 	float y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;
 	float2 coords = float2(x, y);
 
-	float4 normal = normalize(TexNormal.Sample(Sampler, coords) * 2.0f - 1.0f);
-	normal.rgb = lerp(normal.rgb, float3(0, 0, 1), 1.0f - Material.NormalScale);
-
-	normal = float4((normal.x * input.tangent) + (normal.y * input.bitangent) + (normal.z * input.normal), 1.0f);
-
-	float4 r = Reflection(input.world_pos, EyePosition, input.normal.rgb);
-	float spec = saturate(Material.SpecularIntensity * TexSpecular.Sample(Sampler, coords).r);
-
-	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse * float4(Blend, 1.0f);
-	output.colour.a = Material.SpecularPower / 256;
-	output.normal = float4((normal.rgb + 1.0f) / 2.0f, spec);
-
-	return output;
+	return TexDiffuse.Sample(Sampler, coords) * float4(Blend, 1.0f);
 }

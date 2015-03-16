@@ -26,6 +26,7 @@ namespace snuffbox
 		CbGlobal cb_global;
 		CbPerObject cb_per_object;
 		CbUniforms cb_uniforms;
+		CbLight cb_light;
 
 		D3D11_BUFFER_DESC desc;
 		desc.ByteWidth = sizeof(CbGlobal) * 4;
@@ -58,6 +59,12 @@ namespace snuffbox
 		result = device->CreateBuffer(&desc, &data, &uniforms_buffer_);
 		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::uniforms_buffer_");
 		
+		desc.ByteWidth = sizeof(CbLight) * 4;
+		data.pSysMem = &cb_light;
+
+		result = device->CreateBuffer(&desc, &data, &light_buffer_);
+		SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11ConstantBuffer::Create::light_buffer_");
+
 		valid_ = true;
 	}
 
@@ -119,6 +126,20 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11ConstantBuffer::Map(const CbLight& cb)
+	{
+		CbLight* mapped = nullptr;
+		D3D11_MAPPED_SUBRESOURCE data;
+		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
+
+		ctx->Map(light_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &data);
+		mapped = static_cast<CbLight*>(data.pData);
+		mapped->Attributes = cb.Attributes;
+		ctx->Unmap(light_buffer_, 0);
+		Set();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11ConstantBuffer::Set()
 	{
 		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
@@ -126,11 +147,12 @@ namespace snuffbox
 		ID3D11Buffer* buffers[] = {
 			global_buffer_,
 			per_object_buffer_,
-			uniforms_buffer_
+			uniforms_buffer_,
+			light_buffer_
 		};
 
-		ctx->VSSetConstantBuffers(0, 3, buffers);
-		ctx->PSSetConstantBuffers(0, 3, buffers);
+		ctx->VSSetConstantBuffers(0, 4, buffers);
+		ctx->PSSetConstantBuffers(0, 4, buffers);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -144,5 +166,6 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(global_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::global_buffer_");
 		SNUFF_SAFE_RELEASE(per_object_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::per_object_buffer_");
 		SNUFF_SAFE_RELEASE(uniforms_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::uniforms_buffer_");
+		SNUFF_SAFE_RELEASE(light_buffer_, "D3D11ConstantBuffer::~D3D11ConstantBuffer::light_buffer_");
 	}
 }

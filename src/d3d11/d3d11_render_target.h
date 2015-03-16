@@ -151,6 +151,11 @@ namespace snuffbox
 		const bool& clear_depth() const;
 
 		/**
+		* @return const bool& Should lighting be enabled when rendering this target?
+		*/
+		const bool& lighting_enabled() const;
+
+		/**
 		* @brief Sets the post processing effect of this render target
 		* @param[in] path (const std::string&) The path to the effect file
 		*/
@@ -174,6 +179,12 @@ namespace snuffbox
 		*/
 		void set_clear_depth(const bool& v);
 
+		/**
+		* @brief Should lighting be enabled for this render target?
+		* @param[in] v (const bool&) The boolean value
+		*/
+		void set_lighting_enabled(const bool& v);
+
 		/// Default destructor
 		virtual ~D3D11RenderTarget();
 
@@ -191,6 +202,7 @@ namespace snuffbox
 		std::string technique_; //!< The technique of this render target
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
 		bool clear_depth_; //!< Should the depth buffer be cleared for this render target?
+		bool lighting_enabled_; //!< Should lighting be enabled when rendering this render target?
 
 	public:
 		JS_NAME("RenderTarget");
@@ -203,5 +215,7 @@ namespace snuffbox
     static void JSAddMultiTarget(JS_ARGS args);
 		static void JSSetClearDepth(JS_ARGS args);
 		static void JSClearDepth(JS_ARGS args);
+		static void JSSetLightingEnabled(JS_ARGS args);
+		static void JSLightingEnabled(JS_ARGS args);
 	};
 }
