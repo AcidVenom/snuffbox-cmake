@@ -1,7 +1,8 @@
 Game.targets = Game.targets || {
 	gbuffer: new RenderTarget("G-Buffer"),
 	normals: new RenderTarget("Normals"),
-	directional: new RenderTarget("Directional")
+	directional: new RenderTarget("Directional"),
+	//ui: new RenderTarget("UI")
 }
 
 Game.Initialise = function()
@@ -35,6 +36,10 @@ Game.Initialise = function()
 	Game.targets.gbuffer.setClearDepth(true);
 	Game.targets.gbuffer.addMultiTarget(Game.targets.normals);
 	Game.targets.gbuffer.addMultiTarget(Game.targets.directional);
+
+	Game.text = new Text();
+	Game.text.setText("There was an attempt");
+	Game.text.spawn("UI");
 }
 
 Game.Update = function(dt)
@@ -82,6 +87,8 @@ Game.Update = function(dt)
 	Game.skybox.setTranslation(t.x, t.y, t.z);
 
 	Game.model.setRotation(0, 0, 0);
+
+
 }
 
 Game.FixedUpdate = function(timeSteps, fixedDelta)
@@ -92,6 +99,7 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 Game.Draw = function(dt)
 {
 	Game.render(Game.camera, Game.targets.gbuffer);
+	//Game.render(Game.camera, Game.targets.ui);
 }
 
 Game.Shutdown = function()

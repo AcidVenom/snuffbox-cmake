@@ -20,7 +20,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11Polygon::AddVertex(const XMFLOAT4& position, const XMFLOAT4& colour, const XMFLOAT2& texcoord, const XMFLOAT3& normal)
   {
-    vertices_.push_back({ position, colour, texcoord, normal });
+    vertices_.push_back(Vertex(position, colour, texcoord, normal));
   }
 
   //-------------------------------------------------------------------------------------------

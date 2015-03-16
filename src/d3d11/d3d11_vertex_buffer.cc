@@ -78,8 +78,34 @@ namespace snuffbox
 		unsigned int idx1, idx2, idx3;
 		XMVECTOR e1, e2, t1, t2;
 		XMVECTOR p, uv, tangent, bitangent;
-		std::vector<XMVECTOR> tangents;
-		std::vector<XMVECTOR> bitangents;
+		XMFLOAT3 store;
+
+		auto average_tangents = [this](Vertex& v1, const unsigned int& skip)
+		{
+			XMVECTOR old;
+			XMVECTOR tangent = XMLoadFloat3(&v1.tangent);
+			XMVECTOR bitangent = XMLoadFloat3(&v1.bitangent);
+
+			for (unsigned int i = 0; i < indices_.size(); ++i)
+			{
+				if (i == skip)
+				{
+					continue;
+				}
+				Vertex& v2 = vertices_.at(indices_.at(i));
+
+				if (v1.position.x == v2.position.x && v1.position.y == v2.position.y && v1.position.z == v2.position.z)
+				{
+					old = XMLoadFloat3(&v2.tangent);
+					old += tangent;
+					XMStoreFloat3(&v2.tangent, old);
+
+					old = XMLoadFloat3(&v2.bitangent);
+					old += bitangent;
+					XMStoreFloat3(&v2.bitangent, old);
+				}
+			}
+		};
 
 		for (unsigned int i = 0; i < indices_.size(); i += 3)
 		{
@@ -103,18 +129,17 @@ namespace snuffbox
 			tangent = (e1 * XMVectorGetY(t2) - e2 * XMVectorGetY(t1)) * r;
 			bitangent = (e2 * XMVectorGetX(t1) - e1 * XMVectorGetX(t2)) * r;
 
-			for (unsigned int j = 0; j < 3; ++j)
-			{
-				tangents.push_back(tangent);
-				bitangents.push_back(bitangent);
-			}
+			XMStoreFloat3(&store, tangent);
+			v1.tangent = v2.tangent = v3.tangent = store;
+
+			XMStoreFloat3(&store, bitangent);
+			v1.bitangent = v2.bitangent = v3.bitangent = store;
 		}
 
 		for (unsigned int i = 0; i < indices_.size(); ++i)
 		{
 			Vertex& v = vertices_.at(indices_.at(i));
-			XMStoreFloat3(&v.tangent, tangents.at(i));
-			XMStoreFloat3(&v.bitangent, bitangents.at(i));
+			average_tangents(v, i);
 		}
   }
 

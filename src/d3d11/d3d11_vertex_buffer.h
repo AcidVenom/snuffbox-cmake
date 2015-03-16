@@ -12,12 +12,38 @@ namespace snuffbox
   */
   struct Vertex
   {
+		/// Default constructor
+		Vertex() :
+			position(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)),
+			colour(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)),
+			tex_coords(XMFLOAT2(0.0f, 0.0f)),
+			normal(XMFLOAT3(0.0f, 0.0f, 0.0f)),
+			tangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
+			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f))
+		{}
+
+		/**
+		* @brief Construct a new vertex with given attributes
+		* @param[in] p (const XMFLOAT4&) The position of the new vertex
+		* @param[in] c (const XMFLOAT4&) The colour of the new vertex
+		* @param[in] t (const XMFLOAT2&) The texture coordinates of the new vertex
+		* @param[in] n (const XMFLOAT3&) The normal of the new vertex
+		*/
+		Vertex(const XMFLOAT4& p, const XMFLOAT4& c, const XMFLOAT2& t, const XMFLOAT3 n) :
+			position(p),
+			colour(c),
+			tex_coords(t),
+			normal(n),
+			tangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
+			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f))
+		{}
+
     XMFLOAT4 position; //!< The position of the vertex
     XMFLOAT4 colour; //!< The colour of the vertex
     XMFLOAT2 tex_coords; //!< The texture coordinates of the vertex
     XMFLOAT3 normal; //!< The normal of the vertex
     XMFLOAT3 tangent; //!< The tangent of this vertex
-    XMFLOAT3 bitangent; //!< The bitangent of this vertex
+		XMFLOAT3 bitangent; //!< The bitangent of this vertex
 
     static const UINT stride_size = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3);
   };

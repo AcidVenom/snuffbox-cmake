@@ -76,7 +76,11 @@ namespace snuffbox
   {
 		if (spawned_ == false)
 		{
-      D3D11RenderTarget* t = D3D11RenderDevice::Instance()->GetTarget(target);
+			D3D11RenderTarget* t = D3D11RenderDevice::Instance()->GetTarget(target);
+			if (t == nullptr)
+			{
+				return;
+			}
 			t->queue()->Add(this);
       target_ = t;
 			spawned_ = true;

@@ -18,7 +18,7 @@
 	"specular_power" : 16,
 	"specular_intensity" : 1,
 	"reflectivity" : 1, 
-	"normal_scale" : 1,
+	"normal_scale" : 0.75,
 
 	"effect" : "test.effect"
 }
