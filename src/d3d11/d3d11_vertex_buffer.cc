@@ -83,6 +83,13 @@ namespace snuffbox
 		XMVECTOR p, uv, tangent, bitangent;
 		XMFLOAT3 store;
 
+    if (static_cast<float>(indices_.size()) / 3.0f != std::floor(static_cast<float>(indices_.size()) / 3.0f))
+    {
+      SNUFF_LOG_ERROR("Could not calculate tangents for a given vertex buffer, this is according to the indices size\n\
+        Triangle list topology can be used to prevent this (Given the right indices are used)");
+      return;
+    }
+
 		auto average_tangents = [this](Vertex& v1, const unsigned int& skip)
 		{
 			XMVECTOR old;

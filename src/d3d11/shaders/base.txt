@@ -96,7 +96,7 @@ PSOut PS(VOut input)
 	float4 r = Reflection(input.world_pos, EyePosition, input.normal.rgb);
 	float spec = saturate(Material.SpecularIntensity * TexSpecular.Sample(Sampler, coords).r);
 
-	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse * float4(Blend, 1.0f);
+	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse * float4(Blend, 1.0f) * input.colour;
 	output.colour.a = Material.SpecularPower / 256;
 	output.normal = float4((normal.rgb + 1.0f) / 2.0f, spec);
 

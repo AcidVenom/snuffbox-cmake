@@ -26,7 +26,7 @@ namespace snuffbox
     * @param[in] texcoord (const XMFLOAT2&) The texture coordinates of the vertex
     * @param[in] normal (const XMFLOAT3&) The normal of the vertex
     */
-    void AddVertex(const XMFLOAT4& position, const XMFLOAT4& colour, const XMFLOAT2& texcoord, const XMFLOAT3& normal);
+    void AddVertex(const XMFLOAT4& position, const XMFLOAT4& colour, const XMFLOAT2& texcoord, const XMFLOAT3& normal, const XMFLOAT3& tangent, const XMFLOAT3& bitangent);
 
     /**
     * @brief Removes a vertex at a given index
@@ -42,7 +42,7 @@ namespace snuffbox
     * @param[in] texcoord (const XMFLOAT2&) The texture coordinates of the vertex
     * @param[in] normal (const XMFLOAT3&) The normal of the vertex
     */
-    void SetVertex(const int& idx, const XMFLOAT4& position, const XMFLOAT4& colour, const XMFLOAT2& texcoords, const XMFLOAT3& normal);
+    void SetVertex(const int& idx, const XMFLOAT4& position, const XMFLOAT4& colour, const XMFLOAT2& texcoords, const XMFLOAT3& normal, const XMFLOAT3& tangent, const XMFLOAT3& bitangent);
 
     /// Clears all vertices
     void ClearVertices();
@@ -79,8 +79,11 @@ namespace snuffbox
     */
     int NumIndices();
 
-    /// Creates the vertex buffer
-    void Flush();
+    /**
+    * @brief Flushes the vertex buffer
+    * @param[in] tangents (const bool&) Should tangents be calculated for this polygon? Default = false
+    */
+    void Flush(const bool& tangents = false);
 
     /**
     * @brief Sets the primitive topology of this polygon
