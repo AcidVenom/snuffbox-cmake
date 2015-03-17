@@ -32,6 +32,7 @@ namespace snuffbox
 	class D3D11Lighting;
   class D3D11Material;
 	class D3D11Line;
+	class D3D11RasterizerState;
 
 	/**
 	* @class snuffbox::D3D11RenderDevice
@@ -221,6 +222,11 @@ namespace snuffbox
     D3D11DepthState* current_depth_state();
 
 		/**
+		* @return snuffbox::D3D11DepthState* The currently set rasterizer state
+		*/
+		D3D11RasterizerState* current_rasterizer_state();
+
+		/**
 		* @return snuffbox::D3D11RenderTarget* The current target being rendered to
 		*/
 		D3D11RenderTarget* current_target();
@@ -266,9 +272,19 @@ namespace snuffbox
     D3D11BlendState* default_blend_state();
 
 		/**
+		* @return snuffbox::D3D11RasterizerState* The default rasterizer state
+		*/
+		D3D11RasterizerState* default_rasterizer_state();
+
+		/**
 		* @return snuffbox::D3D11Viewport* The viewport a render target uses
 		*/
 		D3D11Viewport* viewport_render_target();
+
+		/**
+		* @return snuffbox::D3D11Viewport* The viewport the full screen pass uses
+		*/
+		D3D11Viewport* viewport();
 
     /**
     * @brief Sets the current vertex buffer type
@@ -306,6 +322,12 @@ namespace snuffbox
     */
     void set_current_blend_state(D3D11BlendState* state);
 
+		/**
+		* @brief Sets the current rasterizer state
+		* @param[in] state (snuffbox::D3D11RasterizerState*) The state to set
+		*/
+		void set_current_rasterizer_state(D3D11RasterizerState* state);
+
 		/// Default destructor
 		virtual ~D3D11RenderDevice();
 
@@ -340,6 +362,7 @@ namespace snuffbox
 
     SharedPtr<D3D11BlendState> default_blend_state_; //!< The default blend state
 		SharedPtr<D3D11DepthState> default_depth_state_; //!< The default depth state
+		SharedPtr<D3D11RasterizerState> default_rasterizer_state_; //!< The default rasterizer state
 
 		ID3D11DepthStencilView* depth_stencil_view_; //!< The depth stencil view
 		ID3D11Texture2D* depth_stencil_buffer_; //!< The actual depth stencil texture
@@ -350,6 +373,7 @@ namespace snuffbox
     D3D11VertexBuffer* current_model_; //!< The currently set model
     D3D11BlendState* current_blend_state_; //!< The currently set blend state
     D3D11DepthState* current_depth_state_; //!< The currently set depth state
+		D3D11RasterizerState* current_rasterizer_state_; //!< The currently set rasterizer state
 
 		D3D11Lighting* lighting_; //!< The lighting system
 		D3D11Line* line_; //!< The line system

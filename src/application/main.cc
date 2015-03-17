@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 	while (game->started())
 	{
 		game->Run();
-    js_state_wrapper->isolate()->IdleNotification(32);
+    js_state_wrapper->isolate()->IdleNotification(16);
 
 		ContentManager::Instance()->UnloadAll();
 

@@ -92,6 +92,8 @@ SET (D3DSources
 	d3d11/d3d11_line.cc
 	d3d11/d3d11_uniforms.h
 	d3d11/d3d11_uniforms.cc
+	d3d11/d3d11_rasterizer_state.h
+	d3d11/d3d11_rasterizer_state.cc
 )
 
 SET (D3DElements

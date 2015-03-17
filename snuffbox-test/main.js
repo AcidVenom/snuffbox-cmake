@@ -53,6 +53,8 @@ Game.Initialise = function()
 
 	Game.camera.setNearPlane(1);
 	Game.camera.setFarPlane(1000);
+	Game.camera.setTranslation(45, 45, 50);
+	Game.camera.setRotation(0.75, -1.6, 0);
 
 	Game.targets.gbuffer.setClearDepth(true);
 	Game.targets.gbuffer.setLightingEnabled(true);
@@ -63,9 +65,9 @@ Game.Initialise = function()
 	Game.light.setDirection(0, -1, -1);
 
 	Game.spheres = [];
-	for (var x = 0; x < 10; ++x)
+	for (var x = 0; x < 2; ++x)
 	{
-		for (var y = 0; y < 10; ++y)
+		for (var y = 0; y < 2; ++y)
 		{
 			Game.spheres.push(new TestSphere(x * 12, 0, y * 12));
 		}

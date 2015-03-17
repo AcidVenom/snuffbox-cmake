@@ -23,6 +23,7 @@ namespace snuffbox
 			D3D11Shader* shader;
 			SharedPtr<D3D11BlendState> blend_state;
 			SharedPtr<D3D11DepthState> depth_state;
+			SharedPtr<D3D11RasterizerState> rasterizer_state;
 			D3D11SamplerState::SamplerTypes sampling;
 		};
 

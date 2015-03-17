@@ -1,6 +1,7 @@
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_blend_state.h"
 #include "../d3d11/d3d11_depth_state.h"
+#include "../d3d11/d3d11_rasterizer_state.h"
 #include "../d3d11/d3d11_shader.h"
 
 #include "../content/content_manager.h"
@@ -103,6 +104,9 @@ namespace snuffbox
 				new_pass.depth_state = AllocatedMemory::Instance().Construct<D3D11DepthState>();
 				new_pass.depth_state->CreateFromJson(pass->ToObject()->Get(String::NewFromUtf8(isolate, "depth"))->ToObject());
 
+				new_pass.rasterizer_state = AllocatedMemory::Instance().Construct<D3D11RasterizerState>();
+				new_pass.rasterizer_state->CreateFromJson(pass->ToObject()->Get(String::NewFromUtf8(isolate, "rasterizer"))->ToObject());
+
 				new_pass.sampling = StringToSampling(*String::Utf8Value(pass->ToObject()->Get(String::NewFromUtf8(isolate, "sampling"))->ToString()));
 				new_passes.push_back(new_pass);
 			}
@@ -155,6 +159,15 @@ namespace snuffbox
       {
         render_device->default_depth_state()->Set();
       }
+
+			if (pass.rasterizer_state != nullptr)
+			{
+				pass.rasterizer_state->Set();
+			}
+			else
+			{
+				render_device->default_rasterizer_state()->Set();
+			}
 
       render_device->SetSampler(static_cast<D3D11SamplerState::SamplerTypes>(pass.sampling));
 

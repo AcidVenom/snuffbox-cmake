@@ -10,6 +10,7 @@
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_blend_state.h"
 #include "../d3d11/d3d11_depth_state.h"
+#include "../d3d11/d3d11_rasterizer_state.h"
 #include "../d3d11/d3d11_effect.h"
 #include "../d3d11/d3d11_lighting.h"
 #include "../d3d11/d3d11_texture.h"
@@ -43,15 +44,16 @@ namespace snuffbox
 		swap_chain_(nullptr),
 		device_(nullptr),
 		context_(nullptr),
-    vertex_buffer_type_(-1),
+		vertex_buffer_type_(-1),
 		camera_(nullptr),
 		depth_stencil_view_(nullptr),
 		current_shader_(nullptr),
 		lighting_(nullptr),
 		current_target_(nullptr),
-    current_model_(nullptr),
-    current_blend_state_(nullptr),
-    current_depth_state_(nullptr)
+		current_model_(nullptr),
+		current_blend_state_(nullptr),
+		current_depth_state_(nullptr),
+		current_rasterizer_state_(nullptr)
 	{
 
 	}
@@ -100,6 +102,11 @@ namespace snuffbox
 
 		default_depth_state_->CreateFromJson(std::string("{}"));
 		default_depth_state_->Set();
+
+		default_rasterizer_state_ = AllocatedMemory::Instance().Construct<D3D11RasterizerState>();
+
+		default_rasterizer_state_->CreateFromJson(std::string("{}"));
+		default_rasterizer_state_->Set();
 
     default_texture_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     default_texture_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
@@ -155,7 +162,7 @@ namespace snuffbox
 
 		HRESULT result = S_OK;
 
-		D3D_FEATURE_LEVEL feature_levels_requested = D3D_FEATURE_LEVEL_10_0;
+		D3D_FEATURE_LEVEL feature_levels_requested = D3D_FEATURE_LEVEL_11_0;
 		D3D_FEATURE_LEVEL feature_levels_supported;
 
 		UINT device_flags = 0;
@@ -545,6 +552,13 @@ namespace snuffbox
 		sampler_linear_->Set();
     back_buffer_->Set(context_);
 
+		D3D11_RECT rect;
+		rect.top = 0;
+		rect.left = 0;
+		rect.right = static_cast<int>(viewport_->width());
+		rect.bottom = static_cast<int>(viewport_->height());
+
+		context_->RSSetScissorRects(1, &rect);
     viewport_->Set();
     screen_quad_->Set();
 
@@ -596,6 +610,7 @@ namespace snuffbox
 
 		current_shader_ = nullptr;
 		current_target_ = nullptr;
+		current_rasterizer_state_ = nullptr;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -628,7 +643,7 @@ namespace snuffbox
 		}
 
     CreateBaseViewport();
-
+		current_rasterizer_state_ = nullptr;
 		ready_ = true;
 	}
 
@@ -845,6 +860,12 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
+	D3D11RasterizerState* D3D11RenderDevice::current_rasterizer_state()
+	{
+		return current_rasterizer_state_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	D3D11RenderTarget* D3D11RenderDevice::current_target()
 	{
 		return current_target_;
@@ -899,7 +920,19 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
+	D3D11RasterizerState* D3D11RenderDevice::default_rasterizer_state()
+	{
+		return default_rasterizer_state_.get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	D3D11Viewport* D3D11RenderDevice::viewport_render_target()
+	{
+		return viewport_render_target_.get();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Viewport* D3D11RenderDevice::viewport()
 	{
 		return viewport_.get();
 	}
@@ -939,6 +972,12 @@ namespace snuffbox
   {
     current_depth_state_ = state;
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderDevice::set_current_rasterizer_state(D3D11RasterizerState* state)
+	{
+		current_rasterizer_state_ = state;
+	}
 
   //-------------------------------------------------------------------------------------------
 	D3D11RenderDevice::~D3D11RenderDevice()

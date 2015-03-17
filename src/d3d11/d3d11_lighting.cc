@@ -4,6 +4,7 @@
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_vertex_buffer.h"
 #include "../d3d11/d3d11_blend_state.h"
+#include "../d3d11/d3d11_viewport.h"
 
 namespace snuffbox
 {
@@ -61,6 +62,10 @@ namespace snuffbox
 	{
 		additive_->Set();
 		D3D11Light* light = nullptr;
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		ID3D11DeviceContext* ctx = render_device->context();
+		D3D11Viewport* vp = render_device->viewport_render_target();
+
 		for (unsigned int i = 0; i < lights_.size(); ++i)
 		{
 			light = lights_.at(i);
@@ -69,6 +74,13 @@ namespace snuffbox
 			{
 				continue;
 			}
+
+			D3D11_RECT rect;
+			rect.top = 0;
+			rect.bottom = static_cast<int>(vp->height());
+			rect.left = 0;
+			rect.right = static_cast<int>(vp->width());
+			ctx->RSSetScissorRects(1, &rect);
 
 			const D3D11Light::Attributes& a = light->attributes();
 			buffer->Map({ a });
