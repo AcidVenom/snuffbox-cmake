@@ -153,6 +153,11 @@ namespace snuffbox
 		*/
 		const bool& focussed() const;
 
+    /**
+    * @return Should the cursor be clipped to the window?
+    */
+    const bool& cursor_clip() const;
+
 		/**
 		* @brief Sets the width of this window
 		* @param[in] w (const int&) The width to set
@@ -165,6 +170,12 @@ namespace snuffbox
 		*/
 		void set_height(const int& h);
 
+    /**
+    * @brief Sets if the cursor should be clipped
+    * @param[in] v (const bool&) The boolean value
+    */
+    void set_cursor_clip(const bool& v);
+
 	private:
 		int x_; //!< The x position of this window
 		int y_; //!< The y position of this window
@@ -175,6 +186,7 @@ namespace snuffbox
 		HINSTANCE instance_; //!< The window instance
 		bool focussed_; //!< Is the window focussed?
 		POINT mouse_position_; //!< The mouse position
+    bool cursor_clip_; //!< Should the cursor be clipped?
 
   public:
     JS_NAME("Window");
@@ -183,5 +195,6 @@ namespace snuffbox
     static void JSSize(JS_ARGS args);
     static void JSSetName(JS_ARGS args);
     static void JSName(JS_ARGS args);
+    static void JSSetCursorClip(JS_ARGS args);
 	};
 }

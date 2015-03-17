@@ -29,10 +29,26 @@ namespace snuffbox
 			return DefWindowProcA(hWnd, message, wParam, lParam);
 		}
 
+    if (window->focussed() == true && window->cursor_clip() == true)
+    {
+      RECT rc;
+
+      GetClientRect(hWnd, &rc);
+      ClientToScreen(hWnd, reinterpret_cast<POINT*>(&rc.left));
+      ClientToScreen(hWnd, reinterpret_cast<POINT*>(&rc.right));
+
+      ClipCursor(&rc);
+    }
+    else
+    { 
+      ClipCursor(NULL);
+    }
+
 		POINT p;
 		if (GetCursorPos(&p))
 		{
 			ScreenToClient(hWnd, &p);
+
 			window->SetMousePosition(p.x, p.y);
 		}
 
@@ -120,7 +136,8 @@ namespace snuffbox
 		width_(w),
 		height_(h),
 		name_(name),
-		focussed_(true)
+		focussed_(true),
+    cursor_clip_(false)
 	{
 		Initialise();
 	}
@@ -378,6 +395,12 @@ namespace snuffbox
 		return focussed_;
 	}
 
+  //-------------------------------------------------------------------------------------------
+  const bool& Win32Window::cursor_clip() const
+  {
+    return cursor_clip_;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void Win32Window::set_width(const int& w)
 	{
@@ -390,11 +413,18 @@ namespace snuffbox
 		height_ = h;
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::set_cursor_clip(const bool& v)
+  {
+    cursor_clip_ = v;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	Win32Window::~Win32Window()
 	{
 		SNUFF_ASSERT_NOTNULL(handle_, "Win32Window::~Win32Window");
 		DestroyWindow(handle_);
+    ClipCursor(NULL);
 		UnregisterClassA(SNUFF_WINDOW_CLASS, instance_);
 		SNUFF_LOG_INFO("Destroyed the window with name '" + name_ + "'");
 	}
@@ -406,7 +436,8 @@ namespace snuffbox
       { "setSize", JSSetSize },
       { "size", JSSize },
       { "setName", JSSetName },
-      { "name", JSName }
+      { "name", JSName },
+      { "setCursorClip", JSSetCursorClip }
     };
 
     JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -456,6 +487,18 @@ namespace snuffbox
     if (wrapper.Check("S") == true)
     {
       self->SetName(wrapper.GetValue<std::string>(0, self->name()));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void Win32Window::JSSetCursorClip(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    Window* self = Game::Instance()->window();
+
+    if (wrapper.Check("B") == true)
+    {
+      self->set_cursor_clip(wrapper.GetValue<bool>(0, false));
     }
   }
 }
