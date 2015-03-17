@@ -277,7 +277,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Terrain::Flush()
 	{
-		vertex_buffer_->Create(vertices_, indices_);
+		vertex_buffer_->Create(vertices_, indices_, false);
 	}
 
   //-------------------------------------------------------------------------------------------
