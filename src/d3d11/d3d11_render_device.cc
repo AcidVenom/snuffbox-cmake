@@ -114,7 +114,7 @@ namespace snuffbox
     default_texture_->Validate();
 
     default_normal_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
-    default_normal_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), sizeof(D3DXCOLOR));
+    default_normal_->Create(1, 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), sizeof(D3DXCOLOR));
     default_normal_->Validate();
 
     default_cube_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();

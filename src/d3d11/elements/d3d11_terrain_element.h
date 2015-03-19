@@ -169,6 +169,7 @@ namespace snuffbox
 		std::vector<int> indices_; //!< The indices of this terrain
 		int width_; //!< The width of the terrain
 		int height_; //!< The height of the terrain
+    float texture_size_; //!< The default texture width of this terrain
 
   public:
     JS_NAME("Terrain");
@@ -181,6 +182,7 @@ namespace snuffbox
 		static void JSNearestVertices(JS_ARGS args);
 		static void JSSetHeight(JS_ARGS args);
 		static void JSGetHeight(JS_ARGS args);
+    static void JSBrushTexture(JS_ARGS args);
 		static void JSFlush(JS_ARGS args);
   };
 }

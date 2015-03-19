@@ -42,16 +42,16 @@ struct PSOut
 	float4 speculars : SV_Target2;
 };
 
-float4 PS(VOut input)
+PSOut PS(VOut input)
 {
 	PSOut output;
 
 	float4 mask = Mask.Sample(Sampler, input.texcoord);
-	mask.rgb = (mask.r + mask.g + mask.b) / 3.0f;
+	float a = (mask.r + mask.g + mask.b) / 3.0f;
 
-	output.colour = Diffuse.Sample(Sampler, input.texcoord) * mask;
-	output.normals = Normal.Sample(Sampler, input.texcoord) * mask;
-	output.speculars = Specular.Sample(Sampler, input.texcoord) * mask;
+	output.colour = Diffuse.Sample(Sampler, input.texcoord);
+	output.normals = Normal.Sample(Sampler, input.texcoord)
+	output.speculars = Specular.Sample(Sampler, input.texcoord);
 
 	return output;
 }

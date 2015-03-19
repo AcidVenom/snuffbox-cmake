@@ -52,8 +52,9 @@ namespace snuffbox
 		/**
 		* @brief Creates the actual texture by a shader resource view
 		* @param[in] texture (ID3D11ShaderResourceView*) The shader resource view to create this texture with
+    * @param[in] release (const bool&) Should the texture be released on destruction?
 		*/
-		void Create(ID3D11ShaderResourceView* texture);
+		void Create(ID3D11ShaderResourceView* texture, const bool& release = true);
 
 		/**
 		* @brief Creates a cube map from a given cube map description
@@ -102,6 +103,7 @@ namespace snuffbox
 		bool valid_; //!< Is this texture valid
 		int width_; //!< The width of the texture
 		int height_; //!< The height of the texture
+    bool release_; //!< Should the texture be released on destruction?
 		ID3D11ShaderResourceView* texture_; //!< The actual texture
 		DXGI_FORMAT format_; //!< The format of this texture
 	};

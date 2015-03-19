@@ -15,7 +15,8 @@ namespace snuffbox
 		width_(0),
 		height_(0),
 		valid_(false),
-		texture_(nullptr)
+		texture_(nullptr),
+    release_(true)
 	{
 
 	}
@@ -107,10 +108,11 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Texture::Create(ID3D11ShaderResourceView* texture)
+	void D3D11Texture::Create(ID3D11ShaderResourceView* texture, const bool& release)
 	{
 		texture_ = texture;
 		valid_ = true;
+    release_ = release;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -194,6 +196,7 @@ namespace snuffbox
 
 			ID3D11RenderTargetView* target;
 			hr = device->CreateRenderTargetView(texture, &view_desc, &target);
+      SNUFF_XASSERT(hr == S_OK, render_device->HRToString(hr, "CreateRenderTargetView"), "D3D11Texture::CreateCubeMap");
 
 			ctx->OMSetRenderTargets(1, &target, nullptr);
 
@@ -302,7 +305,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Texture::~D3D11Texture()
 	{
-		if (valid_ == false)
+		if (valid_ == false || release_ == false)
 		{
 			return;
 		}

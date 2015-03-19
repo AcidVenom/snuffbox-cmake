@@ -21,7 +21,9 @@ namespace snuffbox
 		post_processing_(nullptr),
 		technique_("Default"),
 		clear_depth_(false),
-		lighting_enabled_(false)
+		lighting_enabled_(false),
+    width_(-1),
+    height_(-1)
 	{
     
 	}
@@ -35,7 +37,9 @@ namespace snuffbox
 		post_processing_(nullptr),
 		technique_("Default"),
 		clear_depth_(false),
-		lighting_enabled_(false)
+		lighting_enabled_(false),
+    width_(-1),
+    height_(-1)
 	{
 		JSWrapper wrapper(args);
 		
@@ -111,20 +115,22 @@ namespace snuffbox
         desc.Height = height_;
       }
 
-			result = device->CreateTexture2D(&desc, NULL, &buffer_);
+      if (buffer_ == nullptr)
+      {
+        result = device->CreateTexture2D(&desc, NULL, &buffer_);
+        SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateTexture2D"), "D3D11RenderTarget::Create");
 
-			SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateTexture2D"), "D3D11RenderTarget::Create");
+        D3D11_SHADER_RESOURCE_VIEW_DESC view_desc;
 
-			D3D11_SHADER_RESOURCE_VIEW_DESC view_desc;
+        view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        view_desc.Texture2D.MipLevels = 1;
+        view_desc.Texture2D.MostDetailedMip = 0;
 
-			view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			view_desc.Texture2D.MipLevels = 1;
-			view_desc.Texture2D.MostDetailedMip = 0;
+        result = device->CreateShaderResourceView(buffer_, &view_desc, &resource_);
 
-			result = device->CreateShaderResourceView(buffer_, &view_desc, &resource_);
-
-			SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateShaderResourceView"), "D3D11RenderTarget::Create");
+        SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateShaderResourceView"), "D3D11RenderTarget::Create");
+      }
 
 			result = device->CreateRenderTargetView(buffer_, NULL, &view_);
 
