@@ -206,6 +206,13 @@ namespace snuffbox
 		JSWrapper::SetObjectValue<double>(obj, "Orthographic", 1.0);
 
 		JSStateWrapper::Instance()->RegisterGlobal("CameraType", obj);
+
+    obj = JSWrapper::CreateObject();
+
+    JSWrapper::SetObjectValue<double>(obj, "Local", 0.0);
+    JSWrapper::SetObjectValue<double>(obj, "Absolute", 1.0);
+
+    JSStateWrapper::Instance()->RegisterGlobal("CameraTransformation", obj);
 	}
 
 	//---------------------------------------------------------------------------------------------------------

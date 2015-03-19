@@ -49,6 +49,9 @@ namespace snuffbox
 		*/
 		void Create(const int& w, const int& h);
 
+    /// Prepares the textures for use
+    void PrepareTextures();
+
 		/**
 		* @brief Maps a world coordinate to indices
 		* @param[in] x (const float&) The x position
@@ -106,8 +109,33 @@ namespace snuffbox
 		*/
 		void CalculateNormals(const int& a, const int& b, const int& c);
 
+    /**
+    * @brief Calculates and returns the texture coordinates relative to the terrain of a world position
+    * @param[in] x (const float&) The world x position
+    * @param[in] y (const float&) The world y position
+    * @return XMFLOAT2 The texture coordinates at the position
+    */
+    XMFLOAT2 GetWorldTextureCoordinates(const float& x, const float& y);
+
+    /**
+    * @brief Brushes a texture onto the terrain with a given brush texture
+    * @param[in] brush (const std::string&) The texture mask for the brush
+    * @param[in] texture (const std::string&) The texture to brush onto the terrain
+    * @param[in] x (const float&) The world x coordinate to brush on
+    * @param[in] y (const float&) The world y coordinate to brush on
+    * @param[in] radius (const float&) The radius of the brush
+    */
+    void BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius);
+
 		/// Flushes the terrain after modification of heights
 		void Flush();
+
+    /**
+    * @brief Sets the texture tiling of the terrain
+    * @param[in] u (const float&) The amount of times the texture needs to tile on the x-axis
+    * @param[in] v (const float&) The amount of times the texture needs to tile on the y-axis
+    */
+    void set_texture_tiling(const float& u, const float& v);
 
     /// @see snuffbox::D3D11RenderElement
     D3D11VertexBuffer* vertex_buffer();
@@ -127,6 +155,16 @@ namespace snuffbox
 
   private:
     SharedPtr<D3D11VertexBuffer> vertex_buffer_; //!< The vertex buffer of this quad
+    SharedPtr<D3D11RenderTarget> diffuses_; //!< The terrain diffuses render target that can be drawn to
+    SharedPtr<D3D11RenderTarget> normals_; //!< The terrain normals render target that can be drawn to
+    SharedPtr<D3D11RenderTarget> speculars_; //!< The terrain speculars render target that can be drawn to
+    SharedPtr<D3D11Texture> diffuse_map_; //!< The diffuse map texture
+    SharedPtr<D3D11Texture> normal_map_; //!< The normal map texture
+    SharedPtr<D3D11Texture> specular_map_; //!< The specular map texture
+    SharedPtr<D3D11Viewport> brush_vp_; //!< The viewport to brush the texture with
+    SharedPtr<D3D11Material> material_; //!< The terrain material
+    XMFLOAT2 texture_tiling_; //!< The texture tiling of this terrain
+    D3D11Shader* brush_shader_; //!< The brush shader for this terrain to use
 		std::vector<Vertex> vertices_; //!< The vertices of this terrain
 		std::vector<int> indices_; //!< The indices of this terrain
 		int width_; //!< The width of the terrain

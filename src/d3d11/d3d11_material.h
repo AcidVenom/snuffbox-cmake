@@ -64,8 +64,10 @@ namespace snuffbox
 		* @brief Sets the textures this material uses
 		* @param[in] diffuse (snuffbox::D3D11Texture*) The diffuse map texture
 		* @param[in] normal (snuffbox::D3D11Texture*) The normal map texture
+		* @param[in] specular (snuffbox::D3D11Texture*) The specular map texture
+		* @param[in] light (snuffbox::D3D11Texture*) The light map texture
 		*/
-		void set_textures(D3D11Texture* diffuse, D3D11Texture* normal = nullptr);
+    void set_textures(D3D11Texture* diffuse, D3D11Texture* normal = nullptr, D3D11Texture* specular = nullptr, D3D11Texture* light = nullptr);
 
 		/// Default destructor
 		~D3D11Material();

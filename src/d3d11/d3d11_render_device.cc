@@ -30,6 +30,7 @@
 #include "../d3d11/shaders/d3d11_ui_shader.h"
 #include "../d3d11/shaders/d3d11_text_shader.h"
 #include "../d3d11/shaders/d3d11_cube_map_shader.h"
+#include "../d3d11/shaders/d3d11_brush_shader.h"
 
 #include <comdef.h>
 
@@ -229,42 +230,25 @@ namespace snuffbox
 			io->CreateDir("shaders");
 		}
 
-		bool exists = IOManager::Instance()->Exists("shaders/base.fx");
-		if (exists == false)
-		{
-			IOManager::Instance()->Write("shaders/base.fx", base_shader);
-		}
-
-		exists = IOManager::Instance()->Exists("shaders/post_processing.fx");
-		if (exists == false)
-		{
-			IOManager::Instance()->Write("shaders/post_processing.fx", post_processing_shader);
-		}
-
-		exists = IOManager::Instance()->Exists("shaders/ui.fx");
-		if (exists == false)
-		{
-			IOManager::Instance()->Write("shaders/ui.fx", ui_shader);
-		}
-
-		exists = IOManager::Instance()->Exists("shaders/text.fx");
-		if (exists == false)
-		{
-			IOManager::Instance()->Write("shaders/text.fx", text_shader);
-		}
-
-    exists = IOManager::Instance()->Exists("shaders/cube_map.fx");
-    if (exists == false)
-    {
-      IOManager::Instance()->Write("shaders/cube_map.fx", cube_map_shader);
-    }
-
     ContentManager* content_manager = ContentManager::Instance();
-    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/base.fx");
-    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/post_processing.fx");
-    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/ui.fx");
-    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/text.fx");
-    content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, "shaders/cube_map.fx");
+
+    auto create_and_load = [io, content_manager](const std::string& path, const char* data)
+    {
+      bool exists = io->Exists(path);
+      if (exists == false)
+      {
+        io->Write(path, data);
+      }
+
+      content_manager->Notify(ContentManager::Events::kLoad, ContentTypes::kShader, path);
+    };
+
+    create_and_load("shaders/base.fx", base_shader);
+    create_and_load("shaders/post_processing.fx", post_processing_shader);
+    create_and_load("shaders/ui.fx", ui_shader);
+    create_and_load("shaders/text.fx", text_shader);
+    create_and_load("shaders/cube_map.fx", cube_map_shader);
+    create_and_load("shaders/brush.fx", brush_shader);
   }
 
   //-------------------------------------------------------------------------------------------

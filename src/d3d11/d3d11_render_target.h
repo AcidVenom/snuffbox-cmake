@@ -41,8 +41,10 @@ namespace snuffbox
 		* @param[in] type (snuffbox::D3D11RenderTarget::RenderTargets) The type of the render target
 		* @param[in] swap_chain (IDXGISwapChain*) The swap chain to create the target with
 		* @param[in] device (ID3D11Device*) The device to create the target with
+    * @param[in] w (const int&) The width of the new render target, if none is provided, it defaults to the back buffer width
+    * @param[in] h (const int&) The width of the new render target, if none is provided, it defaults to the back buffer height
 		*/
-		void Create(RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device);
+		void Create(RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device, const int& w = -1, const int& h = -1);
 
 		/**
 		* @brief Retrieves the description of the view of this render target
@@ -203,6 +205,8 @@ namespace snuffbox
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
 		bool clear_depth_; //!< Should the depth buffer be cleared for this render target?
 		bool lighting_enabled_; //!< Should lighting be enabled when rendering this render target?
+    int width_; //!< The width of this target
+    int height_; //!< The height of this target
 
 	public:
 		JS_NAME("RenderTarget");

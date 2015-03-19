@@ -1,14 +1,23 @@
 #include "../../d3d11/elements/d3d11_terrain_element.h"
+#include "../../d3d11/d3d11_material.h"
+#include "../../d3d11/d3d11_render_target.h"
+#include "../../d3d11/d3d11_viewport.h"
+#include "../../d3d11/d3d11_shader.h"
 #include "../../d3d11/d3d11_vertex_buffer.h"
+#include "../../content/content_manager.h"
 
 #undef max
+
+static int terrain_textures = -1;
 
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
 	D3D11Terrain::D3D11Terrain() :
 		width_(256),
-		height_(256)
+		height_(256),
+    texture_tiling_(1.0f, 1.0f),
+    brush_shader_(nullptr)
   {
     Create(width_, height_);
   }
@@ -17,7 +26,9 @@ namespace snuffbox
 	D3D11Terrain::D3D11Terrain(JS_ARGS args) :
 		D3D11RenderElement(args),
 		width_(256),
-		height_(256)
+		height_(256),
+    texture_tiling_(1.0f, 1.0f),
+    brush_shader_(nullptr)
   {
 		Create(width_, height_);
   }
@@ -31,7 +42,17 @@ namespace snuffbox
 		vertices_.clear();
 		indices_.clear();
 
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
+
+    PrepareTextures();
+
+    material_ = AllocatedMemory::Instance().Construct<D3D11Material>();
+    
+    D3D11Material* default_mat = render_device->default_material();
+    material_->set_effect(default_mat->effect());
+    material_->set_textures(diffuse_map_.get(), normal_map_.get(), specular_map_.get());
+    material_->Validate();
 
 		for (int y = 0; y < height_; y++)
 		{
@@ -41,7 +62,7 @@ namespace snuffbox
 
 				vertex.position = XMFLOAT4(static_cast<float>(x), 0.0f, static_cast<float>(y), 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-				vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_, static_cast<float>(y) / height_);
+        vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_ * texture_tiling_.x, static_cast<float>(y) / height_ * texture_tiling_.y);
 				vertex.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 				vertex.tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -65,6 +86,39 @@ namespace snuffbox
 		}
 
 		vertex_buffer_->Create(vertices_, indices_, false);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::PrepareTextures()
+  {
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+    ++terrain_textures;
+    diffuses_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("TerrainTextureDiffuse" + std::to_string(terrain_textures));
+    diffuses_->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, render_device->swap_chain(), render_device->device(), width_, height_);
+
+    normals_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("TerrainTextureNormals" + std::to_string(terrain_textures));
+    normals_->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, render_device->swap_chain(), render_device->device(), width_, height_);
+
+    speculars_ = AllocatedMemory::Instance().Construct<D3D11RenderTarget>("TerrainTextureSpeculars" + std::to_string(terrain_textures));
+    speculars_->Create(D3D11RenderTarget::RenderTargets::kRenderTarget, render_device->swap_chain(), render_device->device(), width_, height_);
+
+    diffuses_->AddMultiTarget(normals_.get());
+    diffuses_->AddMultiTarget(speculars_.get());
+
+    render_device->AddRenderTarget(diffuses_.get());
+
+    brush_vp_ = AllocatedMemory::Instance().Construct<D3D11Viewport>();
+    brush_vp_->Create(0.0f, 0.0f, static_cast<float>(width_), static_cast<float>(height_));
+
+    diffuse_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    diffuse_map_->Create(diffuses_->resource());
+
+    normal_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    normal_map_->Create(normals_->resource());
+
+    specular_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
+    specular_map_->Create(speculars_->resource());
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -274,11 +328,122 @@ namespace snuffbox
 		va.normal = normal;
 	}
 
-	//-------------------------------------------------------------------------------------------
-	void D3D11Terrain::Flush()
-	{
-		vertex_buffer_->Create(vertices_, indices_, false);
-	}
+  //-------------------------------------------------------------------------------------------
+  XMFLOAT2 D3D11Terrain::GetWorldTextureCoordinates(const float& x, const float& y)
+  {
+    XMVECTOR p1 = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+    XMVECTOR p2 = XMVectorSet(static_cast<float>(width_), 0.0f, static_cast<float>(height_), 1.0f);
+    XMVECTOR deter = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+
+    XMVECTOR p = XMVectorSet(x, 0.0f, y, 1.0f);
+    p = XMVector4Transform(p, XMMatrixInverse(&deter, world_matrix()));
+
+    XMVECTOR offset = p - p1;
+    XMVECTOR tex_coords = offset / p2;
+
+    XMFLOAT2 to_return;
+    XMStoreFloat2(&to_return, tex_coords);
+
+    to_return.x *= texture_tiling_.x;
+    to_return.y *= texture_tiling_.y;
+
+    return to_return;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius)
+  {
+    if (brush_shader_ == nullptr)
+    {
+      SNUFF_LOG_ERROR("The shader 'brush.fx' was never loaded, thus there cannot be brushed to the terrain");
+      return;
+    }
+
+    ContentManager* content_manager = ContentManager::Instance();
+
+    D3D11Texture* brush_texture = content_manager->Get<D3D11Texture>(brush);
+    D3D11Texture* diffuse = content_manager->Get<D3D11Texture>(texture);
+
+    if (brush_texture == nullptr || diffuse == nullptr)
+    {
+      SNUFF_LOG_ERROR("Tried to paint onto the terrain with an invalid brush or diffuse texture");
+      return;
+    }
+
+    D3D11VertexBuffer brush_vbo(D3D11VertexBuffer::VertexBufferType::kOther);
+
+    std::vector<int> indices = {
+      0, 1, 3, 0, 3, 2
+    };
+
+    float hr = radius / 2.0f;
+    XMFLOAT2 t1 = GetWorldTextureCoordinates(x - hr, y - hr);
+    XMFLOAT2 t2 = GetWorldTextureCoordinates(x + hr, y - hr);
+    XMFLOAT2 t3 = GetWorldTextureCoordinates(x - hr, y + hr);
+    XMFLOAT2 t4 = GetWorldTextureCoordinates(x + hr, y + hr);
+
+    XMVECTOR deter = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+
+    XMVECTOR pv1 = XMVectorSet(x - hr, 0.0f, y - hr, 1.0f);
+    XMVECTOR pv2 = XMVectorSet(x + hr, 0.0f, y - hr, 1.0f);
+    XMVECTOR pv3 = XMVectorSet(x - hr, 0.0f, y + hr, 1.0f);
+    XMVECTOR pv4 = XMVectorSet(x + hr, 0.0f, y + hr, 1.0f);
+
+    XMVECTOR div = XMVectorSet(static_cast<float>(width_), 0.0f, static_cast<float>(height_), 1.0f);
+    XMVECTOR subtract = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+
+    pv1 = (XMVector4Transform(pv1, XMMatrixInverse(&deter, world_matrix())) / div) * 2.0f - subtract;
+    pv2 = (XMVector4Transform(pv2, XMMatrixInverse(&deter, world_matrix())) / div) * 2.0f - subtract;
+    pv3 = (XMVector4Transform(pv3, XMMatrixInverse(&deter, world_matrix())) / div) * 2.0f - subtract;
+    pv4 = (XMVector4Transform(pv4, XMMatrixInverse(&deter, world_matrix())) / div) * 2.0f - subtract;
+
+    XMFLOAT4 p1, p2, p3, p4;
+
+    XMStoreFloat4(&p1, pv1);
+    XMStoreFloat4(&p2, pv2);
+    XMStoreFloat4(&p3, pv3);
+    XMStoreFloat4(&p4, pv4);
+
+    p1.y = p1.z;
+    p2.y = p2.z;
+    p3.y = p3.z;
+    p4.y = p4.z;
+
+    p1.z = p2.z = p3.z = p4.z = 0.0f;
+
+    brush_vbo.Create({
+      Vertex(p1, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t1, XMFLOAT3(0.0f, 0.0f, 1.0f)),
+      Vertex(p2, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t2, XMFLOAT3(0.0f, 0.0f, 1.0f)),
+      Vertex(p3, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t3, XMFLOAT3(0.0f, 0.0f, 1.0f)),
+      Vertex(p4, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t4, XMFLOAT3(0.0f, 0.0f, 1.0f))
+    },
+    indices);
+    
+    D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+    diffuses_->Set(render_device->context());
+    brush_vbo.Set();
+    brush_vp_->Set();
+    brush_shader_->Set();
+
+    D3D11Texture::SetMultipleTextures(0, 2, { brush_texture, diffuse });
+    brush_vbo.Draw();
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::Flush()
+  {
+    vertex_buffer_->Create(vertices_, indices_, false);
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::set_texture_tiling(const float& u, const float& v)
+  {
+    texture_tiling_.x = u;
+    texture_tiling_.y = v;
+
+    Flush();
+  }
 
   //-------------------------------------------------------------------------------------------
 	D3D11VertexBuffer* D3D11Terrain::vertex_buffer()

@@ -260,10 +260,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Material::set_textures(D3D11Texture* diffuse, D3D11Texture* normal)
+  void D3D11Material::set_textures(D3D11Texture* diffuse, D3D11Texture* normal, D3D11Texture* specular, D3D11Texture* light)
 	{
 		diffuse_ = diffuse;
 		normal_ = normal;
+    specular_ = specular;
+    light_map_ = light;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

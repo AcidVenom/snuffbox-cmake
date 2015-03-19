@@ -121,11 +121,13 @@ SET (D3DShaders
 	d3d11/shaders/d3d11_text_shader.h
 	d3d11/shaders/d3d11_post_processing_shader.h
 	d3d11/shaders/d3d11_cube_map_shader.h
+	d3d11/shaders/d3d11_brush_shader.h
 	d3d11/shaders/base.txt
 	d3d11/shaders/post_processing.txt
 	d3d11/shaders/ui.txt
 	d3d11/shaders/text.txt
 	d3d11/shaders/cube_map.txt
+	d3d11/shaders/brush.txt
 )
 
 SET (OGLSources

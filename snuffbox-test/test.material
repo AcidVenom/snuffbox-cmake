@@ -1,9 +1,8 @@
 {
-	"diffuse_map" : "metal.png",
-	"normal_map" : "metal_normal.png",
-	"specular_map" : "metal_specular.png",
-	"specular_intensity" : 1,
-	"specular_power" : 16,
+	"diffuse_map" : "stones.png",
+	"normal_map" : "stones_normal.png",
+	"specular_intensity" : 0.15,
+	"specular_power" : 1,
 	"normal_scale" : 1,
 	"diffuse" : [1, 1, 1, 1],
 	"reflectivity" : 0

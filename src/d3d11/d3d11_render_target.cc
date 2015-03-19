@@ -50,7 +50,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11RenderTarget::Create(D3D11RenderTarget::RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device)
+  void D3D11RenderTarget::Create(D3D11RenderTarget::RenderTargets type, IDXGISwapChain* swap_chain, ID3D11Device* device, const int& w, const int& h)
 	{
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		HRESULT result = S_OK;
@@ -98,6 +98,18 @@ namespace snuffbox
 
 			desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+      if (w != -1 && h != -1)
+      {
+        width_ = w;
+        height_ = h;
+      }
+
+      if (width_ != -1 && height_ != -1)
+      {
+        desc.Width = width_;
+        desc.Height = height_;
+      }
 
 			result = device->CreateTexture2D(&desc, NULL, &buffer_);
 
