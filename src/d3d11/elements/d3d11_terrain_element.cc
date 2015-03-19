@@ -7,6 +7,7 @@
 #include "../../d3d11/d3d11_rasterizer_state.h"
 #include "../../d3d11/d3d11_blend_state.h"
 #include "../../d3d11/d3d11_sampler_state.h"
+#include "../../d3d11/d3d11_uniforms.h"
 #include "../../content/content_manager.h"
 
 #undef max
@@ -63,7 +64,7 @@ namespace snuffbox
     a.ambient = b.ambient;
     a.diffuse = b.diffuse;
     a.emissive = b.emissive;
-    a.normal_scale = b.normal_scale;
+    a.normal_scale = 1.0f;
     a.reflectivity = b.reflectivity;
     a.specular_intensity = 1.0f;
     a.specular_power = b.specular_power;
@@ -80,7 +81,7 @@ namespace snuffbox
 
 				vertex.position = XMFLOAT4(static_cast<float>(x), 0.0f, static_cast<float>(y), 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-        vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_ * texture_tiling_.x, static_cast<float>(y) / height_ * texture_tiling_.y);
+        vertex.tex_coords = XMFLOAT2(static_cast<float>(x) / width_, static_cast<float>(y) / height_);
 				vertex.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 				vertex.tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -139,6 +140,8 @@ namespace snuffbox
     specular_map_ = AllocatedMemory::Instance().Construct<D3D11Texture>();
     specular_map_->Create(speculars_->resource(), false);
     specular_map_->Validate();
+
+    brush_uniform_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -373,7 +376,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius)
+  void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const std::string& normal, const std::string& specular)
   {
     if (brush_shader_ == nullptr)
     {
@@ -385,6 +388,17 @@ namespace snuffbox
 
     D3D11Texture* brush_texture = content_manager->Get<D3D11Texture>(brush);
     D3D11Texture* diffuse = content_manager->Get<D3D11Texture>(texture);
+    D3D11Texture* normal_map, *specular_map = nullptr;
+
+    if (normal != "null")
+    {
+      normal_map = content_manager->Get<D3D11Texture>(normal);
+    }
+
+    if (specular != "null")
+    {
+      specular_map = content_manager->Get<D3D11Texture>(specular);
+    }
 
     if (brush_texture == nullptr || diffuse == nullptr)
     {
@@ -430,6 +444,11 @@ namespace snuffbox
     p1.z = p2.z = p3.z = p4.z = 0.0f;
     p1.w = p2.w = p3.w = p4.w = 1.0f;
 
+    float coords[4] = { t1.x, t1.y, t4.x, t4.y };
+    brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat4, "Brush", coords);
+
+    brush_uniform_->Apply();
+
     std::vector<int> indices = {
       0, 1, 3, 0, 3, 2
     };
@@ -462,7 +481,12 @@ namespace snuffbox
     brush_vp_->Set();
     brush_shader_->Set();
 
-    D3D11Texture::SetMultipleTextures(0, 2, { brush_texture, diffuse, render_device->default_normal(), render_device->default_texture() });
+    D3D11Texture::SetMultipleTextures(0, 4, { 
+      brush_texture, 
+      diffuse, 
+      normal_map == nullptr ? render_device->default_normal() : normal_map,
+      specular_map == nullptr ? render_device->default_texture() : specular_map
+    });
     brush_vbo.Draw();
   }
 
@@ -520,6 +544,7 @@ namespace snuffbox
 			{ "setHeight", JSSetHeight },
       { "getHeight", JSGetHeight },
       { "brushTexture", JSBrushTexture },
+      { "setTextureTiling", JSSetTextureTiling },
 			{ "flush", JSFlush }
 		};
 
@@ -667,7 +692,21 @@ namespace snuffbox
         wrapper.GetValue<std::string>(1, "undefined"),
         wrapper.GetValue<float>(2, 0.0f),
         wrapper.GetValue<float>(3, 0.0f),
-        wrapper.GetValue<float>(4, 1.0f));
+        wrapper.GetValue<float>(4, 1.0f),
+        wrapper.GetValue<std::string>(5, "null"),
+        wrapper.GetValue<std::string>(6, "null"));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::JSSetTextureTiling(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11Terrain* self = wrapper.GetPointer<D3D11Terrain>(args.This());
+
+    if (wrapper.Check("NN") == true)
+    {
+      self->set_texture_tiling(wrapper.GetValue<float>(0, 1.0f), wrapper.GetValue<float>(1, 1.0f));
     }
   }
 

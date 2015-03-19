@@ -5,7 +5,7 @@ R"(cbuffer Global : register(b0)
 	float4x4 Projection;
 }
 
-cbuffer Uniforms : register(b3)
+cbuffer Uniforms : register(b2)
 {
 
 }
