@@ -151,19 +151,6 @@ namespace snuffbox
 		error += ") ";
 
 		error += "Expected '" + TypeToString(expected) + "', but got '" + TypeToString(got) + "' for argument " + std::to_string(arg + 1) + "\n\t";
-		Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 20);
-
-		Local<StackFrame> frame;
-		for (int i = 0; i < stack->GetFrameCount(); ++i)
-		{
-			frame = stack->GetFrame(i);
-			error += "\n\t";
-			error += "at " + std::string(*String::Utf8Value(frame->GetFunctionName())) +
-				" (" + std::string(*String::Utf8Value(frame->GetScriptName())) +
-				":" + std::to_string(frame->GetLineNumber()) + ":" + std::to_string(frame->GetColumn()) + ")";
-		}
-
-		error += "\n";
 
 		SNUFF_LOG_ERROR(error);
 	}

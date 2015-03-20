@@ -98,6 +98,16 @@ namespace snuffbox
 		*/
 		const bool& IsReleased(const Key::Keys& keycode) const;
 
+		/**
+		* @return const snuffbox::Key::Keys& The last key pressed on the keyboard
+		*/
+		const Key::Keys& last_pressed() const;
+
+		/**
+		* @return const snuffbox::Key::Keys& The last key released off of the keyboard
+		*/
+		const Key::Keys& last_released() const;
+
 	private:
 		std::queue<KeyData> queue_; //!< The message queue that still needs processing
 		KeyState						states_[255]; //!< A list of key states
@@ -113,5 +123,7 @@ namespace snuffbox
     static void JSIsPressed(JS_ARGS args);
     static void JSIsDown(JS_ARGS args);
     static void JSIsReleased(JS_ARGS args);
+		static void JSLastPressed(JS_ARGS args);
+		static void JSLastReleased(JS_ARGS args);
 	};
 }

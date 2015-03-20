@@ -88,6 +88,18 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	const Key::Keys& Keyboard::last_pressed() const
+	{
+		return last_pressed_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	const Key::Keys& Keyboard::last_released() const
+	{
+		return last_released_;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	Keyboard::~Keyboard()
 	{
 		ResetStates();
@@ -111,7 +123,9 @@ namespace snuffbox
     JSFunctionRegister funcs[] = {
       { "isPressed", JSIsPressed },
       { "isDown", JSIsDown },
-      { "isReleased", JSIsReleased }
+      { "isReleased", JSIsReleased },
+			{ "lastPressed", JSLastPressed },
+			{ "lastReleased", JSLastReleased }
     };
 
     JSEnumerateKeys();
@@ -145,4 +159,18 @@ namespace snuffbox
 
     wrapper.ReturnValue<bool>(Keyboard::Instance()->IsReleased(static_cast<Key::Keys>(wrapper.GetValue<int>(0, 0))));
   }
+
+	//-------------------------------------------------------------------------------------------
+	void Keyboard::JSLastPressed(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		wrapper.ReturnValue<std::string>(Key::KeyToString(Keyboard::Instance()->last_pressed()));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Keyboard::JSLastReleased(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		wrapper.ReturnValue<std::string>(Key::KeyToString(Keyboard::Instance()->last_released()));
+	}
 }

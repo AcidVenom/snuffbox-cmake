@@ -8,6 +8,8 @@ namespace snuffbox
     type_(type),
     vertex_buffer_(nullptr),
     index_buffer_(nullptr),
+		vertex_size_(0),
+		index_size_(0),
     valid_(false),
     topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
   {
@@ -43,10 +45,10 @@ namespace snuffbox
     D3D11_BUFFER_DESC desc;
     ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
 
-    desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices_.size());
     desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    desc.CPUAccessFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     desc.MiscFlags = 0;
 
     D3D11_SUBRESOURCE_DATA input;
@@ -59,10 +61,10 @@ namespace snuffbox
 
     ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
 
-    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.ByteWidth = static_cast<UINT>(sizeof(int) * indices_.size());
     desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    desc.CPUAccessFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     desc.MiscFlags = 0;
 
     ZeroMemory(&input, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -72,8 +74,58 @@ namespace snuffbox
     result = render_device->device()->CreateBuffer(&desc, &input, &index_buffer_);
     SNUFF_XASSERT(result == S_OK, render_device->HRToString(result, "CreateBuffer"), "D3D11VertexBuffer::Create");
 
+		vertex_size_ = static_cast<unsigned int>(vertices_.size());
+		index_size_ = static_cast<unsigned int>(indices_.size());
+
     valid_ = true;
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11VertexBuffer::Update(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents)
+	{
+		if (tangents == true)
+		{
+			CalculateTangents();
+		}
+		
+		if (valid_ == false)
+		{
+			SNUFF_LOG_WARNING("Attempted to update an invalid vertex buffer");
+			return;
+		}
+
+		if (vertex_size_ != verts.size() || index_size_ != indices.size())
+		{
+			SNUFF_LOG_ERROR("Could not update vertex buffer, the current vertices/indices sizes are not equal to the ones buffered");
+			return;
+		}
+
+		vertices_ = verts;
+		indices_ = indices;
+
+		Vertex* v = nullptr;
+
+		D3D11_MAPPED_SUBRESOURCE data;
+		ID3D11DeviceContext* ctx = D3D11RenderDevice::Instance()->context();
+
+		ctx->Map(vertex_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &data);
+		v = static_cast<Vertex*>(data.pData);
+		for (unsigned int i = 0; i < vertex_size_; ++i)
+		{
+			v[i] = vertices_.at(i);
+		}
+		ctx->Unmap(vertex_buffer_, 0);
+		
+		int* idx = nullptr;
+
+		ctx->Map(index_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &data);
+		idx = static_cast<int*>(data.pData);
+		for (unsigned int i = 0; i < index_size_; ++i)
+		{
+			idx[i] = indices_.at(i);
+		}
+		ctx->Unmap(index_buffer_, 0);
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11VertexBuffer::CalculateTangents()

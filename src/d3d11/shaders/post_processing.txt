@@ -157,8 +157,8 @@ float4 PS(VOut input) : SV_TARGET
 	LightResult result = ComputeLighting(view, position.xyz, normal.rgb, specular_intensity, specular_power);
 	
 	float4 final = diffuse;
-	final *= result.Diffuse;
 	final += result.Specular;
+	final *= result.Diffuse;
 	final.a = result.Specular.a;
 	return final;
 })"

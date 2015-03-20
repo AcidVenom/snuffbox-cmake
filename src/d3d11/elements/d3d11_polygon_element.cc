@@ -6,7 +6,7 @@ namespace snuffbox
   D3D11Polygon::D3D11Polygon() : 
     topology_(static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST))
   {
-
+		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ namespace snuffbox
 		D3D11RenderElement(args),
     topology_(static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST))
   {
-
+		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace snuffbox
   {
     if (idx >= vertices_.size() || idx < 0)
     {
-      SNUFF_LOG_ERROR("Attempted to set a vertex at index '" + std::to_string(idx) + "', this is out of bounds; vertices size is '" + std::to_string(vertices_.size()));
+      SNUFF_LOG_ERROR("Attempted to set a vertex at index '" + std::to_string(idx) + "', this is out of bounds; vertices size is '" + std::to_string(vertices_.size()) + "'");
 
       return;
     }
@@ -81,7 +81,7 @@ namespace snuffbox
   {
     if (idx >= indices_.size() || idx < 0)
     {
-      SNUFF_LOG_ERROR("Attempted to remove an index at index '" + std::to_string(idx) + "', this is out of bounds; indices size is '" + std::to_string(indices_.size()));
+			SNUFF_LOG_ERROR("Attempted to remove an index at index '" + std::to_string(idx) + "', this is out of bounds; indices size is '" + std::to_string(indices_.size()) + "'");
 
       return;
     }
@@ -114,6 +114,18 @@ namespace snuffbox
     return static_cast<int>(indices_.size());
   }
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11Polygon::Create(const bool& tangents)
+	{
+		if (indices_.size() == 0 || vertices_.size() == 0)
+		{
+			SNUFF_LOG_WARNING("Attempted to create a polygon with either 0 vertices or 0 indices, a polygon needs both vertices and indices");
+			return;
+		}
+
+		vertex_buffer_->Create(vertices_, indices_, tangents);
+	}
+
   //-------------------------------------------------------------------------------------------
   void D3D11Polygon::Flush(const bool& tangents)
   {
@@ -123,9 +135,7 @@ namespace snuffbox
       return;
     }
 
-    vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-
-    vertex_buffer_->Create(vertices_, indices_, tangents);
+    vertex_buffer_->Update(vertices_, indices_, tangents);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -176,6 +186,7 @@ namespace snuffbox
       { "removeIndex", JSRemoveIndex },
       { "clearIndices", JSClearIndices },
       { "numIndices", JSNumIndices },
+			{ "create", JSCreate },
       { "flush", JSFlush },
       { "setTopology", JSSetTopology },
       { "setBillboarding", JSSetBillboarding }
@@ -356,6 +367,15 @@ namespace snuffbox
      
     self->Flush(wrapper.GetValue<bool>(0, false));
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Polygon::JSCreate(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Polygon* self = wrapper.GetPointer<D3D11Polygon>(args.This());
+
+		self->Create(wrapper.GetValue<bool>(0, false));
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11Polygon::JSSetTopology(JS_ARGS args)

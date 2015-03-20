@@ -182,6 +182,28 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	std::string JSStateWrapper::StackDump(const int& max)
+	{
+		HandleScope scope(isolate_);
+		std::string error;
+		Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate_, max);
+
+		Local<StackFrame> frame;
+		for (int i = 0; i < stack->GetFrameCount(); ++i)
+		{
+			frame = stack->GetFrame(i);
+			error += "\n\t";
+			error += "at " + std::string(*String::Utf8Value(frame->GetFunctionName())) +
+				" (" + std::string(*String::Utf8Value(frame->GetScriptName())) +
+				":" + std::to_string(frame->GetLineNumber()) + ":" + std::to_string(frame->GetColumn()) + ")";
+		}
+
+		error += "\n";
+
+		return error;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void JSStateWrapper::RegisterGlobal(const std::string& name, const Handle<Value>& value)
 	{
 		Local<Object> global = Local<Context>::New(isolate_, context_)->Global();

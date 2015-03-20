@@ -86,6 +86,14 @@ namespace snuffbox
     */
 		void Create(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents = true);
 
+		/**
+		* @brief Updates the vertex/index buffers without creating a new vertex buffer
+		* @param[in] verts (const std::vector<snuffbox::Vertex>&) The vertices to set
+		* @param[in] indices (const std::vector<int>&) The indices to set
+		* @param[in] tangents (const bool&) Should tangents be calculated? Default = true
+		*/
+		void Update(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents = true);
+
     /// Calculates the tangents of the the current vertices
     void CalculateTangents();
 
@@ -118,6 +126,8 @@ namespace snuffbox
     D3D11_PRIMITIVE_TOPOLOGY topology_; //!< The tolopogy this vertex buffer uses
     ID3D11Buffer* vertex_buffer_; //!< The actual vertex buffer
     ID3D11Buffer* index_buffer_; //!< The actual index buffer
+		unsigned int vertex_size_; //!< The number of vertices after creation
+		unsigned int index_size_; //!< The number of indices after creation
     bool valid_; //!< Is this vertex buffer valid and ready for use?
   };
 }

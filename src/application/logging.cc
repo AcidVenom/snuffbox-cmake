@@ -16,6 +16,11 @@ namespace snuffbox
 	{
     std::string msg = TypeToString(type) + " " + message + "\n";
 
+		if (type == LogType::kError || type == LogType::kFatal)
+		{
+			msg += JSStateWrapper::Instance()->StackDump();
+		}
+
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
     console->Log(TypeToColour(type), msg);

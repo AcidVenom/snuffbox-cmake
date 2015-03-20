@@ -79,6 +79,12 @@ namespace snuffbox
     */
     int NumIndices();
 
+		/**
+		* @brief Creates the vertex buffer
+		* @param[in] tangents (const bool&) Should tangents be calculated for this polygon? Default = false
+		*/
+		void Create(const bool& tangents = false);
+
     /**
     * @brief Flushes the vertex buffer
     * @param[in] tangents (const bool&) Should tangents be calculated for this polygon? Default = false
@@ -116,7 +122,8 @@ namespace snuffbox
     static void JSRemoveIndex(JS_ARGS args);
     static void JSClearIndices(JS_ARGS args);
     static void JSNumIndices(JS_ARGS args);
-    static void JSFlush(JS_ARGS args);
+		static void JSCreate(JS_ARGS args);
+		static void JSFlush(JS_ARGS args);
     static void JSSetTopology(JS_ARGS args);
     static void JSSetBillboarding(JS_ARGS args);
   };

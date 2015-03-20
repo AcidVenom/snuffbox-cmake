@@ -72,6 +72,13 @@ namespace snuffbox
 		bool GetException(v8::TryCatch* try_catch, std::string* buffer);
 
 		/**
+		* @brief Retrieves a stack dump of the current stack frame
+		* @param[in] max (const int&) The maximum stack size to output, default = 20
+		* @return std::string The stringified stack
+		*/
+		std::string StackDump(const int& max = 20);
+
+		/**
 		* @brief Registers a global JavaScript value
 		* @param[in] name (const std::string&) The name of the value to register
 		* @param[in] value (const v8::Handle<v8::Value>&) The value to register
