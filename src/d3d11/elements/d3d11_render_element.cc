@@ -29,7 +29,9 @@ namespace snuffbox
 		blend_(1.0f, 1.0f, 1.0f),
 		alpha_(1.0f),
 		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
-		animation_(nullptr)
+		animation_(nullptr),
+		alpha_changed_(false),
+		blend_changed_(false)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -50,7 +52,9 @@ namespace snuffbox
 		blend_(1.0f, 1.0f, 1.0f),
 		alpha_(1.0f),
 		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
-		animation_(nullptr)
+		animation_(nullptr),
+		alpha_changed_(false),
+		blend_changed_(false)
 	{
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
@@ -181,6 +185,31 @@ namespace snuffbox
 				break;
 			}
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::Propagate()
+	{
+		if (blend_changed_ == false && alpha_changed_ == false)
+		{
+			return;
+		}
+
+		for (D3D11RenderElement* it : children_)
+		{
+			if (alpha_changed_ == true)
+			{
+				it->set_alpha(alpha_);
+			}
+
+			if (blend_changed_ == true)
+			{
+				it->set_blend(blend_.x, blend_.y, blend_.z);
+			}
+		}
+
+		blend_changed_ = false;
+		alpha_changed_ = false;
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -369,12 +398,18 @@ namespace snuffbox
 		blend_.x = r;
 		blend_.y = g;
 		blend_.z = b;
+
+		blend_changed_ = true;
+		Propagate();
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_alpha(const float& a)
 	{
 		alpha_ = a;
+
+		alpha_changed_ = true;
+		Propagate();
 	}
 
 	//-------------------------------------------------------------------------------------------

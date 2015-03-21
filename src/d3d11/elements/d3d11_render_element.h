@@ -85,6 +85,9 @@ namespace snuffbox
 		*/
 		void RemoveChild(D3D11RenderElement* child);
 
+		/// Propagates the current alpha and blend values to the children of this element
+		void Propagate();
+
     /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
     */
@@ -304,6 +307,8 @@ namespace snuffbox
 		XMFLOAT4 animation_coordinates_; //!< The animation coordinates of this render element
 		Animation* animation_; //!< The animation of this render element
 		std::vector<D3D11RenderElement*> children_; //!< The children of this render element
+		bool blend_changed_; //!< Was the blend of this render element changed since last frame?
+		bool alpha_changed_; //!< Was the alpha of this render element changed since last frame?
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
