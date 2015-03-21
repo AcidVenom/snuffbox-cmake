@@ -31,7 +31,12 @@ namespace snuffbox
 		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
 		animation_(nullptr),
 		alpha_changed_(false),
-		blend_changed_(false)
+		blend_changed_(false),
+		override_diffuse_(nullptr),
+		override_normal_(nullptr),
+		override_specular_(nullptr),
+		override_light_(nullptr),
+		override_effect_(nullptr)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -54,7 +59,12 @@ namespace snuffbox
 		animation_coordinates_(0.0f, 0.0f, 1.0f, 1.0f),
 		animation_(nullptr),
 		alpha_changed_(false),
-		blend_changed_(false)
+		blend_changed_(false),
+		override_diffuse_(nullptr),
+		override_normal_(nullptr),
+		override_specular_(nullptr),
+		override_light_(nullptr),
+		override_effect_(nullptr)
 	{
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
@@ -315,6 +325,56 @@ namespace snuffbox
 		return animation_;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	D3D11Texture* D3D11RenderElement::override_diffuse()
+	{
+		if (override_diffuse_ != nullptr && override_diffuse_->is_valid() == false)
+		{
+			override_diffuse_ = nullptr;
+		}
+		return override_diffuse_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Texture* D3D11RenderElement::override_normal()
+	{
+		if (override_normal_ != nullptr && override_normal_->is_valid() == false)
+		{
+			override_normal_ = nullptr;
+		}
+		return override_normal_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Texture* D3D11RenderElement::override_specular()
+	{
+		if (override_specular_ != nullptr && override_specular_->is_valid() == false)
+		{
+			override_specular_ = nullptr;
+		}
+		return override_specular_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Texture* D3D11RenderElement::override_light()
+	{
+		if (override_light_ != nullptr && override_light_->is_valid() == false)
+		{
+			override_light_ = nullptr;
+		}
+		return override_light_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	D3D11Effect* D3D11RenderElement::override_effect()
+	{
+		if (override_effect_ != nullptr && override_effect_->is_valid() == false)
+		{
+			override_effect_ = nullptr;
+		}
+		return override_effect_;
+	}
+
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)
   {
@@ -443,6 +503,36 @@ namespace snuffbox
 		}
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_override_diffuse(D3D11Texture* diffuse)
+	{
+		override_diffuse_ = diffuse;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_override_normal(D3D11Texture* normal)
+	{
+		override_normal_ = normal;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_override_specular(D3D11Texture* specular)
+	{
+		override_specular_ = specular;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_override_light(D3D11Texture* light)
+	{
+		override_light_ = light;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::set_override_effect(D3D11Effect* effect)
+	{
+		override_effect_ = effect;
+	}
+
   //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
   {
@@ -489,6 +579,10 @@ namespace snuffbox
 			{ "alpha", JSAlpha },
 			{ "setUniform", JSSetUniform },
 			{ "setAnimation", JSSetAnimation },
+			{ "setDiffuseMap", JSSetDiffuseMap },
+			{ "setNormalMap", JSSetNormalMap },
+			{ "setSpecularMap", JSSetSpecularMap },
+			{ "setLightMap", JSSetLightMap },
       { "destroy", JSDestroy }
     };
 
@@ -834,6 +928,86 @@ namespace snuffbox
 		{
 			self->set_animation(wrapper.GetPointer<Animation>(0));
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetDiffuseMap(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+		D3D11Texture* tex = nullptr;
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("S") == true)
+		{
+			tex = ContentManager::Instance()->Get<D3D11Texture>(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+		
+		self->set_override_diffuse(tex);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetNormalMap(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+		D3D11Texture* tex = nullptr;
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("S") == true)
+		{
+			tex = ContentManager::Instance()->Get<D3D11Texture>(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+
+		self->set_override_normal(tex);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetSpecularMap(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+		D3D11Texture* tex = nullptr;
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("S") == true)
+		{
+			tex = ContentManager::Instance()->Get<D3D11Texture>(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+
+		self->set_override_specular(tex);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetLightMap(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+		D3D11Texture* tex = nullptr;
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("S") == true)
+		{
+			tex = ContentManager::Instance()->Get<D3D11Texture>(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+
+		self->set_override_light(tex);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11RenderElement::JSSetEffect(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+		D3D11Effect* fx = nullptr;
+		wrapper.set_error_checks(false);
+
+		if (wrapper.Check("S") == true)
+		{
+			fx = ContentManager::Instance()->Get<D3D11Effect>(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+
+		self->set_override_effect(fx);
 	}
 
 	//-------------------------------------------------------------------------------------------

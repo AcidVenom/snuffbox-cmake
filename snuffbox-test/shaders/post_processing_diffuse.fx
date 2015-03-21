@@ -3,6 +3,8 @@ cbuffer Global : register(b0)
 	float Time;
 	float4x4 View;
 	float4x4 Projection;
+	float4 EyePosition;
+	float4x4 InvViewProjection;
 }
 
 cbuffer Uniforms : register(b2)
@@ -28,10 +30,10 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 	return output;
 }
 
-Texture2D Tex2D;
+Texture2D Target : register(t0);
 SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	return Tex2D.Sample(Sampler, input.texcoord);
+	return Target.Sample(Sampler, input.texcoord);
 }

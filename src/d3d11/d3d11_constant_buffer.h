@@ -54,6 +54,8 @@ namespace snuffbox
 	__declspec(align(16)) struct CbLight
 	{
 		D3D11Light::Attributes Attributes;
+		XMFLOAT4 Ambient;
+		XMFLOAT4 Shadow;
 	};
 
 	/**

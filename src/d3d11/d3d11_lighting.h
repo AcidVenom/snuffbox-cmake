@@ -56,6 +56,11 @@ namespace snuffbox
 		const XMFLOAT4& ambient_colour() const;
 
 		/**
+		* @return const XMFLOAT4& The shadow colour that is currently in use
+		*/
+		const XMFLOAT4& shadow_colour() const;
+
+		/**
 		* @brief Sets the ambient colour
 		* @param[in] r (const float&) The red value of the colour
 		* @param[in] g (const float&) The green value of the colour
@@ -63,12 +68,21 @@ namespace snuffbox
 		*/
 		void set_ambient_colour(const float& r, const float& g, const float& b);
 
+		/**
+		* @brief Sets the shadow colour
+		* @param[in] r (const float&) The red value of the colour
+		* @param[in] g (const float&) The green value of the colour
+		* @param[in] b (const float&) The blue value of the colour
+		*/
+		void set_shadow_colour(const float& r, const float& g, const float& b);
+
 		/// Default destructor
 		~D3D11Lighting();
 
 	private:
 		std::vector<D3D11Light*> lights_; //!< The list of lights that need to be passed to the constant buffer
 		XMFLOAT4 ambient_colour_; //!< The global ambient colour
+		XMFLOAT4 shadow_colour_; //!< The global shadow colour
 		SharedPtr<D3D11BlendState> additive_; //!< The additive blend state
 
 	public:
@@ -76,5 +90,7 @@ namespace snuffbox
 		static void RegisterJS(JS_SINGLETON obj);
 		static void JSSetAmbientColour(JS_ARGS args);
 		static void JSAmbientColour(JS_ARGS args);
+		static void JSSetShadowColour(JS_ARGS args);
+		static void JSShadowColour(JS_ARGS args);
 	};
 }

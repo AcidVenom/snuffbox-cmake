@@ -15,7 +15,7 @@ cbuffer PerObject : register(b1)
 	float Alpha;
 }
 
-cbuffer Uniforms : register(b3)
+cbuffer Uniforms : register(b2)
 {
 
 }

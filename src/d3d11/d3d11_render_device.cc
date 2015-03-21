@@ -351,9 +351,9 @@ namespace snuffbox
     default_material_->set_effect(default_effect_.get());
 
     D3D11Material::Attributes& attributes = default_material_->attributes();
-    attributes.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    attributes.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     attributes.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    attributes.emissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+    attributes.emissive = 0.0f;
     attributes.normal_scale = 0.0f;
     attributes.reflectivity = 0.0f;
     attributes.specular_power = 1.0f;

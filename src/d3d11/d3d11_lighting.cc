@@ -10,7 +10,8 @@ namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Lighting::D3D11Lighting() :
-		ambient_colour_(1.0f, 1.0f, 1.0f, 1.0f)
+		ambient_colour_(0.0f, 0.0f, 0.0f, 1.0f),
+		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 		additive_ = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 		additive_->CreateFromJson(std::string("{\
@@ -83,7 +84,7 @@ namespace snuffbox
 			ctx->RSSetScissorRects(1, &rect);
 
 			const D3D11Light::Attributes& a = light->attributes();
-			buffer->Map({ a });
+			buffer->Map({ a, ambient_colour_, shadow_colour_ });
 			vbo->Draw();
 		}
 	}
@@ -101,11 +102,25 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	const XMFLOAT4& D3D11Lighting::shadow_colour() const
+	{
+		return shadow_colour_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11Lighting::set_ambient_colour(const float& r, const float& g, const float& b)
 	{
 		ambient_colour_.x = r;
 		ambient_colour_.y = g;
 		ambient_colour_.z = b;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Lighting::set_shadow_colour(const float& r, const float& g, const float& b)
+	{
+		shadow_colour_.x = r;
+		shadow_colour_.y = g;
+		shadow_colour_.z = b;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -118,7 +133,10 @@ namespace snuffbox
 	void D3D11Lighting::RegisterJS(JS_SINGLETON obj)
 	{
 		JSFunctionRegister funcs[] = {
-			{ "setAmbientColour", JSSetAmbientColour }
+			{ "setAmbientColour", JSSetAmbientColour },
+			{ "ambientColour", JSAmbientColour },
+			{ "setShadowColour", JSSetShadowColour },
+			{ "shadowColour", JSShadowColour }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -140,10 +158,40 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	void D3D11Lighting::JSSetShadowColour(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("NNN"))
+		{
+			D3D11Lighting::Instance()->set_shadow_colour(
+				wrapper.GetValue<float>(0, 1.0f),
+				wrapper.GetValue<float>(1, 1.0f),
+				wrapper.GetValue<float>(2, 1.0f)
+				);
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11Lighting::JSAmbientColour(JS_ARGS args)
 	{
 		JSWrapper wrapper(args);
 		const XMFLOAT4 c = D3D11Lighting::Instance()->ambient_colour();
+
+		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
+
+		JSWrapper::SetObjectValue(obj, "r", c.x);
+		JSWrapper::SetObjectValue(obj, "g", c.y);
+		JSWrapper::SetObjectValue(obj, "b", c.z);
+
+		wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Lighting::JSShadowColour(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		const XMFLOAT4 c = D3D11Lighting::Instance()->shadow_colour();
 
 		v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
 

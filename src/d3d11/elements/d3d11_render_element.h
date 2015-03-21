@@ -178,6 +178,31 @@ namespace snuffbox
 		*/
 		Animation* animation();
 
+		/**
+		* @return snuffbox::D3D11Texture* The override diffuse map to override the material diffuse map
+		*/
+		D3D11Texture* override_diffuse();
+
+		/**
+		* @return snuffbox::D3D11Texture* The override normal map to override the material normal map
+		*/
+		D3D11Texture* override_normal();
+
+		/**
+		* @return snuffbox::D3D11Texture* The override specular map to override the material specular map
+		*/
+		D3D11Texture* override_specular();
+
+		/**
+		* @return snuffbox::D3D11Texture* The override light map to override the material light map
+		*/
+		D3D11Texture* override_light();
+
+		/**
+		* @return snuffbox::D3D11Effect* The override effect to override the material effect
+		*/
+		D3D11Effect* override_effect();
+
     /**
     * @brief Sets the translation of this render element
     * @param[in] x (const float&) The new x position
@@ -287,6 +312,36 @@ namespace snuffbox
 		*/
 		void set_animation(Animation* animation);
 
+		/**
+		* @brief Sets the override diffuse map of this element
+		* @param[in] diffuse (snuffbox::D3D11Texture*) The pointer to the texture
+		*/
+		void set_override_diffuse(D3D11Texture* diffuse);
+
+		/**
+		* @brief Sets the override normal map of this element
+		* @param[in] normal (snuffbox::D3D11Texture*) The pointer to the texture
+		*/
+		void set_override_normal(D3D11Texture* normal);
+
+		/**
+		* @brief Sets the override specular map of this element
+		* @param[in] specular (snuffbox::D3D11Texture*) The pointer to the texture
+		*/
+		void set_override_specular(D3D11Texture* specular);
+
+		/**
+		* @brief Sets the override light map of this element
+		* @param[in] light (snuffbox::D3D11Texture*) The pointer to the texture
+		*/
+		void set_override_light(D3D11Texture* light);
+
+		/**
+		* @brief Sets the override effect of this element
+		* @param[in] effect (snuffbox::D3D11Effect*) The pointer to the effect
+		*/
+		void set_override_effect(D3D11Effect* effect);
+
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
     XMVECTOR rotation_; //!< The rotation vector of this render element
@@ -309,6 +364,11 @@ namespace snuffbox
 		std::vector<D3D11RenderElement*> children_; //!< The children of this render element
 		bool blend_changed_; //!< Was the blend of this render element changed since last frame?
 		bool alpha_changed_; //!< Was the alpha of this render element changed since last frame?
+		D3D11Texture* override_diffuse_; //!< An override texture to override the material texture
+		D3D11Texture* override_normal_; //!< An override texture to override the material texture
+		D3D11Texture* override_specular_; //!< An override texture to override the material texture
+		D3D11Texture* override_light_; //!< An override texture to override the material texture
+		D3D11Effect* override_effect_; //!< And override effect to override the material effect
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);
@@ -335,6 +395,11 @@ namespace snuffbox
     static void JSSpawn(JS_ARGS args);
 		static void JSSetUniform(JS_ARGS args);
 		static void JSSetAnimation(JS_ARGS args);
+		static void JSSetDiffuseMap(JS_ARGS args);
+		static void JSSetNormalMap(JS_ARGS args);
+		static void JSSetSpecularMap(JS_ARGS args);
+		static void JSSetLightMap(JS_ARGS args);
+		static void JSSetEffect(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
 		static void JSDestroy(JS_ARGS args);
   };

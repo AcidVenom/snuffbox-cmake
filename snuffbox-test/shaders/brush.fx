@@ -5,9 +5,10 @@ cbuffer Global : register(b0)
 	float4x4 Projection;
 }
 
-cbuffer Uniforms : register(b3)
+cbuffer Uniforms : register(b2)
 {
-
+	float4 Brush;
+	float4 Opacity;
 }
 
 struct VOut
@@ -45,13 +46,17 @@ struct PSOut
 PSOut PS(VOut input)
 {
 	PSOut output;
+	float2 brush_coords;
 
-	float4 mask = Mask.Sample(Sampler, input.texcoord);
+	brush_coords.x = (input.texcoord.x - Brush.x) / (Brush.z - Brush.x);
+	brush_coords.y = (input.texcoord.y - Brush.y) / (Brush.w - Brush.y);
+
+	float4 mask = Mask.Sample(Sampler, brush_coords);
 	float a = (mask.r + mask.g + mask.b) / 3.0f;
 
-	output.colour = Diffuse.Sample(Sampler, input.texcoord);
-	output.normals = Normal.Sample(Sampler, input.texcoord)
-	output.speculars = Specular.Sample(Sampler, input.texcoord);
+	output.colour = float4(Diffuse.Sample(Sampler, input.texcoord).rgb, a);
+	output.normals = float4(Normal.Sample(Sampler, input.texcoord).rgb, a);
+	output.speculars = float4(Specular.Sample(Sampler, input.texcoord).rgb, a);
 
 	return output;
 }

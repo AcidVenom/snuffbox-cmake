@@ -106,11 +106,11 @@ namespace snuffbox
 		attributes_ = {
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-			XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 			1.0f,
 			1.0f,
 			0.0f,
-			1.0f
+			1.0f,
+			0.0f
 		};
 
 		auto GetFloat4 = [this, obj, isolate, path](const std::string& field, XMFLOAT4& store)
@@ -128,7 +128,6 @@ namespace snuffbox
 			}
 		};
 
-		GetFloat4("emissive", attributes_.emissive);
 		GetFloat4("diffuse", attributes_.diffuse);
 		GetFloat4("ambient", attributes_.ambient);
 
@@ -159,10 +158,17 @@ namespace snuffbox
 		{
 			attributes_.normal_scale = static_cast<float>(val->ToNumber()->Value());
 		}
+
+		val = obj->Get(String::NewFromUtf8(isolate, "emissive"));
+
+		if (val.IsEmpty() == false && val->IsUndefined() == false)
+		{
+			attributes_.emissive = static_cast<float>(val->ToNumber()->Value());
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Material::Apply()
+	void D3D11Material::Apply(D3D11Texture* override_diffuse, D3D11Texture* override_normal, D3D11Texture* override_specular, D3D11Texture* override_light)
 	{
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     D3D11Texture* default_tex = render_device->default_texture();
@@ -188,6 +194,26 @@ namespace snuffbox
     {
       light_map_ = nullptr;
     }
+
+		if (override_diffuse != nullptr)
+		{
+			diffuse_ = override_diffuse;
+		}
+		
+		if (override_normal != nullptr)
+		{
+			normal_ = override_normal;
+		}
+
+		if (override_specular != nullptr)
+		{
+			specular_ = override_specular;
+		}
+
+		if (override_light != nullptr)
+		{
+			light_map_ = override_light;
+		}
 
 		resources.push_back(diffuse_ == nullptr ? default_tex : diffuse_);
     resources.push_back(normal_ == nullptr ? default_normal : normal_);

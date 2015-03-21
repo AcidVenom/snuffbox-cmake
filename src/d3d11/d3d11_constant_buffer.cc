@@ -135,6 +135,8 @@ namespace snuffbox
 		ctx->Map(light_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &data);
 		mapped = static_cast<CbLight*>(data.pData);
 		mapped->Attributes = cb.Attributes;
+		mapped->Ambient = cb.Ambient;
+		mapped->Shadow = cb.Shadow;
 		ctx->Unmap(light_buffer_, 0);
 		Set();
 	}

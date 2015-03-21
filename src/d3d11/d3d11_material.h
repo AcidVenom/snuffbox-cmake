@@ -16,7 +16,6 @@ namespace snuffbox
 		*/
 		struct Attributes
 		{
-			XMFLOAT4 emissive;
 			XMFLOAT4 diffuse;
 			XMFLOAT4 ambient;
 
@@ -24,6 +23,8 @@ namespace snuffbox
 			float specular_intensity;
 			float reflectivity;
 			float normal_scale;
+			float emissive;
+			XMFLOAT3 padding;
 		};
 
 	public:
@@ -33,8 +34,14 @@ namespace snuffbox
 		/// @see snuffbox::Content::Load
 		void Load(const std::string& path);
 
-		/// Applies this material
-		void Apply();
+		/**
+		* @brief Applies this material
+		* @param[in] override_diffuse (snuffbox::D3D11Texture*) The diffuse override, default = nullptr
+		* @param[in] override_normal (snuffbox::D3D11Texture*) The normal override, default = nullptr
+		* @param[in] override_specular (snuffbox::D3D11Texture*) The specular override, default = nullptr
+		* @param[in] override_light (snuffbox::D3D11Texture*) The light override, default = nullptr
+		*/
+		void Apply(D3D11Texture* override_diffuse = nullptr, D3D11Texture* override_normal = nullptr, D3D11Texture* override_specular = nullptr, D3D11Texture* override_light = nullptr);
 
 		/**
 		* @brief Retrieves a float4 value from a given JSON array
