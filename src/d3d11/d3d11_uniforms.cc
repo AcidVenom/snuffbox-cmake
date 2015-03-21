@@ -14,20 +14,20 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Uniforms::SetUniform(const D3D11Uniforms::UniformTypes& type, const std::string& name, const float* value)
 	{
-		Uniforms::iterator it = uniforms_.find(name);
-
-		if (it != uniforms_.end())
+		for (Uniform& it : uniforms_)
 		{
-			XMFLOAT4& v = it->second;
-
-			SetValue(type, v, value);
-			return;
+			if (it.name == name)
+			{
+				SetValue(type, it.value, value);
+				return;
+			}
 		}
 
-		XMFLOAT4 uniform;
-		SetValue(type, uniform, value);
+		Uniform uniform;
+		uniform.name = name;
+		SetValue(type, uniform.value, value);
 
-		uniforms_.emplace(name, uniform);
+		uniforms_.push_back(uniform);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -59,19 +59,13 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11Uniforms::Apply()
 	{
-		std::vector<XMFLOAT4> uniforms;
-		for (Uniforms::iterator it = uniforms_.begin(); it != uniforms_.end(); ++it)
-		{
-			uniforms.push_back(it->second);
-		}
-
 		CbUniforms cb_uniforms;
 		D3D11ConstantBuffer* buffer = D3D11RenderDevice::Instance()->constant_buffer();
 
-		int s = static_cast<int>(uniforms.size());
+		int s = static_cast<int>(uniforms_.size());
 		for (int i = 0; i < s; ++i)
 		{
-			cb_uniforms.Uniforms[i] = uniforms[i];
+			cb_uniforms.Uniforms[i] = uniforms_.at(i).value;
 		}
 
 		buffer->Map(cb_uniforms, s);

@@ -31,6 +31,8 @@
 #include "../d3d11/shaders/d3d11_text_shader.h"
 #include "../d3d11/shaders/d3d11_cube_map_shader.h"
 #include "../d3d11/shaders/d3d11_brush_shader.h"
+#include "../d3d11/shaders/d3d11_base_diffuse_shader.h"
+#include "../d3d11/shaders/d3d11_post_processing_diffuse_shader.h"
 
 #include <comdef.h>
 
@@ -248,7 +250,9 @@ namespace snuffbox
     create_and_load("shaders/ui.fx", ui_shader);
     create_and_load("shaders/text.fx", text_shader);
     create_and_load("shaders/cube_map.fx", cube_map_shader);
-    create_and_load("shaders/brush.fx", brush_shader);
+		create_and_load("shaders/brush.fx", brush_shader);
+		create_and_load("shaders/base_diffuse.fx", base_diffuse_shader);
+		create_and_load("shaders/post_processing_diffuse.fx", post_processing_diffuse_shader);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -363,6 +367,14 @@ namespace snuffbox
 		pass.shader = content_manager->Get<D3D11Shader>("shaders/post_processing.fx");
 
 		technique.name = "Default";
+		technique.passes = { pass };
+
+		default_post_processing_->AddTechnique(technique);
+
+		pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
+		pass.shader = content_manager->Get<D3D11Shader>("shaders/post_processing_diffuse.fx");
+
+		technique.name = "Diffuse";
 		technique.passes = { pass };
 
 		default_post_processing_->AddTechnique(technique);

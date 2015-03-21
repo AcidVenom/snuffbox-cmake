@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <vector>
 
 #include "../d3d11/d3d11_render_device.h"
 #include "../js/js_object.h"
@@ -27,6 +27,17 @@ namespace snuffbox
 			kFloat2 = 2,
 			kFloat3 = 3,
 			kFloat4 = 4
+		};
+
+		/**
+		* @struct snuffbox::D3D11Uniforms::Uniform
+		* @brief Contains a name and value of a uniform
+		* @author Daniël Konings
+		*/
+		struct Uniform
+		{
+			std::string name; //!< The uniform name
+			XMFLOAT4 value; //!< The uniform value
 		};
 
 	public:
@@ -56,7 +67,7 @@ namespace snuffbox
 		virtual ~D3D11Uniforms();
 
 	private:
-		typedef std::map<std::string, XMFLOAT4> Uniforms;
+		typedef std::vector<Uniform> Uniforms;
 		Uniforms uniforms_; //!< The actual uniforms
 
 	public:
