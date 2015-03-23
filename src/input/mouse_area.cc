@@ -145,10 +145,7 @@ namespace snuffbox
     {
       if (entered_ == true)
       {
-        if (callback == true)
-        {
-          OnLeave();
-        }
+        OnLeave();
         entered_ = false;
       }
 

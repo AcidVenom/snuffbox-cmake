@@ -27,12 +27,12 @@ namespace snuffbox
 
 		/**
 		* @struct snuffbox::D3D11Terrain::WorldCoordinates
-		* @brief Basically a float2
+		* @brief Basically a float3
 		* @author Daniël Konings
 		*/
 		struct WorldCoordinates
 		{
-			float x, z;
+			float x, y, z;
 		};
 
   public:
@@ -118,6 +118,14 @@ namespace snuffbox
     XMFLOAT2 GetWorldTextureCoordinates(const float& x, const float& y);
 
     /**
+    * @brief Retrieves the bilinear height of a given position
+    * @param[in] x (const float&) The world x position to calculate the height from
+    * @param[in] y (const float&) The world y position to calculate the height from
+    * @return float The bilinear interpolated height of the position
+    */
+    float GetBilinearHeight(const float& x, const float& y);
+
+    /**
     * @brief Brushes a texture onto the terrain with a given brush texture
     * @param[in] brush (const std::string&) The texture mask for the brush
     * @param[in] texture (const std::string&) The texture to brush onto the terrain
@@ -184,7 +192,8 @@ namespace snuffbox
 		static void JSIndexToWorld(JS_ARGS args);
 		static void JSNearestVertices(JS_ARGS args);
 		static void JSSetHeight(JS_ARGS args);
-		static void JSGetHeight(JS_ARGS args);
+    static void JSGetHeight(JS_ARGS args);
+    static void JSGetBilinearHeight(JS_ARGS args);
     static void JSBrushTexture(JS_ARGS args);
     static void JSSetTextureTiling(JS_ARGS args);
 		static void JSFlush(JS_ARGS args);

@@ -199,7 +199,7 @@ namespace snuffbox
 
     p = XMVector3Transform(p, world_matrix());
 
-		return WorldCoordinates{ XMVectorGetX(p), XMVectorGetZ(p) };
+		return WorldCoordinates{ XMVectorGetX(p), GetHeight(x, y), XMVectorGetZ(p) };
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -376,6 +376,24 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  float D3D11Terrain::GetBilinearHeight(const float& x, const float& y)
+  {
+    std::vector<D3D11Terrain::Indices>& indices = NearestVertices(x, y);
+
+    WorldCoordinates p1 = IndexToWorld(indices.at(0).x, indices.at(0).y);
+    WorldCoordinates p2 = IndexToWorld(indices.at(1).x, indices.at(1).y);
+    WorldCoordinates p3 = IndexToWorld(indices.at(2).x, indices.at(2).y);
+
+    float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
+
+    float l1 = ((p2.z - p3.z) * (x - p3.x) + (p3.x - p2.x) * (y - p3.z)) / det;
+    float l2 = ((p3.z - p1.z) * (x - p3.x) + (p1.x - p3.x) * (y - p3.z)) / det;
+    float l3 = 1.0f - l1 - l2;
+
+    return l1 * p1.y + l2 * p2.y + l3 * p3.y;
+  }
+
+  //-------------------------------------------------------------------------------------------
   void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const std::string& normal, const std::string& specular)
   {
     if (brush_shader_ == nullptr)
@@ -543,6 +561,7 @@ namespace snuffbox
 			{ "nearestVertices", JSNearestVertices },
 			{ "setHeight", JSSetHeight },
       { "getHeight", JSGetHeight },
+      { "getBilinearHeight", JSGetBilinearHeight },
       { "brushTexture", JSBrushTexture },
       { "setTextureTiling", JSSetTextureTiling },
 			{ "flush", JSFlush }
@@ -618,11 +637,14 @@ namespace snuffbox
 
 		if (wrapper.Check("NN") == true)
 		{
-			WorldCoordinates coords = self->IndexToWorld(wrapper.GetValue<int>(0, 0), wrapper.GetValue<int>(1, 0));
+      int x = wrapper.GetValue<int>(0, 0);
+      int y = wrapper.GetValue<int>(1, 0);
+			WorldCoordinates coords = self->IndexToWorld(x, y);
 
 			v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
 			
 			JSWrapper::SetObjectValue(obj, "x", coords.x);
+      JSWrapper::SetObjectValue(obj, "y", coords.y);
 			JSWrapper::SetObjectValue(obj, "z", coords.z);
 
 			wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
@@ -678,6 +700,18 @@ namespace snuffbox
 			wrapper.ReturnValue<float>(self->GetHeight(wrapper.GetValue<int>(0, 0), wrapper.GetValue<int>(1, 0)));
 		}
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11Terrain::JSGetBilinearHeight(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11Terrain* self = wrapper.GetPointer<D3D11Terrain>(args.This());
+
+    if (wrapper.Check("NN") == true)
+    {
+      wrapper.ReturnValue<float>(self->GetBilinearHeight(wrapper.GetValue<float>(0, 0.0f), wrapper.GetValue<float>(1, 0.0f)));
+    }
+  }
 
   //-------------------------------------------------------------------------------------------
   void D3D11Terrain::JSBrushTexture(JS_ARGS args)
