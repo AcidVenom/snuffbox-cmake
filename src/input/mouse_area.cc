@@ -46,7 +46,7 @@ namespace snuffbox
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
     D3D11Viewport* vp = nullptr;
 
-    if (parent_->target() != nullptr && parent_->target()->viewport()->valid() == true)
+    if (parent_->target() != nullptr && parent_->target()->viewport() != nullptr && parent_->target()->viewport()->valid() == true)
     {
       vp = parent_->target()->viewport();
     }
@@ -63,8 +63,8 @@ namespace snuffbox
     screen.x = relative.x / res.x * 2.0f;
     screen.y = relative.y / res.y * 2.0f;
 
-    float ratio_x = vp->width() / res.x;
-    float ratio_y = vp->height() / res.y;
+    float ratio_x = vp == nullptr ? 1.0f : vp->width() / res.x;
+		float ratio_y = vp == nullptr ? 1.0f : vp->height() / res.y;
 
     if (screen.x > ratio_x || screen.x < -ratio_x || screen.y > ratio_y || screen.y < -ratio_y)
     {

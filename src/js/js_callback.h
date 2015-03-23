@@ -7,12 +7,18 @@
 
 namespace snuffbox
 {
+	/// @todo Make more hacks like this
+	static void JSWeak(const v8::WeakCallbackData<v8::Function, JSObject>& data)
+	{
+		
+	}
+
   /**
   * @class snuffbox::JSCallback<...Args>
   * @brief Used to wrap callbacks to JavaScript
   * @author Daniël Konings
   */
-  template <typename ...Args>
+	template <typename ...Args>
   class JSCallback
   {
   public:
@@ -116,6 +122,8 @@ namespace snuffbox
     }
 
     callback_.Reset(isolate, value.As<v8::Function>());
+		JSObject* null = nullptr;
+		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
     valid_ = true;
 
     return true;
@@ -159,7 +167,9 @@ namespace snuffbox
       return false;
     }
 
-    callback_.Reset(isolate, value.As<v8::Function>());
+		callback_.Reset(isolate, value.As<v8::Function>());
+		JSObject* null = nullptr;
+		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
     valid_ = true;
 
     return true;
@@ -170,7 +180,9 @@ namespace snuffbox
   inline void JSCallback<Args...>::Set(const v8::Handle<v8::Value>& cb)
   {
     v8::Handle<v8::Value> value = cb;
-    callback_.Reset(JSStateWrapper::Instance()->isolate(), value.As<v8::Function>());
+		callback_.Reset(JSStateWrapper::Instance()->isolate(), value.As<v8::Function>());
+		JSObject* null = nullptr;
+		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
     valid_ = true;
   }
 
@@ -223,7 +235,17 @@ namespace snuffbox
     int nargs = push_arg(args...);
 
     v8::Local<v8::Function> func = v8::Local<v8::Function>::New(isolate, callback_);
-    nargs != 0 ? func->Call(wrapper->global(), nargs, &values_[0]) : func->Call(wrapper->global(), 0, 0);
+		v8::Local<v8::Value> ctx = func->Get(v8::String::NewFromUtf8(isolate, "ctx"));
+
+    nargs != 0 ? func->Call(
+			ctx->IsUndefined() == false && ctx->IsObject() == true ? 
+			ctx->ToObject() : wrapper->global(), nargs, &values_[0]) 
+			
+			: 
+			
+			func->Call(
+			ctx->IsUndefined() == false && ctx->IsObject() == true ?
+			ctx->ToObject() : wrapper->global(), 0, 0);
 
     std::string exception;
     bool failed = wrapper->GetException(&try_catch, &exception);

@@ -68,8 +68,15 @@ namespace snuffbox
 		* @brief Logs with a given logging type and a message
 		* @param[in] type (const snuffbox::DebugLogging::LogType&) The type of the log message
 		* @param[in] msg (const std::string&) The message to log
+		* @param[in] dump (const bool&) Should the stack be dumped? Default = true
 		*/
-		static void Log(const LogType& type, const std::string& msg);
+		static void Log(const LogType& type, const std::string& msg, const bool& dump = true);
+
+		/**
+		* @brief Logs an assertion
+		* @param[in] msg (const std::string&) The assertion message
+		*/
+		static void Assert(const std::string& msg);
 
 		/**
 		* @brief Logs with a given RGB value and a message

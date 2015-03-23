@@ -36,7 +36,8 @@ namespace snuffbox
 		override_normal_(nullptr),
 		override_specular_(nullptr),
 		override_light_(nullptr),
-		override_effect_(nullptr)
+		override_effect_(nullptr),
+		target_(nullptr)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -64,7 +65,8 @@ namespace snuffbox
 		override_normal_(nullptr),
 		override_specular_(nullptr),
 		override_light_(nullptr),
-		override_effect_(nullptr)
+		override_effect_(nullptr),
+		target_(nullptr)
 	{
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 

@@ -21,7 +21,7 @@ namespace snuffbox
     Console();
 
     /// Default destructor
-    ~Console();
+    virtual ~Console();
 
     /**
     * @brief Returns the singleton instance of this object

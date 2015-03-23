@@ -12,13 +12,14 @@
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	void DebugLogging::Log(const DebugLogging::LogType& type, const std::string& message)
+	void DebugLogging::Log(const DebugLogging::LogType& type, const std::string& message, const bool& dump)
 	{
     std::string msg = TypeToString(type) + " " + message + "\n";
 
-		if (type == LogType::kError || type == LogType::kFatal)
+		JSStateWrapper* wrapper = JSStateWrapper::Instance();
+		if (wrapper != nullptr && type == LogType::kError || type == LogType::kFatal && dump == true && wrapper->running() == true)
 		{
-			msg += JSStateWrapper::Instance()->StackDump();
+			msg += wrapper->StackDump();
 		}
 
 #ifdef SNUFF_BUILD_CONSOLE
@@ -48,6 +49,12 @@ namespace snuffbox
 #if defined SNUFF_WIN32 && _DEBUG
     OutputDebugStringA(std::string(msg).c_str());
 #endif
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void DebugLogging::Assert(const std::string& msg)
+	{
+		Log(LogType::kFatal, msg, false);
 	}
 
   //---------------------------------------------------------------------------------------------------------
