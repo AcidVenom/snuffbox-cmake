@@ -230,6 +230,8 @@ namespace snuffbox
 
 		global_.Reset();
 		context_.Reset();
+
+		SNUFF_LOG_INFO("Collected all JavaScript garbage");
 	}
 
   //-------------------------------------------------------------------------------------------

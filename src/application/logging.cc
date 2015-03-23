@@ -1,4 +1,5 @@
 #include "../application/logging.h"
+#include "../application/game.h"
 
 #ifdef SNUFF_WIN32
 #include <Windows.h>
@@ -25,6 +26,11 @@ namespace snuffbox
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
     console->Log(TypeToColour(type), msg);
+
+		if (Game::Instance()->started() == false)
+		{
+			qApp->processEvents();
+		}
 #endif
 
     printf(msg.c_str());

@@ -69,6 +69,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	AllocatedMemory::~AllocatedMemory()
 	{
+		SNUFF_LOG_INFO("Checking for leaks");
     CheckForLeaks();
 	}
 }

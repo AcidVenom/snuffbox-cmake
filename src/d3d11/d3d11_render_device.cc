@@ -165,7 +165,15 @@ namespace snuffbox
 
 		HRESULT result = S_OK;
 
-		D3D_FEATURE_LEVEL feature_levels_requested = D3D_FEATURE_LEVEL_11_0;
+		D3D_FEATURE_LEVEL feature_levels_requested[] =
+		{
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1,
+		};
 		D3D_FEATURE_LEVEL feature_levels_supported;
 
 		UINT device_flags = 0;
@@ -181,7 +189,7 @@ namespace snuffbox
 			D3D_DRIVER_TYPE_HARDWARE,
 			NULL,
 			device_flags,
-			&feature_levels_requested,
+			feature_levels_requested,
 			1,
 			D3D11_SDK_VERSION,
 			&desc,
@@ -194,7 +202,7 @@ namespace snuffbox
 			SNUFF_ASSERT(HRToString(result, "D3D11CreateDeviceAndSwapChain"), "D3D11DisplayDevice::CreateDevice");
 		}
 
-    context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
   //-------------------------------------------------------------------------------------------
