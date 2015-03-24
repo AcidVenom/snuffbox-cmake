@@ -394,7 +394,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const std::string& normal, const std::string& specular)
+  void D3D11Terrain::BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const float& opacity, const std::string& normal, const std::string& specular)
   {
     if (brush_shader_ == nullptr)
     {
@@ -463,7 +463,8 @@ namespace snuffbox
     p1.w = p2.w = p3.w = p4.w = 1.0f;
 
     float coords[4] = { t1.x, t1.y, t4.x, t4.y };
-    brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat4, "Brush", coords);
+		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat4, "Brush", coords);
+		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat, "Opacity", &opacity);
 
     brush_uniform_->Apply();
 
@@ -727,8 +728,9 @@ namespace snuffbox
         wrapper.GetValue<float>(2, 0.0f),
         wrapper.GetValue<float>(3, 0.0f),
         wrapper.GetValue<float>(4, 1.0f),
-        wrapper.GetValue<std::string>(5, "null"),
-        wrapper.GetValue<std::string>(6, "null"));
+				wrapper.GetValue<float>(5, 1.0f),
+        wrapper.GetValue<std::string>(6, "null"),
+        wrapper.GetValue<std::string>(7, "null"));
     }
   }
 

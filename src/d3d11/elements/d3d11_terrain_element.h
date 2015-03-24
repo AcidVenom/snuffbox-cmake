@@ -132,10 +132,11 @@ namespace snuffbox
     * @param[in] x (const float&) The world x coordinate to brush on
     * @param[in] y (const float&) The world y coordinate to brush on
     * @param[in] radius (const float&) The radius of the brush
+		* @param[in] opacity (const float&) The opacity of the brush, default = 1.0f
     * @param[in] normal (const std::string&) The normal texture for the brush, optional
     * @param[in] specular (const std::string&) The specular texture for the brush, optional
     */
-    void BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const std::string& normal = "null", const std::string& specular = "null");
+		void BrushTexture(const std::string& brush, const std::string& texture, const float& x, const float& y, const float& radius, const float& opacity = 1.0f, const std::string& normal = "null", const std::string& specular = "null");
 
 		/// Flushes the terrain after modification of heights
 		void Flush();
