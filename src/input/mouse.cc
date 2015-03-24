@@ -117,9 +117,15 @@ namespace snuffbox
     std::sort(mouse_areas_.begin(), mouse_areas_.end(), MouseAreaSorter());
 
     bool do_callback = true;
+		bool callback = true;
     for (unsigned int i = 0; i < mouse_areas_.size(); ++i)
     {
-      do_callback = !mouse_areas_.at(i)->Check(this, do_callback);
+      do_callback = !mouse_areas_.at(i)->Check(this, callback);
+
+			if (do_callback == false)
+			{
+				callback = false;
+			}
     }
 	}
 

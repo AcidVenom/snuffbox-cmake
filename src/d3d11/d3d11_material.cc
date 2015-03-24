@@ -173,6 +173,8 @@ namespace snuffbox
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     D3D11Texture* default_tex = render_device->default_texture();
     D3D11Texture* default_normal = render_device->default_normal();
+		D3D11Texture* diffuse = nullptr, *normal = nullptr, *specular = nullptr, *light = nullptr;
+
 		std::vector<D3D11Texture*> resources;
 
     if (diffuse_ != nullptr && (diffuse_->is_valid() == false || diffuse_->texture() == nullptr))
@@ -197,28 +199,44 @@ namespace snuffbox
 
 		if (override_diffuse != nullptr)
 		{
-			diffuse_ = override_diffuse;
+			diffuse = override_diffuse;
+		}
+		else
+		{
+			diffuse = diffuse_;
 		}
 		
 		if (override_normal != nullptr)
 		{
-			normal_ = override_normal;
+			normal = override_normal;
+		}
+		else
+		{
+			normal = normal_;
 		}
 
 		if (override_specular != nullptr)
 		{
-			specular_ = override_specular;
+			specular = override_specular;
+		}
+		else
+		{
+			specular = specular_;
 		}
 
 		if (override_light != nullptr)
 		{
-			light_map_ = override_light;
+			light = override_light;
+		}
+		else
+		{
+			light = light_map_;
 		}
 
-		resources.push_back(diffuse_ == nullptr ? default_tex : diffuse_);
-    resources.push_back(normal_ == nullptr ? default_normal : normal_);
-    resources.push_back(specular_ == nullptr ? default_tex : specular_);
-    resources.push_back(light_map_ == nullptr ? default_tex : light_map_);
+		resources.push_back(diffuse == nullptr ? default_tex : diffuse);
+    resources.push_back(normal == nullptr ? default_normal : normal);
+    resources.push_back(specular == nullptr ? default_tex : specular);
+    resources.push_back(light == nullptr ? default_tex : light);
 
 		D3D11Texture::SetMultipleTextures(1, static_cast<int>(resources.size()), resources);
 

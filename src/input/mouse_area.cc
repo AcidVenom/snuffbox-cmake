@@ -70,12 +70,8 @@ namespace snuffbox
     {
       if (entered_ == true)
       {
+				OnLeave();
         entered_ = false;
-
-        if (callback == true)
-        {
-          OnLeave();
-        }
       }
       return false;
     }
@@ -102,8 +98,12 @@ namespace snuffbox
     {
       if (entered_ == false)
       {
-        OnEnter();
-        entered_ = true;
+				if (callback == true)
+				{
+					OnEnter();
+				}
+
+				entered_ = true;
       }
 
       Mouse::MouseButton button;
@@ -141,7 +141,8 @@ namespace snuffbox
         }
       }
     }
-    else
+    
+		if (in_bounds == false || callback == false)
     {
       if (entered_ == true)
       {
