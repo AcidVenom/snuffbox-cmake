@@ -21,7 +21,6 @@ namespace snuffbox
 
 		SNUFF_XASSERT(hr == S_OK, render_device->HRToString(hr, "CreateRasterizerState"), "D3D11RasterizerState::Create");
 
-		SetScissorRect(0, 0, 1.0f, 1.0f);
 		valid_ = true;
 		desc_ = desc;
 	}
@@ -72,7 +71,7 @@ namespace snuffbox
 		ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
 		desc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 		desc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-		desc.ScissorEnable = true;
+		desc.ScissorEnable = false;
 
 		for (unsigned int i = 0; i < properties->Length(); ++i)
 		{
@@ -102,15 +101,6 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11RasterizerState::SetScissorRect(const float& x, const float& y, const float& w, const float& h)
-	{
-		scissor_.x = x;
-		scissor_.y = y;
-		scissor_.z = w;
-		scissor_.w = h;
-	}
-
-	//---------------------------------------------------------------------------------------------------------
 	void D3D11RasterizerState::Set()
 	{
 		if (valid_ == false)
@@ -126,17 +116,6 @@ namespace snuffbox
 			render_device->set_current_rasterizer_state(this);
 			ID3D11DeviceContext* ctx = render_device->context();
 			ctx->RSSetState(rasterizer_);
-			D3D11_RECT r;
-			
-			D3D11Viewport* vp = render_device->viewport_render_target();
-
-			r.left = static_cast<int>(vp->x());
-			r.top = static_cast<int>(vp->y());
-
-			r.right = static_cast<int>(scissor_.z * vp->width());
-			r.bottom = static_cast<int>(scissor_.w * vp->height());
-
-			ctx->RSSetScissorRects(1, &r);
 		}
 	}
 
@@ -150,30 +129,19 @@ namespace snuffbox
 
 		const D3D11_RASTERIZER_DESC& other_desc = other->description();
 
-		if (other_desc.AntialiasedLineEnable != desc_.AntialiasedLineEnable ||
-			other_desc.CullMode != desc_.CullMode ||
-			other_desc.DepthBias != desc_.DepthBias ||
-			other_desc.DepthBiasClamp != desc_.DepthBiasClamp ||
-			other_desc.FillMode != desc_.FillMode ||
-			other_desc.FrontCounterClockwise != desc_.FrontCounterClockwise ||
-			other_desc.MultisampleEnable != desc_.MultisampleEnable ||
-			other_desc.ScissorEnable != desc_.ScissorEnable ||
-			other_desc.SlopeScaledDepthBias != desc_.SlopeScaledDepthBias
-			)
-		{
-			return false;
-		}
-
-		const XMFLOAT4& other_scissor = other->scissor();
-
-		if (other_scissor.x != scissor_.x ||
-			other_scissor.y != scissor_.y ||
-			other_scissor.z != scissor_.z ||
-			other_scissor.w != scissor_.w
-			)
-		{
-			return false;
-		}
+    if (other_desc.AntialiasedLineEnable != desc_.AntialiasedLineEnable ||
+      other_desc.CullMode != desc_.CullMode ||
+      other_desc.DepthBias != desc_.DepthBias ||
+      other_desc.DepthBiasClamp != desc_.DepthBiasClamp ||
+      other_desc.FillMode != desc_.FillMode ||
+      other_desc.FrontCounterClockwise != desc_.FrontCounterClockwise ||
+      other_desc.MultisampleEnable != desc_.MultisampleEnable ||
+      other_desc.ScissorEnable != desc_.ScissorEnable ||
+      other_desc.SlopeScaledDepthBias != desc_.SlopeScaledDepthBias
+      )
+    {
+      return false;
+    }
 
 		return true;
 	}
@@ -182,12 +150,6 @@ namespace snuffbox
 	const D3D11_RASTERIZER_DESC& D3D11RasterizerState::description() const
 	{
 		return desc_;
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	const XMFLOAT4& D3D11RasterizerState::scissor() const
-	{
-		return scissor_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

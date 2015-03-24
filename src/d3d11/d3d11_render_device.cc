@@ -559,13 +559,6 @@ namespace snuffbox
 		sampler_linear_->Set();
     back_buffer_->Set(context_);
 
-		D3D11_RECT rect;
-		rect.top = 0;
-		rect.left = 0;
-		rect.right = static_cast<int>(viewport_->width());
-		rect.bottom = static_cast<int>(viewport_->height());
-
-		context_->RSSetScissorRects(1, &rect);
     viewport_->Set();
     screen_quad_->Set();
 
@@ -751,14 +744,16 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderDevice::MapUIBuffer()
 	{
-    D3D11_VIEWPORT vp;
-    UINT num = 1;
-    D3D11RenderDevice::Instance()->context()->RSGetViewports(&num, &vp);
-
-
+    D3D11Viewport* vp = current_target_->viewport();
+    float ratio_x = 1.0f, ratio_y = 1.0f;
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
-    float ratio_x = viewport_render_target_->width() / vp.Width;
-    float ratio_y = viewport_render_target_->height() / vp.Height;
+
+    if (vp != nullptr && vp->valid() == true)
+    {
+      ratio_x = viewport_render_target_->width() / vp->width();
+      ratio_y = viewport_render_target_->height() / vp->height();
+    }
+    
     XMMATRIX projection = XMMatrixOrthographicRH(res.x / ratio_x, res.y / ratio_y, -9999999.0f, 9999999.0f);
 
 		constant_buffer_->Map({

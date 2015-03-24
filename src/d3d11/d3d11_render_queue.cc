@@ -188,8 +188,6 @@ namespace snuffbox
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		render_device->MapUIBuffer();
 
-		render_device->current_target()->Set(render_device->context());
-
 		for (int i = static_cast<int>(ui_.size()) - 1; i >= 0; --i)
 		{
 			element = ui_.at(i);
