@@ -169,6 +169,11 @@ namespace snuffbox
     D3D11RenderTarget* target();
 
 		/**
+		* @return const bool& Is this element billboarding?
+		*/
+		const bool& billboarding() const;
+
+		/**
 		* @return const XMFLOAT4& The animation coordinates of this render element
 		*/
 		const XMFLOAT4& animation_coordinates() const;

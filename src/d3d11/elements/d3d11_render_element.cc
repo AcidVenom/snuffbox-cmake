@@ -131,7 +131,7 @@ namespace snuffbox
 
     if (billboarding_ == true)
     {
-      XMMATRIX billboard = XMMatrixTranspose(D3D11RenderDevice::Instance()->camera()->view());
+      XMMATRIX billboard = XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), D3D11RenderDevice::Instance()->camera()->view());
 
       billboard._14 = billboard._24 = billboard._34 = billboard._41 = billboard._42 = billboard._43 = 0;
       billboard._44 = 1;
@@ -314,6 +314,12 @@ namespace snuffbox
   {
     return target_;
   }
+
+	//-------------------------------------------------------------------------------------------
+	const bool& D3D11RenderElement::billboarding() const
+	{
+		return billboarding_;
+	}
 
 	//-------------------------------------------------------------------------------------------
 	const XMFLOAT4& D3D11RenderElement::animation_coordinates() const

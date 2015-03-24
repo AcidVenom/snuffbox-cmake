@@ -98,7 +98,7 @@ namespace snuffbox
 		XMVECTOR deter;
 		constant_buffer->Map({
 			element->world_matrix(),
-			XMMatrixTranspose(XMMatrixInverse(&deter, element->world_matrix())),
+			element->billboarding() == true ? XMMatrixInverse(&deter, element->world_matrix()) : XMMatrixTranspose(XMMatrixInverse(&deter, element->world_matrix())),
 			element->animation_coordinates(),
 			element->blend(),
 			element->alpha(),
