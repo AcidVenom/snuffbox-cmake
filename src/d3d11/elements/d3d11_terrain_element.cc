@@ -9,6 +9,7 @@
 #include "../../d3d11/d3d11_sampler_state.h"
 #include "../../d3d11/d3d11_uniforms.h"
 #include "../../content/content_manager.h"
+#include "../../application/game.h"
 
 #undef max
 
@@ -34,7 +35,7 @@ namespace snuffbox
 		height_(256),
     texture_tiling_(1.0f, 1.0f),
     brush_shader_(ContentManager::Instance()->Get<D3D11Shader>("shaders/brush.fx")),
-    texture_size_(2048.0f)
+		texture_size_(2048.0f)
   {
 		Create(width_, height_);
   }
@@ -44,6 +45,18 @@ namespace snuffbox
   {
 		width_ = w;
 		height_ = h;
+
+		brush_vbo_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
+		
+		std::vector<int> indices({ 0, 0, 0, 0, 0, 0 });
+
+		brush_vbo_->Create({
+			Vertex(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)),
+			Vertex(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)),
+			Vertex(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)),
+			Vertex(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f))
+		},
+		indices);
 
 		vertices_.clear();
 		indices_.clear();
@@ -424,8 +437,6 @@ namespace snuffbox
       return;
     }
 
-    D3D11VertexBuffer brush_vbo(D3D11VertexBuffer::VertexBufferType::kOther);
-
     float hr = radius / 2.0f;
     XMFLOAT2 t1 = GetWorldTextureCoordinates(x - hr, y - hr);
     XMFLOAT2 t2 = GetWorldTextureCoordinates(x + hr, y - hr);
@@ -472,7 +483,7 @@ namespace snuffbox
       0, 1, 3, 0, 3, 2
     };
 
-    brush_vbo.Create({
+    brush_vbo_->Update({
       Vertex(p1, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t1, XMFLOAT3(0.0f, 0.0f, 1.0f)),
       Vertex(p2, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t2, XMFLOAT3(0.0f, 0.0f, 1.0f)),
       Vertex(p3, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), t3, XMFLOAT3(0.0f, 0.0f, 1.0f)),
@@ -485,18 +496,9 @@ namespace snuffbox
     render_device->default_blend_state()->Set();
     render_device->default_rasterizer_state()->Set();
 
-    D3D11_RECT rect;
-    rect.left = static_cast<UINT>(brush_vp_->x());
-    rect.top = static_cast<UINT>(brush_vp_->y());
-    rect.right = static_cast<UINT>(brush_vp_->width());
-    rect.bottom = static_cast<UINT>(brush_vp_->height());
-
-    render_device->context()->RSSetScissorRects(1, &rect);
-    render_device->set_current_rasterizer_state(nullptr);
-
     render_device->SetSampler(D3D11SamplerState::SamplerTypes::kLinear);
     diffuses_->Set(render_device->context());
-    brush_vbo.Set();
+    brush_vbo_->Set();
     brush_vp_->Set();
     brush_shader_->Set();
 
@@ -506,7 +508,7 @@ namespace snuffbox
       normal_map == nullptr ? render_device->default_normal() : normal_map,
       specular_map == nullptr ? render_device->default_texture() : specular_map
     });
-    brush_vbo.Draw();
+    brush_vbo_->Draw();
   }
 
   //-------------------------------------------------------------------------------------------
@@ -514,6 +516,95 @@ namespace snuffbox
   {
     vertex_buffer_->Update(vertices_, indices_, false);
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Terrain::SaveTexture(const std::string& path)
+	{
+		std::string full_path = Game::Instance()->path() + "/" + path;
+
+		SNUFF_LOG_INFO("Saving terrain texture to '" + path + "'");
+
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+		auto save_texture = [render_device, full_path](D3D11RenderTarget* target, const std::string& append)
+		{
+			ID3D11Resource* texture = nullptr;
+
+			HRESULT hr = S_OK;
+
+			target->resource()->GetResource(&texture);
+
+			hr = D3DX11SaveTextureToFileA(render_device->context(), texture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_TIFF, (full_path + append).c_str());
+			SNUFF_XASSERT(hr == S_OK, render_device->HRToString(hr, "D3DX10SaveTextureToFileA"), "D3D11Terrain::SaveTexture");
+		
+			texture->Release();
+		};
+
+		save_texture(diffuses_.get(), "_diffuse.tiff");
+		save_texture(normals_.get(), "_normal.tiff");
+		save_texture(speculars_.get(), "_specular.tiff");
+
+		SNUFF_LOG_INFO("Saved terrain texture to '" + path + "'");
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Terrain::LoadTexture(const std::string& path)
+	{
+		SNUFF_LOG_INFO("Loading terrain texture");
+
+		std::vector<int> indices({ 0, 1, 3, 0, 3, 2 });
+
+		brush_vbo_->Update({
+			{ XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+			{ XMFLOAT4(-1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+			{ XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+			{ XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
+		},
+		indices);
+
+		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
+
+		render_device->default_blend_state()->Set();
+		render_device->default_rasterizer_state()->Set();
+
+		render_device->SetSampler(D3D11SamplerState::SamplerTypes::kLinear);
+		diffuses_->Set(render_device->context());
+		brush_vbo_->Set();
+		brush_vp_->Set();
+		brush_shader_->Set();
+
+		D3D11Texture diffuse_texture;
+		diffuse_texture.Load(path + "_diffuse.tiff");
+		diffuse_texture.Validate();
+
+		D3D11Texture normal_texture;
+		normal_texture.Load(path + "_normal.tiff");
+		normal_texture.Validate();
+
+		D3D11Texture specular_texture;
+		specular_texture.Load(path + "_specular.tiff");
+		specular_texture.Validate();
+
+		float opacity = 1.0f;
+		float coords[4] = {
+			0.0f, 0.0f, 1.0f, 1.0f
+		};
+
+		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat4, "Brush", coords);
+		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat, "Opacity", &opacity);
+		brush_uniform_->Apply();
+
+		D3D11Texture* default_texture = render_device->default_texture();
+
+		D3D11Texture::SetMultipleTextures(0, 4, {
+			default_texture,
+			diffuse_texture.is_valid() ? &diffuse_texture : default_texture,
+			normal_texture.is_valid() ? &normal_texture : render_device->default_normal(),
+			specular_texture.is_valid() ? &specular_texture : default_texture
+		});
+		brush_vbo_->Draw();
+
+		SNUFF_LOG_INFO("Loaded terrain texture");
+	}
 
   //-------------------------------------------------------------------------------------------
   void D3D11Terrain::set_texture_tiling(const float& u, const float& v)
@@ -565,7 +656,9 @@ namespace snuffbox
       { "getBilinearHeight", JSGetBilinearHeight },
       { "brushTexture", JSBrushTexture },
       { "setTextureTiling", JSSetTextureTiling },
-			{ "flush", JSFlush }
+			{ "flush", JSFlush },
+			{ "saveTexture", JSSaveTexture },
+			{ "loadTexture", JSLoadTexture }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -753,5 +846,29 @@ namespace snuffbox
 		D3D11Terrain* self = wrapper.GetPointer<D3D11Terrain>(args.This());
 
 		self->Flush();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Terrain::JSSaveTexture(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Terrain* self = wrapper.GetPointer<D3D11Terrain>(args.This());
+
+		if (wrapper.Check("S") == true)
+		{
+			self->SaveTexture(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11Terrain::JSLoadTexture(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Terrain* self = wrapper.GetPointer<D3D11Terrain>(args.This());
+
+		if (wrapper.Check("S") == true)
+		{
+			self->LoadTexture(wrapper.GetValue<std::string>(0, "undefined"));
+		}
 	}
 }

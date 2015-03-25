@@ -100,7 +100,7 @@ namespace snuffbox
 
 			SNUFF_XASSERT(valid == true, "Tried to create a render target without a corresponding back buffer!", "D3D11RenderTarget::Create");
 
-			desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
       if (w != -1 && h != -1)
@@ -123,7 +123,7 @@ namespace snuffbox
         D3D11_SHADER_RESOURCE_VIEW_DESC view_desc;
 
         view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         view_desc.Texture2D.MipLevels = 1;
         view_desc.Texture2D.MostDetailedMip = 0;
 

@@ -141,6 +141,18 @@ namespace snuffbox
 		/// Flushes the terrain after modification of heights
 		void Flush();
 
+		/**
+		* @brief Saves the terrain texture to a path
+		* @param[in] path (const std::string&) The path to save to
+		*/
+		void SaveTexture(const std::string& path);
+
+		/**
+		* @brief Loads a terrain texture as a base layer
+		* @param[in] path (const std::string&) The path to load from
+		*/
+		void LoadTexture(const std::string& path);
+
     /**
     * @brief Sets the texture tiling of the terrain
     * @param[in] u (const float&) The amount of times the texture needs to tile on the x-axis
@@ -166,6 +178,7 @@ namespace snuffbox
 
   private:
     SharedPtr<D3D11VertexBuffer> vertex_buffer_; //!< The vertex buffer of this quad
+		SharedPtr<D3D11VertexBuffer> brush_vbo_; //!< The brush vertex buffer
     SharedPtr<D3D11RenderTarget> diffuses_; //!< The terrain diffuses render target that can be drawn to
     SharedPtr<D3D11RenderTarget> normals_; //!< The terrain normals render target that can be drawn to
     SharedPtr<D3D11RenderTarget> speculars_; //!< The terrain speculars render target that can be drawn to
@@ -198,5 +211,7 @@ namespace snuffbox
     static void JSBrushTexture(JS_ARGS args);
     static void JSSetTextureTiling(JS_ARGS args);
 		static void JSFlush(JS_ARGS args);
+		static void JSSaveTexture(JS_ARGS args);
+		static void JSLoadTexture(JS_ARGS args);
   };
 }
