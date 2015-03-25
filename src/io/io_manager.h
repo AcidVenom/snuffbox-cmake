@@ -2,6 +2,8 @@
 
 #include "../js/js_object.h"
 
+#include <vector>
+
 namespace snuffbox
 {
 	class IOManager : public JSObject
@@ -55,6 +57,13 @@ namespace snuffbox
 		*/
 		void CreateDir(const std::string& path);
 
+		/**
+		* @brief Retrieves the files in a directory and returns the names
+		* @param[in] path (const std::string&) The path of the directory to look for files
+		* @return std::vector<std::string> The list of file names
+		*/
+		std::vector<std::string> FilesInDirectory(const std::string& path);
+
 	public:
 		JS_NAME("IO");
 		static void RegisterJS(JS_SINGLETON obj);
@@ -63,5 +72,6 @@ namespace snuffbox
 		static void JSWrite(JS_ARGS args);
 		static void JSDirectoryExists(JS_ARGS args);
 		static void JSCreateDir(JS_ARGS args);
+		static void JSFilesInDirectory(JS_ARGS args);
 	};
 }

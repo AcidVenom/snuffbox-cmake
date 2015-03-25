@@ -21,6 +21,13 @@ namespace snuffbox
   }
 
 	//------------------------------------------------------------------------------
+	Handle<Array> JSWrapper::CreateArray()
+	{
+		Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		return Array::New(isolate);
+	}
+
+	//------------------------------------------------------------------------------
 	JSWrapper::Types JSWrapper::TypeOf(const Local<Value>& value)
 	{
 		if (value->IsFunction())

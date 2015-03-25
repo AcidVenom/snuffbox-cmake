@@ -74,6 +74,41 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	std::vector<std::string> IOManager::FilesInDirectory(const std::string& path)
+	{
+		HANDLE dir;
+		WIN32_FIND_DATA file_data;
+		std::vector<std::string> out;
+		std::string directory = Game::Instance()->path() + "/" + path;
+
+		if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+		{
+			return out;
+		}
+
+		do {
+			std::string file_name = file_data.cFileName;
+			bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+			if (file_name[0] == '.')
+			{
+				continue;
+			}
+
+			if (is_directory == true)
+			{
+				continue;
+			}
+
+			out.push_back(path + "/" + file_name);
+		} while (FindNextFile(dir, &file_data));
+
+		FindClose(dir);
+
+		return out;
+	}
+
+	//-------------------------------------------------------------------------------------------
 	IOManager::~IOManager()
 	{
 
@@ -87,7 +122,8 @@ namespace snuffbox
 			{ "exists", JSExists },
 			{ "write", JSWrite },
 			{ "directoryExists", JSDirectoryExists },
-			{ "createDirectory", JSCreateDir }
+			{ "createDirectory", JSCreateDir },
+			{ "filesInDirectory", JSFilesInDirectory }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -167,6 +203,26 @@ namespace snuffbox
 		if (wrapper.Check("S") == true)
 		{
 			IOManager::Instance()->CreateDir(wrapper.GetValue<std::string>(0, "undefined"));
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void IOManager::JSFilesInDirectory(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+
+		if (wrapper.Check("S") == true)
+		{
+			std::vector<std::string> names = IOManager::Instance()->FilesInDirectory(wrapper.GetValue<std::string>(0, "undefined"));
+
+			v8::Handle<v8::Array> arr = JSWrapper::CreateArray();
+
+			for (unsigned int i = 0; i < static_cast<unsigned int>(names.size()); ++i)
+			{
+				JSWrapper::SetArrayValue<std::string>(arr, i, names.at(i));
+			}
+
+			wrapper.ReturnValue<v8::Handle<v8::Array>>(arr);
 		}
 	}
 }

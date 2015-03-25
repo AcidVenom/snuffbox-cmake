@@ -87,14 +87,29 @@ namespace snuffbox
     */
     static v8::Handle<v8::Object> CreateObject();
 
+		/**
+		* @brief Creates a JavaScript array handle and returns it
+		* @return v8::Handle<v8::Array> The created array handle
+		*/
+		static v8::Handle<v8::Array> CreateArray();
+
     /**
-    * @brief Returns a value to JavaScript
+    * @brief Sets an object value
     * @param[in] obj (const v8::Handle<v8::Object>&) The object to assign the value to
     * @param[in] field (const std::string&) The field to set
     * @param[in] val (const T&) The value to set
     */
     template<typename T>
     static void SetObjectValue(const v8::Handle<v8::Object>& obj, const std::string& field, const T& val);
+
+		/**
+		* @brief Sets an array value
+		* @param[in] obj (const v8::Handle<v8::Array>&) The array to assign the value to
+		* @param[in] idx (const int&) The index to set
+		* @param[in] val (const T&) The value to set
+		*/
+		template<typename T>
+		static void SetArrayValue(const v8::Handle<v8::Array>& obj, const int& idx, const T& val);
 
 		/**
 		* @brief Returns the type of a local value
@@ -327,6 +342,14 @@ namespace snuffbox
     args_.GetReturnValue().Set<v8::Object>(val);
   }
 
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::ReturnValue<v8::Handle<v8::Array>>(const v8::Handle<v8::Array>& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		args_.GetReturnValue().Set<v8::Array>(val);
+	}
+
   //-------------------------------------------------------------------------------------------
   template<>
   inline void JSWrapper::SetObjectValue<double>(const v8::Handle<v8::Object>& obj, const std::string& field, const double& val)
@@ -372,4 +395,66 @@ namespace snuffbox
     v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
     obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), val);
   }
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetObjectValue<v8::Handle<v8::Array>>(const v8::Handle<v8::Object>& obj, const std::string& field, const v8::Handle<v8::Array>& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(v8::String::NewFromUtf8(isolate, field.c_str()), val);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<double>(const v8::Handle<v8::Array>& obj, const int& idx, const double& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(idx, v8::Number::New(isolate, val));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<float>(const v8::Handle<v8::Array>& obj, const int& idx, const float& val)
+	{
+		JSWrapper::SetArrayValue<double>(obj, idx, val);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<int>(const v8::Handle<v8::Array>& obj, const int& idx, const int& val)
+	{
+		JSWrapper::SetArrayValue<double>(obj, idx, val);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<bool>(const v8::Handle<v8::Array>& obj, const int& idx, const bool& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(idx, v8::Boolean::New(isolate, val));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<std::string>(const v8::Handle<v8::Array>& obj, const int& idx, const std::string& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(idx, v8::String::NewFromUtf8(isolate, val.c_str()));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<v8::Handle<v8::Object>>(const v8::Handle<v8::Array>& obj, const int& idx, const v8::Handle<v8::Object>& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(idx, val);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	inline void JSWrapper::SetArrayValue<v8::Handle<v8::Array>>(const v8::Handle<v8::Array>& obj, const int& idx, const v8::Handle<v8::Array>& val)
+	{
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+		obj->Set(idx, val);
+	}
 }
