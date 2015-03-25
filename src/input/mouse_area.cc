@@ -110,7 +110,7 @@ namespace snuffbox
       for (unsigned int i = 0; i < 3; ++i)
       {
         button = static_cast<Mouse::MouseButton>(i);
-        if (mouse->IsDown(button) == true)
+				if (mouse->IsDown(button) == true || mouse->IsDoubleClicked(button) == true)
         {
           if (callback == true)
           {
@@ -118,7 +118,7 @@ namespace snuffbox
           }
         }
 
-        if (mouse->IsPressed(button) == true)
+        if (mouse->IsPressed(button) == true || mouse->IsDoubleClicked(button) == true)
         {
           was_pressed_[button] = true;
 
