@@ -437,7 +437,7 @@ namespace snuffbox
       return;
     }
 
-    float hr = radius / 2.0f;
+    float hr = radius;
     XMFLOAT2 t1 = GetWorldTextureCoordinates(x - hr, y - hr);
     XMFLOAT2 t2 = GetWorldTextureCoordinates(x + hr, y - hr);
     XMFLOAT2 t3 = GetWorldTextureCoordinates(x - hr, y + hr);
