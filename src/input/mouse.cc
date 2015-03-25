@@ -172,7 +172,7 @@ namespace snuffbox
 		float w = static_cast<float>(window->width());
 		float h = static_cast<float>(window->height());
 
-		D3D11Viewport* vp = D3D11RenderDevice::Instance()->viewport_render_target();
+		D3D11Viewport* vp = D3D11RenderDevice::Instance()->viewport();
 		
 		float x1 = vp->x();
 		float y1 = vp->y();

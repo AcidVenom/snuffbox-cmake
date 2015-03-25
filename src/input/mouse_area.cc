@@ -50,23 +50,19 @@ namespace snuffbox
     {
       vp = parent_->target()->viewport();
     }
+    else
+    {
+      vp = D3D11RenderDevice::Instance()->viewport_render_target();
+    }
 
     XMMATRIX proj = XMMatrixOrthographicRH(res.x, res.y, 0.0f, 1.0f);
     XMMATRIX wp = parent_->world_matrix() * proj;
 
-    Mouse::float2 relative = mouse->Position(Mouse::MousePosition::kRelative);
-    
-    relative.x += vp == nullptr ? 0 : -vp->x() + vp->width() / 2.0f;
-    relative.y += vp == nullptr ? 0 : (-res.y / 2.0f + vp->y()) + vp->height() / 2.0f;
+    Mouse::float2 screen = mouse->Position(Mouse::MousePosition::kScreen);
 
-    Mouse::float2 screen;
-    screen.x = relative.x / res.x * 2.0f;
-    screen.y = relative.y / res.y * 2.0f;
+    SNUFF_LOG_INFO(std::to_string(screen.x));
 
-    float ratio_x = vp == nullptr ? 1.0f : vp->width() / res.x;
-		float ratio_y = vp == nullptr ? 1.0f : vp->height() / res.y;
-
-    if (screen.x > ratio_x || screen.x < -ratio_x || screen.y > ratio_y || screen.y < -ratio_y)
+    if (screen.x > 1.0f || screen.x < -1.0f || screen.y > 1.0f || screen.y < -1.0f)
     {
       if (entered_ == true)
       {
@@ -110,7 +106,7 @@ namespace snuffbox
       for (unsigned int i = 0; i < 3; ++i)
       {
         button = static_cast<Mouse::MouseButton>(i);
-				if (mouse->IsDown(button) == true || mouse->IsDoubleClicked(button) == true)
+        if (mouse->IsDown(button) == true)
         {
           if (callback == true)
           {
@@ -118,7 +114,7 @@ namespace snuffbox
           }
         }
 
-        if (mouse->IsPressed(button) == true || mouse->IsDoubleClicked(button) == true)
+        if (mouse->IsPressed(button) == true)
         {
           was_pressed_[button] = true;
 
