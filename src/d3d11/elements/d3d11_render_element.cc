@@ -591,6 +591,7 @@ namespace snuffbox
 			{ "setNormalMap", JSSetNormalMap },
 			{ "setSpecularMap", JSSetSpecularMap },
 			{ "setLightMap", JSSetLightMap },
+      { "setEffect", JSSetEffect },
       { "destroy", JSDestroy }
     };
 
