@@ -329,6 +329,16 @@ namespace snuffbox
 
     default_effect_->AddTechnique(technique);
 
+    pass.sampling = D3D11SamplerState::SamplerTypes::kLinear;
+    pass.shader = content_manager->Get<D3D11Shader>("shaders/base_diffuse.fx");
+    pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+    pass.blend_state->CreateFromJson(std::string("{}"));
+
+    technique.name = "Diffuse";
+    technique.passes = { pass };
+
+    default_effect_->AddTechnique(technique);
+
     pass.shader = content_manager->Get<D3D11Shader>("shaders/ui.fx");
 		pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
 

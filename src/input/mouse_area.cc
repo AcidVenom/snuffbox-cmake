@@ -60,8 +60,6 @@ namespace snuffbox
 
     Mouse::float2 screen = mouse->Position(Mouse::MousePosition::kScreen);
 
-    SNUFF_LOG_INFO(std::to_string(screen.x));
-
     if (screen.x > 1.0f || screen.x < -1.0f || screen.y > 1.0f || screen.y < -1.0f)
     {
       if (entered_ == true)
@@ -106,7 +104,7 @@ namespace snuffbox
       for (unsigned int i = 0; i < 3; ++i)
       {
         button = static_cast<Mouse::MouseButton>(i);
-        if (mouse->IsDown(button) == true)
+        if (mouse->IsDown(button) || mouse->IsDoubleClicked(button) == true)
         {
           if (callback == true)
           {
@@ -114,7 +112,7 @@ namespace snuffbox
           }
         }
 
-        if (mouse->IsPressed(button) == true)
+        if (mouse->IsPressed(button) || mouse->IsDoubleClicked(button) == true)
         {
           was_pressed_[button] = true;
 
