@@ -94,6 +94,11 @@ namespace snuffbox
 		const CameraTypes& type() const;
 
 		/**
+		* @return const float& The current zoom of the camera
+		*/
+		const float& zoom() const;
+
+		/**
 		* @brief Sets the translation of the camera
 		* @param[in] x (const float&) The new x position
 		* @param[in] y (const float&) The new y position
@@ -126,6 +131,12 @@ namespace snuffbox
 		* @param[in] fov (const float&) The new field of view
 		*/
 		void set_fov(const float& fov);
+
+		/**
+		* @brief Sets the zoom of the camera
+		* @param[in] zoom (const float&) The zoom of the camera
+		*/
+		void set_zoom(const float& zoom);
 
 		/**
 		* @brief Translate by given values
@@ -172,6 +183,7 @@ namespace snuffbox
 		float near_plane_; //!< The camera near plane
 		float far_plane_; //!< The camera far plane
 		float fov_; //!< The field of view of the camera
+		float zoom_; //!< The zoom of the camera
 		const XMVECTOR cam_forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		const XMVECTOR cam_right_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
@@ -192,5 +204,7 @@ namespace snuffbox
 		static void JSSetFov(JS_ARGS args);
 		static void JSFov(JS_ARGS args);
 		static void JSUnproject(JS_ARGS args);
+		static void JSSetZoom(JS_ARGS args);
+		static void JSZoom(JS_ARGS args);
 	};
 }

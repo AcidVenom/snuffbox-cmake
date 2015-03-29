@@ -19,7 +19,8 @@ namespace snuffbox
 		target_(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 		move_left_right_(0.0f),
 		move_back_forward_(0.0f),
-		move_up_down_(0.0f)
+		move_up_down_(0.0f),
+		zoom_(1.0f)
 	{
 
 	}
@@ -37,7 +38,8 @@ namespace snuffbox
 		target_(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)),
 		move_left_right_(0.0f),
 		move_back_forward_(0.0f),
-		move_up_down_(0.0f)
+		move_up_down_(0.0f),
+		zoom_(1.0f)
 	{
 		JSWrapper wrapper(args);
 
@@ -68,7 +70,7 @@ namespace snuffbox
 		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
 		if (type_ == CameraTypes::kOrthographic)
 		{
-			projection_ = XMMatrixOrthographicRH(res.x, res.y, near_plane_, far_plane_);
+			projection_ = XMMatrixOrthographicRH(res.x / zoom_, res.y / zoom_, near_plane_, far_plane_);
 		}
 		else if (type_ == CameraTypes::kPerspective)
 		{
@@ -128,6 +130,12 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Camera::zoom() const
+	{
+		return zoom_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
 	void D3D11Camera::set_translation(const float& x, const float& y, const float& z)
 	{
 		float yy = D3D11RenderSettings::Instance()->invert_y() == false ? -y : y;
@@ -156,6 +164,12 @@ namespace snuffbox
 	void D3D11Camera::set_fov(const float& fov)
 	{
 		fov_ = fov;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Camera::set_zoom(const float& zoom)
+	{
+		zoom_ = zoom;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -233,7 +247,9 @@ namespace snuffbox
 			{ "farPlane", JSFarPlane },
 			{ "setFov", JSSetFov },
 			{ "fov", JSFov },
-			{ "unproject", JSUnproject }
+			{ "unproject", JSUnproject },
+			{ "setZoom", JSSetZoom },
+			{ "zoom", JSZoom }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -406,5 +422,26 @@ namespace snuffbox
 
 			wrapper.ReturnValue<v8::Handle<v8::Object>>(obj);
 		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Camera::JSSetZoom(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Camera* self = wrapper.GetPointer<D3D11Camera>(args.This());
+
+		if (wrapper.Check("N") == true)
+		{
+			self->set_zoom(wrapper.GetValue<float>(0, 1.0f));
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11Camera::JSZoom(JS_ARGS args)
+	{
+		JSWrapper wrapper(args);
+		D3D11Camera* self = wrapper.GetPointer<D3D11Camera>(args.This());
+
+		wrapper.ReturnValue<double>(self->zoom());
 	}
 }
