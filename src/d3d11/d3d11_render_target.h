@@ -7,6 +7,7 @@ namespace snuffbox
 {
   class D3D11RenderQueue;
 	class D3D11Uniforms;
+  class D3D11RenderElement;
 
 	/**
 	* @class snuffbox::D3D11RenderTarget
@@ -103,6 +104,12 @@ namespace snuffbox
     * @param[in] ID3D11ShaderResourceView* The depth stencil view resource used for deferred rendering
     */
     void SetResources(ID3D11DeviceContext* context, ID3D11ShaderResourceView* depth_stencil_resource);
+
+    /**
+    * @brief Finds and removes a render element when destructed
+    * @param[in] ptr (snuffbox:D3D11RenderElement*) The element to remove
+    */
+    void FindAndRemove(D3D11RenderElement* ptr);
 
 		/// Releases all referenced D3D11 com objects
 		void Release();

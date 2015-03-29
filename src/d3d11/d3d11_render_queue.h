@@ -71,6 +71,12 @@ namespace snuffbox
     /// Clears the entire render queue
     void Clear();
 
+    /**
+    * @brief Removes a render element from the queue
+    * @param[in] ptr (snuffbox::D3D11RenderElement*) The element to remove
+    */
+    void Remove(D3D11RenderElement* ptr);
+
   private:
     std::vector<D3D11RenderElement*> world_; //!< A list of world elements to sort and / or draw
 		std::vector<D3D11RenderElement*> ui_; //!< A list of UI elements to sort and / or draw

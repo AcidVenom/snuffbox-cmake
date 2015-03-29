@@ -558,6 +558,11 @@ namespace snuffbox
 		{
 			animation_->set_parent(nullptr);
 		}
+
+    if (target_ != nullptr)
+    {
+      target_->FindAndRemove(this);
+    }
   }
 
   //-------------------------------------------------------------------------------------------

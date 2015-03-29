@@ -17,7 +17,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	bool RenderSorterZ::operator()(D3D11RenderElement* a, D3D11RenderElement* b)
 	{
-		return XMVectorGetZ(a->translation()) > XMVectorGetZ(b->translation());
+		return a == nullptr || b == nullptr ? false : XMVectorGetZ(a->translation()) > XMVectorGetZ(b->translation());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ namespace snuffbox
     {
 			element = world_.at(i);
 
-      if (element->spawned() == true)
+      if (element != nullptr && element->spawned() == true)
       {
         DrawElement(context, element);
       }
@@ -236,6 +236,26 @@ namespace snuffbox
 			ui_.at(i)->Destroy();
 		}
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderQueue::Remove(D3D11RenderElement* ptr)
+  {
+    for (unsigned int i = 0; i < world_.size(); ++i)
+    {
+      if (world_.at(i) == ptr)
+      {
+        world_.at(i) = nullptr;
+      }
+    }
+
+    for (unsigned int i = 0; i < ui_.size(); ++i)
+    {
+      if (world_.at(i) == ptr)
+      {
+        world_.at(i) = nullptr;
+      }
+    }
+  }
 
   //-------------------------------------------------------------------------------------------
   D3D11RenderQueue::~D3D11RenderQueue()

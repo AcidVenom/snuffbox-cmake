@@ -266,6 +266,12 @@ namespace snuffbox
     delete[] resources;
   }
 
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::FindAndRemove(D3D11RenderElement* ptr)
+  {
+    queue_->Remove(ptr);
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::Release()
 	{
