@@ -8,7 +8,6 @@ cbuffer Global : register(b0)
 
 struct Attributes
 {
-	float4 Emissive;
 	float4 Diffuse;
 	float4 Ambient;
 
@@ -16,6 +15,7 @@ struct Attributes
 	float SpecularIntensity;
 	float Reflectivity;
 	float NormalScale;
+	float Emissive;
 };
 
 cbuffer PerObject : register(b1)
@@ -72,6 +72,7 @@ struct PSOut
 {
 	float4 colour : SV_Target0;
 	float4 normal : SV_Target1;
+	float4 ambient : SV_Target2;
 };
 float4 Reflection(float4 p, float4 eye, float3 normal)
 {
@@ -96,9 +97,10 @@ PSOut PS(VOut input)
 	float4 r = Reflection(input.world_pos, EyePosition, input.normal.rgb);
 	float spec = saturate(Material.SpecularIntensity * TexSpecular.Sample(Sampler, coords).r);
 
-	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, Material.Reflectivity) * Material.Diffuse * float4(Blend, 1.0f) * input.colour;
+	output.colour = lerp(TexDiffuse.Sample(Sampler, coords), r, saturate(Material.Reflectivity)) * Material.Diffuse * float4(Blend, 1.0f) * input.colour;
 	output.colour.a = Material.SpecularPower / 256;
 	output.normal = float4((normal.rgb + 1.0f) / 2.0f, spec);
+	output.ambient = float4(Material.Ambient.rgb, saturate(TexLight.Sample(Sampler, coords).r * Material.Emissive));
 
 	return output;
 }

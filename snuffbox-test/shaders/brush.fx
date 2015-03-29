@@ -54,9 +54,16 @@ PSOut PS(VOut input)
 	float4 mask = Mask.Sample(Sampler, brush_coords);
 	float a = (mask.r + mask.g + mask.b) / 3.0f;
 
-	output.colour = float4(Diffuse.Sample(Sampler, input.texcoord).rgb, a);
-	output.normals = float4(Normal.Sample(Sampler, input.texcoord).rgb, a);
-	output.speculars = float4(Specular.Sample(Sampler, input.texcoord).rgb, a);
+	a *= Opacity.r;
+
+	output.colour = Diffuse.Sample(Sampler, input.texcoord);
+	output.colour.a *= a;
+
+	output.normals = Normal.Sample(Sampler, input.texcoord);
+	output.normals.a *= a;
+
+	output.speculars = Specular.Sample(Sampler, input.texcoord);
+	output.speculars.a *= a;
 
 	return output;
 }

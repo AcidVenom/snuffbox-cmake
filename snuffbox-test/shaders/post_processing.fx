@@ -31,6 +31,8 @@ struct LightAttributes
 cbuffer LightBuffer : register(b3)
 {
 	LightAttributes Light;
+	float4 Ambient;
+	float4 Shadow;
 }
 
 struct VOut
@@ -53,6 +55,7 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 
 Texture2D TexColour : register(t0);
 Texture2D TexNormal : register(t1);
+Texture2D TexAmbient : register(t2);
 Texture2D TexDepth : register(t3);
 SamplerState Sampler;
 
@@ -82,7 +85,7 @@ LightResult Directional(float3 v, float3 n, float i, float p)
 	float3 l = Light.Direction.xyz;
 
 	result.Diffuse = Diffuse(-l, n);
-	result.Specular = Specular(v, l, n, i, p);
+	result.Specular = Specular(v, -l, n, i, p);
 
 	return result;
 }
@@ -133,6 +136,7 @@ float4 PS(VOut input) : SV_TARGET
 	float4 diffuse = TexColour.Sample(Sampler, input.texcoord);
 	float4 normal = TexNormal.Sample(Sampler, input.texcoord);
 	float4 depth = TexDepth.Sample(Sampler, input.texcoord);
+	float4 ambient = TexAmbient.Sample(Sampler, input.texcoord);
 
 	float4 position;
 	position.x = input.texcoord.x * 2.0f - 1.0f;
@@ -156,9 +160,11 @@ float4 PS(VOut input) : SV_TARGET
 
 	LightResult result = ComputeLighting(view, position.xyz, normal.rgb, specular_intensity, specular_power);
 	
-	float4 final = diffuse;
-	final += result.Specular;
-	final *= result.Diffuse;
+	float emissive = ambient.a;
+	ambient = float4(Ambient.rgb + ambient.rgb, 1.0f);
+
+	float4 final = saturate(saturate(diffuse * ambient) * (Shadow + result.Diffuse)  + result.Specular + emissive);
 	final.a = result.Specular.a;
+
 	return final;
 }

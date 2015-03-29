@@ -42,8 +42,6 @@ Game.Initialise = function()
 	
 	ContentManager.load("texture", "metal.png");
 	ContentManager.load("texture", "metal_normal.png");
-	ContentManager.load("texture", "stones.png");
-	ContentManager.load("texture", "stones_normal.png");
 	ContentManager.load("texture", "metal_specular.png");
 	ContentManager.load("model", "sphere.fbx");
 	ContentManager.load("material", "test.material");
