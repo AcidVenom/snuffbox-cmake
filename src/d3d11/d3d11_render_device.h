@@ -286,6 +286,11 @@ namespace snuffbox
 		*/
 		D3D11Viewport* viewport();
 
+		/**
+		* @return ID3D11ShaderResourceView* The depth stencil resource of the depth stencil view
+		*/
+		ID3D11ShaderResourceView* depth_stencil_resource();
+
     /**
     * @brief Sets the current vertex buffer type
     * @param[in] type (const int&) The type to set

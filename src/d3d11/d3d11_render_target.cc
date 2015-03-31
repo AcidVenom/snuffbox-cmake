@@ -88,7 +88,7 @@ namespace snuffbox
 			}
 			else
 			{
-				queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>();
+				queue_ = AllocatedMemory::Instance().Construct<D3D11RenderQueue>(this);
         uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
         post_processing_ = D3D11RenderDevice::Instance()->default_post_processing();
 			}
@@ -207,7 +207,7 @@ namespace snuffbox
 			return;
 		}
 
-    ID3D11RenderTargetView** views = new ID3D11RenderTargetView*[mrts_.size()];
+		ID3D11RenderTargetView* views[8];
 
     for (unsigned int i = 0; i < mrts_.size(); ++i)
     {
@@ -215,8 +215,6 @@ namespace snuffbox
     }
 
     context->OMSetRenderTargets(static_cast<UINT>(mrts_.size()), views, depth_stencil);
-
-    delete[] views;
 	}
 
   //---------------------------------------------------------------------------------------------------------
@@ -252,7 +250,7 @@ namespace snuffbox
   //---------------------------------------------------------------------------------------------------------
   void D3D11RenderTarget::SetResources(ID3D11DeviceContext* context, ID3D11ShaderResourceView* depth_stencil_resource)
   {
-    ID3D11ShaderResourceView** resources = new ID3D11ShaderResourceView*[mrts_.size() + 1];
+		ID3D11ShaderResourceView* resources[8];
 
     for (unsigned int i = 0; i < mrts_.size(); ++i)
     {
@@ -262,8 +260,6 @@ namespace snuffbox
     resources[mrts_.size()] = depth_stencil_resource;
 
     context->PSSetShaderResources(0, static_cast<UINT>(mrts_.size() + 1), resources);
-
-    delete[] resources;
   }
 
   //---------------------------------------------------------------------------------------------------------

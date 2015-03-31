@@ -949,6 +949,12 @@ namespace snuffbox
 		return viewport_.get();
 	}
 
+	//-------------------------------------------------------------------------------------------
+	ID3D11ShaderResourceView* D3D11RenderDevice::depth_stencil_resource()
+	{
+		return depth_stencil_resource_;
+	}
+
   //-------------------------------------------------------------------------------------------
   void D3D11RenderDevice::set_vertex_buffer_type(const int& type)
   {

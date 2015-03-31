@@ -253,7 +253,7 @@ namespace snuffbox
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     D3D11Texture** old = render_device->set_textures();
 
-    ID3D11ShaderResourceView** resources = new ID3D11ShaderResourceView*[8];
+    ID3D11ShaderResourceView* resources[8];
     D3D11Texture* current = nullptr;
 
     bool set = false;
@@ -270,12 +270,12 @@ namespace snuffbox
       old[start + i] = current;
     }
 
+		resources[start + textures.size()] = render_device->depth_stencil_resource();
+
     if (set == true)
     {
       render_device->context()->PSSetShaderResources(start, num, resources);
     }
-
-    delete[] resources;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

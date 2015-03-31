@@ -37,8 +37,11 @@ namespace snuffbox
     };
 
   public:
-    /// Default constructor
-    D3D11RenderQueue();
+    /**
+		* @brief Constructs this queue with a given render target
+		* @param[in] target (snuffbox::D3D11RenderTarget*) The target parent of this queue
+		*/
+    D3D11RenderQueue(D3D11RenderTarget* target);
 
     /// Default destructor
     ~D3D11RenderQueue();
@@ -80,5 +83,6 @@ namespace snuffbox
   private:
     std::vector<D3D11RenderElement*> world_; //!< A list of world elements to sort and / or draw
 		std::vector<D3D11RenderElement*> ui_; //!< A list of UI elements to sort and / or draw
+		D3D11RenderTarget* target_; //!< The owner of this render queue
   };
 }

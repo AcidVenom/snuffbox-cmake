@@ -41,7 +41,8 @@ namespace snuffbox
 	}
 
   //-------------------------------------------------------------------------------------------
-  D3D11RenderQueue::D3D11RenderQueue()
+  D3D11RenderQueue::D3D11RenderQueue(D3D11RenderTarget* target) :
+		target_(target)
   {
 
   }
@@ -175,7 +176,7 @@ namespace snuffbox
     {
 			element = world_.at(i);
 
-      if (element != nullptr && element->spawned() == true)
+      if (element != nullptr && element->spawned() == true && element->target() == target_)
       {
         DrawElement(context, element);
       }
