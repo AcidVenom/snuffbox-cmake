@@ -21,6 +21,7 @@ namespace snuffbox
 		post_processing_(nullptr),
 		technique_("Default"),
 		clear_depth_(false),
+    clear_albedo_(true),
 		lighting_enabled_(false),
     width_(-1),
     height_(-1)
@@ -37,6 +38,7 @@ namespace snuffbox
 		post_processing_(nullptr),
 		technique_("Default"),
 		clear_depth_(false),
+    clear_albedo_(true),
 		lighting_enabled_(false),
     width_(-1),
     height_(-1)
@@ -193,6 +195,10 @@ namespace snuffbox
 		{
       for (unsigned int i = 0; i < mrts_.size(); ++i)
       {
+        if (mrts_.at(i)->clear_albedo() == false && mrts_.at(i) != this)
+        {
+          continue;
+        }
         context->ClearRenderTargetView(mrts_.at(i)->view(), D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
       }
 		}
@@ -281,6 +287,7 @@ namespace snuffbox
 		if (type_ == RenderTargets::kRenderTarget)
 		{
 			SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::~D3D11RenderTarget::resource_");
+      queue_->Clear();
 		}
 
 		valid_ = false;
@@ -340,6 +347,12 @@ namespace snuffbox
 		return clear_depth_;
 	}
 
+  //---------------------------------------------------------------------------------------------------------
+  const bool& D3D11RenderTarget::clear_albedo() const
+  {
+    return clear_albedo_;
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	const bool& D3D11RenderTarget::lighting_enabled() const
 	{
@@ -370,6 +383,12 @@ namespace snuffbox
 		clear_depth_ = v;
 	}
 
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::set_clear_albedo(const bool& v)
+  {
+    clear_albedo_ = v;
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::set_lighting_enabled(const bool& v)
 	{
@@ -396,7 +415,9 @@ namespace snuffbox
 			{ "setClearDepth", JSSetClearDepth },
 			{ "clearDepth", JSClearDepth },
 			{ "setLightingEnabled", JSSetLightingEnabled },
-			{ "lightingEnabled", JSLightingEnabled }
+      { "lightingEnabled", JSLightingEnabled },
+      { "setClearAlbedo", JSSetClearAlbedo },
+      { "clearAlbedo", JSClearAlbedo }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -505,6 +526,27 @@ namespace snuffbox
 
 		wrapper.ReturnValue<bool>(self->clear_depth());
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::JSSetClearAlbedo(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+    if (wrapper.Check("B") == true)
+    {
+      self->set_clear_albedo(wrapper.GetValue<bool>(0, false));
+    }
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::JSClearAlbedo(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+    self->Clear(D3D11RenderDevice::Instance()->context());
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11RenderTarget::JSSetLightingEnabled(JS_ARGS args)

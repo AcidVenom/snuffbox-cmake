@@ -159,6 +159,11 @@ namespace snuffbox
 		*/
 		const bool& clear_depth() const;
 
+    /**
+    * @return const bool& Should the albedo colour be cleared when rendering this target?
+    */
+    const bool& clear_albedo() const;
+
 		/**
 		* @return const bool& Should lighting be enabled when rendering this target?
 		*/
@@ -188,6 +193,12 @@ namespace snuffbox
 		*/
 		void set_clear_depth(const bool& v);
 
+    /**
+    * @brief Sets if the albedo colour should be cleared when rendering this target
+    * @param[in] v (const bool&) The boolean value
+    */
+    void set_clear_albedo(const bool& v);
+
 		/**
 		* @brief Should lighting be enabled for this render target?
 		* @param[in] v (const bool&) The boolean value
@@ -210,6 +221,7 @@ namespace snuffbox
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
+    bool clear_albedo_; //!< Should the albedo colour be cleared?
 		bool clear_depth_; //!< Should the depth buffer be cleared for this render target?
 		bool lighting_enabled_; //!< Should lighting be enabled when rendering this render target?
     int width_; //!< The width of this target
@@ -228,5 +240,7 @@ namespace snuffbox
 		static void JSClearDepth(JS_ARGS args);
 		static void JSSetLightingEnabled(JS_ARGS args);
 		static void JSLightingEnabled(JS_ARGS args);
+    static void JSSetClearAlbedo(JS_ARGS args);
+    static void JSClearAlbedo(JS_ARGS args);
 	};
 }

@@ -270,8 +270,6 @@ namespace snuffbox
       old[start + i] = current;
     }
 
-		resources[start + textures.size()] = render_device->depth_stencil_resource();
-
     if (set == true)
     {
       render_device->context()->PSSetShaderResources(start, num, resources);

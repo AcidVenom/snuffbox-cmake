@@ -117,7 +117,7 @@ namespace snuffbox
 
 		if (material != nullptr && material->is_valid() == true)
 		{
-			material->Apply(element->override_diffuse(), element->override_normal(), element->override_specular());
+			material->Apply(element->override_diffuse(), element->override_normal(), element->override_specular(), element->override_light());
 			D3D11Effect* effect = material->effect();
 			D3D11Effect* override_effect = element->override_effect();
 			if (override_effect != nullptr)
