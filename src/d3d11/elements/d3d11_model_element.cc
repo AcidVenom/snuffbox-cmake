@@ -19,6 +19,8 @@ namespace snuffbox
   {
 		JSWrapper wrapper(args);
 
+    wrapper.set_error_checks(false);
+
 		if (wrapper.Check("S"))
 		{
 			SetModel(wrapper.GetValue<std::string>(0, "undefined"));
@@ -27,6 +29,18 @@ namespace snuffbox
 		{
 			path_ = "undefined";
 		}
+
+    if (wrapper.Check("SO"))
+    {
+      set_parent(wrapper.GetPointer<D3D11RenderElement>(1));
+    }
+    else
+    {
+      if (wrapper.Check("O"))
+      {
+        set_parent(wrapper.GetPointer<D3D11RenderElement>(0));
+      }
+    }
   }
 
 	//-------------------------------------------------------------------------------------------
