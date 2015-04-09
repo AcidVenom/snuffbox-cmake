@@ -154,6 +154,11 @@ namespace snuffbox
     */
     D3D11Viewport* viewport();
 
+    /**
+    * @return snuffbox::D3D11Line* The line system of this render target
+    */
+    D3D11Line* line();
+
 		/**
 		* @return const bool& Should the depth buffer be cleared when rendering this target?
 		*/
@@ -218,6 +223,7 @@ namespace snuffbox
     SharedPtr<D3D11RenderQueue> queue_; //!< The queue of this render target
 		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
     SharedPtr<D3D11Viewport> viewport_; //!< The viewport that can be overrided from JavaScript
+    SharedPtr<D3D11Line> line_; //!< The line system for this target
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets
@@ -242,5 +248,6 @@ namespace snuffbox
 		static void JSLightingEnabled(JS_ARGS args);
     static void JSSetClearAlbedo(JS_ARGS args);
     static void JSClearAlbedo(JS_ARGS args);
+    static void JSDrawLine(JS_ARGS args);
 	};
 }

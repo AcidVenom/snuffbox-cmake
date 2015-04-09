@@ -132,14 +132,19 @@ namespace snuffbox
     if (billboarding_ == true)
     {
       XMMATRIX billboard = XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), D3D11RenderDevice::Instance()->camera()->view());
+      XMFLOAT4X4 matrix;
+      XMStoreFloat4x4(&matrix, billboard);
+      matrix._14 = matrix._24 = matrix._34 = matrix._41 = matrix._42 = matrix._43 = 0;
+      matrix._44 = 1;
 
-      billboard._14 = billboard._24 = billboard._34 = billboard._41 = billboard._42 = billboard._43 = 0;
-      billboard._44 = 1;
-
-      rotation *= billboard;
+      rotation *= XMLoadFloat4x4(&matrix);
     }
 
-		trans._42 *= invert_y == false ? -1 : 1;
+    XMFLOAT4X4 matrix;
+    XMStoreFloat4x4(&matrix, trans);
+		matrix._42 *= invert_y == false ? -1 : 1;
+
+    trans = XMLoadFloat4x4(&matrix);
 
 		*world =
 			XMMatrixScalingFromVector(scale_ * size_) *
@@ -167,10 +172,16 @@ namespace snuffbox
 			XMVectorSetW(t, 1.0f);
 
 			XMMATRIX parent_trans = XMMatrixTranslationFromVector(t);
-			parent_trans._42 *= invert_y == false ? -1 : 1;
+      XMStoreFloat4x4(&matrix, parent_trans);
+      matrix._42 *= invert_y == false ? -1 : 1;
+
+      parent_trans = XMLoadFloat4x4(&matrix);
 
 			XMMATRIX root_trans = XMMatrixTranslationFromVector(parent->translation());
-			root_trans._42 *= invert_y == false ? -1 : 1;
+      XMStoreFloat4x4(&matrix, root_trans);
+      matrix._42 *= invert_y == false ? -1 : 1;
+
+      root_trans = XMLoadFloat4x4(&matrix);
 
 			*world *=
 				s * rot * parent_trans *
@@ -223,6 +234,33 @@ namespace snuffbox
 		blend_changed_ = false;
 		alpha_changed_ = false;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  BoundingBox D3D11RenderElement::Bounds()
+  {
+    const XMMATRIX& world = world_matrix();
+
+    const BoundingBox& bounds = vertex_buffer()->bounds();
+    BoundingBox out;
+    bounds.Transform(out, world);
+
+    return out;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  bool D3D11RenderElement::RayIntersection(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance)
+  {
+    BoundingBox bounds = Bounds();
+
+    bool intersects = bounds.Intersects(XMLoadFloat3(&origin), XMLoadFloat3(&dir), *distance);
+    
+    if (intersects == true)
+    {
+      return vertex_buffer()->Pick(origin, dir, distance, world_matrix());
+    }
+
+    return false;
+  }
 
   //-------------------------------------------------------------------------------------------
   const XMVECTOR& D3D11RenderElement::translation() const
@@ -597,7 +635,9 @@ namespace snuffbox
 			{ "setSpecularMap", JSSetSpecularMap },
 			{ "setLightMap", JSSetLightMap },
       { "setEffect", JSSetEffect },
-      { "destroy", JSDestroy }
+      { "destroy", JSDestroy },
+      { "rayIntersection", JSRayIntersection },
+      { "bounds", JSBounds }
     };
 
     JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -1023,6 +1063,64 @@ namespace snuffbox
 
 		self->set_override_effect(fx);
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSRayIntersection(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+
+    if (wrapper.Check("NNNNNN") == true)
+    {
+      float distance;
+      bool result = self->RayIntersection(
+        XMFLOAT3(
+        wrapper.GetValue<float>(0, 0.0f),
+        wrapper.GetValue<float>(1, 0.0f),
+        wrapper.GetValue<float>(2, 0.0f)),
+
+        XMFLOAT3(
+        wrapper.GetValue<float>(3, 0.0f),
+        wrapper.GetValue<float>(4, 0.0f),
+        wrapper.GetValue<float>(5, 0.0f)
+        ), &distance);
+
+      if (result == true)
+      {
+        wrapper.ReturnValue<float>(distance);
+      }
+      else
+      {
+        wrapper.ReturnValue<bool>(false);
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::JSBounds(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
+    
+    BoundingBox bounds = self->Bounds();
+    v8::Handle<v8::Object> center = wrapper.CreateObject();
+
+    wrapper.SetObjectValue(center, "x", bounds.Center.x);
+    wrapper.SetObjectValue(center, "y", bounds.Center.y);
+    wrapper.SetObjectValue(center, "z", bounds.Center.z);
+
+    v8::Handle<v8::Object> extents = wrapper.CreateObject();
+
+    wrapper.SetObjectValue(extents, "x", bounds.Extents.x);
+    wrapper.SetObjectValue(extents, "y", bounds.Extents.y);
+    wrapper.SetObjectValue(extents, "z", bounds.Extents.z);
+
+    v8::Handle<v8::Object> to_return = wrapper.CreateObject();
+    wrapper.SetObjectValue(to_return, "center", center);
+    wrapper.SetObjectValue(to_return, "extents", extents);
+
+    wrapper.ReturnValue<v8::Handle<v8::Object>>(to_return);
+  }
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::JSSpawned(JS_ARGS args)

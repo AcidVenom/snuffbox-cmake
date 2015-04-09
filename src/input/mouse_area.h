@@ -5,7 +5,9 @@
 #include "../js/js_callback.h"
 
 #include <Windows.h>
-#include <xnamath.h>
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 namespace snuffbox
 {

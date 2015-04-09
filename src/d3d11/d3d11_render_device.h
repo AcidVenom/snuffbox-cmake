@@ -5,7 +5,10 @@
 #include <d3dcommon.h>
 #include <D3DX10.h>
 #include <D3DX11.h>
-#include <xnamath.h>
+#include <DirectXMath.h>
+#include <DirectXCollision.h>
+
+using namespace DirectX;
 
 #include <string>
 #include <vector>
@@ -381,7 +384,6 @@ namespace snuffbox
 		D3D11RasterizerState* current_rasterizer_state_; //!< The currently set rasterizer state
 
 		D3D11Lighting* lighting_; //!< The lighting system
-		D3D11Line* line_; //!< The line system
 
     SharedPtr<D3D11Texture> default_texture_; //!< The default texture
     SharedPtr<D3D11Texture> default_normal_; //!< The default texture

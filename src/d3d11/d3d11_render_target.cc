@@ -4,6 +4,7 @@
 #include "../d3d11/d3d11_uniforms.h"
 #include "../d3d11/d3d11_viewport.h"
 #include "../d3d11/d3d11_render_settings.h"
+#include "../d3d11/d3d11_line.h"
 
 #include "../content/content_manager.h"
 
@@ -26,7 +27,7 @@ namespace snuffbox
     width_(-1),
     height_(-1)
 	{
-    
+    line_ = AllocatedMemory::Instance().Construct<D3D11Line>();
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -43,6 +44,8 @@ namespace snuffbox
     width_(-1),
     height_(-1)
 	{
+    line_ = AllocatedMemory::Instance().Construct<D3D11Line>();
+
 		JSWrapper wrapper(args);
 		
 		SNUFF_XASSERT(wrapper.Check("S"), "There was an attempt to create a render target without a name", "RenderTarget::RenderTarget");
@@ -341,6 +344,12 @@ namespace snuffbox
     return viewport_.get();
   }
 
+  //---------------------------------------------------------------------------------------------------------
+  D3D11Line* D3D11RenderTarget::line()
+  {
+    return line_.get();
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	const bool& D3D11RenderTarget::clear_depth() const
 	{
@@ -417,7 +426,8 @@ namespace snuffbox
 			{ "setLightingEnabled", JSSetLightingEnabled },
       { "lightingEnabled", JSLightingEnabled },
       { "setClearAlbedo", JSSetClearAlbedo },
-      { "clearAlbedo", JSClearAlbedo }
+      { "clearAlbedo", JSClearAlbedo },
+      { "drawLine", JSDrawLine }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -568,4 +578,29 @@ namespace snuffbox
 
 		wrapper.ReturnValue<bool>(self->lighting_enabled());
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::JSDrawLine(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11RenderTarget* self = wrapper.GetPointer<D3D11RenderTarget>(args.This());
+
+    if (wrapper.Check("NNNNNNNNNNNN") == true)
+    {
+      self->line()->DrawLine(
+        wrapper.GetValue<float>(0, 0.0f),
+        wrapper.GetValue<float>(1, 0.0f),
+        wrapper.GetValue<float>(2, 0.0f),
+        wrapper.GetValue<float>(3, 0.0f),
+        wrapper.GetValue<float>(4, 0.0f),
+        wrapper.GetValue<float>(5, 0.0f),
+        wrapper.GetValue<float>(6, 0.0f),
+        wrapper.GetValue<float>(7, 0.0f),
+        wrapper.GetValue<float>(8, 0.0f),
+        wrapper.GetValue<float>(9, 0.0f),
+        wrapper.GetValue<float>(10, 0.0f),
+        wrapper.GetValue<float>(11, 0.0f)
+        );
+    }
+  }
 }

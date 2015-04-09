@@ -8,8 +8,8 @@ namespace snuffbox
     type_(type),
     vertex_buffer_(nullptr),
     index_buffer_(nullptr),
-		vertex_size_(0),
-		index_size_(0),
+    vertex_size_(0),
+    index_size_(0),
     valid_(false),
     topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
   {
@@ -77,6 +77,8 @@ namespace snuffbox
 		vertex_size_ = static_cast<unsigned int>(vertices_.size());
 		index_size_ = static_cast<unsigned int>(indices_.size());
 
+    CalculateBounds();
+
     valid_ = true;
   }
 
@@ -125,7 +127,55 @@ namespace snuffbox
 			idx[i] = indices_.at(i);
 		}
 		ctx->Unmap(index_buffer_, 0);
+
+    CalculateBounds();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11VertexBuffer::CalculateBounds()
+  {
+    float min_x = 0.0f, min_y = 0.0f, min_z = 0.0f;
+    float max_x = 0.0f, max_y = 0.0f, max_z = 0.0f;
+
+    for (unsigned int i = 0; i < vertices_.size(); ++i)
+    {
+      const XMFLOAT4& p = vertices_.at(i).position;
+
+      if (p.x < min_x)
+      {
+        min_x = p.x;
+      }
+      else if (p.x > max_x)
+      {
+        max_x = p.x;
+      }
+
+      if (p.y < min_y)
+      {
+        min_y = p.y;
+      }
+      else if (p.y > max_y)
+      {
+        max_y = p.y;
+      }
+
+      if (p.z < min_z)
+      {
+        min_z = p.z;
+      }
+      else if (p.z > max_z)
+      {
+        max_z = p.z;
+      }
+    }
+
+    float x = (max_x - min_x) / 2.0f;
+    float y = (max_y - min_y) / 2.0f;
+    float z = (max_z - min_z) / 2.0f;
+
+    bounds_.Center = XMFLOAT3(min_x + x, (min_y + y) * -1, min_z + z);
+    bounds_.Extents = XMFLOAT3(x, y, z);
+  }
 
   //-------------------------------------------------------------------------------------------
   void D3D11VertexBuffer::CalculateTangents()
@@ -270,6 +320,107 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  bool D3D11VertexBuffer::Pick(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance, const XMMATRIX& world)
+  {
+    XMVECTOR v1, v2, v3, u, v, n, p;
+    float a, b, c, d;
+    float ep1, ep2, t;
+    float pix, piy, piz;
+    XMVECTOR point;
+
+    for (int i = 0; i < indices_.size() / 3; i++)
+    {
+      XMFLOAT3 tV1, tV2, tV3;
+
+      Vertex& vert_a = vertices_.at(indices_.at((i * 3) + 0));
+      Vertex& vert_b = vertices_.at(indices_.at((i * 3) + 1));
+      Vertex& vert_c = vertices_.at(indices_.at((i * 3) + 2));
+
+      vert_a.position.y *= -1;
+      vert_b.position.y *= -1;
+      vert_c.position.y *= -1;
+
+      v1 = XMLoadFloat4(&vert_a.position);
+      v2 = XMLoadFloat4(&vert_b.position);
+      v3 = XMLoadFloat4(&vert_c.position);
+
+      v1 = XMVector3TransformCoord(v1, world);
+      v2 = XMVector3TransformCoord(v2, world);
+      v3 = XMVector3TransformCoord(v3, world);
+
+      u = v2 - v1;
+      v = v3 - v1;
+
+      n = XMVector3Normalize(XMVector3Cross(u, v));
+
+      p = v1;
+
+      a = XMVectorGetX(n);
+      b = XMVectorGetY(n);
+      c = XMVectorGetZ(n);
+      d = (-a * XMVectorGetX(p) - b * XMVectorGetY(p) - c * XMVectorGetZ(p));
+
+      t = 0.0f;
+      ep1 = (origin.x * a) + (origin.y * b) + (origin.z * c);
+      ep2 = (dir.x * a) + (dir.y * b) + (dir.z * c);
+
+      if (ep2 != 0.0f)
+      {
+        t = -(ep1 + d) / (ep2);
+      }
+
+      if (t > 0.0f)
+      {
+        pix = origin.x + dir.x * t;
+        piy = origin.y + dir.y * t;
+        piz = origin.z + dir.z * t;
+
+        point = XMVectorSet(pix, piy, piz, 0.0f);
+        
+        if (PointInTriangle(v1, v2, v3, point) == true)
+        {
+          *distance = t / 2.0f;
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  bool D3D11VertexBuffer::PointInTriangle(const XMVECTOR& v1, const XMVECTOR& v2, const XMVECTOR& v3, const XMVECTOR& point)
+  {
+    XMVECTOR cp1 = XMVector3Cross((v3 - v2), (point - v2));
+    XMVECTOR cp2 = XMVector3Cross((v3 - v2), (v1 - v2));
+
+    if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
+    {
+      cp1 = XMVector3Cross((v3 - v1), (point - v1));
+      cp2 = XMVector3Cross((v3 - v1), (v2 - v1));
+      if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
+      {
+        cp1 = XMVector3Cross((v2 - v1), (point - v1));
+        cp2 = XMVector3Cross((v2 - v1), (v3 - v1));
+        if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  //-------------------------------------------------------------------------------------------
   const D3D11VertexBuffer::VertexBufferType& D3D11VertexBuffer::type() const
   {
     return type_;
@@ -279,6 +430,12 @@ namespace snuffbox
   const D3D11_PRIMITIVE_TOPOLOGY& D3D11VertexBuffer::topology() const
   {
     return topology_;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  const BoundingBox& D3D11VertexBuffer::bounds() const
+  {
+    return bounds_;
   }
 
   //-------------------------------------------------------------------------------------------

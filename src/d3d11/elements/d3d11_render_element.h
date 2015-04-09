@@ -89,6 +89,20 @@ namespace snuffbox
 		void Propagate();
 
     /**
+    * @return BoundingBox The bounds of this render element, transformed with the world matrix
+    */
+    BoundingBox Bounds();
+
+    /**
+    * @brief Checks for a ray intersection with the vertices of this render element
+    * @param[in] origin (const XMFLOAT3&) The origin of the ray
+    * @param[in] dir (const XMFLOAT3&) The direction of the ray
+    * @param[out] distance (float*) The hit distance with the ray
+    * @return bool Was there an intersection?
+    */
+    bool RayIntersection(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance);
+
+    /**
     * @return snuffbox::D3D11VertexBuffer* The vertex buffer associated with this render element
     */
     virtual D3D11VertexBuffer* vertex_buffer() = 0;
@@ -405,6 +419,8 @@ namespace snuffbox
 		static void JSSetSpecularMap(JS_ARGS args);
 		static void JSSetLightMap(JS_ARGS args);
 		static void JSSetEffect(JS_ARGS args);
+    static void JSBounds(JS_ARGS args);
+    static void JSRayIntersection(JS_ARGS args);
 		static void JSSpawned(JS_ARGS args);
 		static void JSDestroy(JS_ARGS args);
   };

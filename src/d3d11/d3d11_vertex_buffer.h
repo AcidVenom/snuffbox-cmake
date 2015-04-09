@@ -94,7 +94,10 @@ namespace snuffbox
 		*/
 		void Update(const std::vector<Vertex>& verts, const std::vector<int>& indices, const bool& tangents = true);
 
-    /// Calculates the tangents of the the current vertices
+    /// Calculates the bounds of the current vertices
+    void CalculateBounds();
+
+    /// Calculates the tangents of the current vertices
     void CalculateTangents();
 
     /// Sets the vertex/index buffer
@@ -102,6 +105,26 @@ namespace snuffbox
 
     /// Draws the set vertex/index buffer
     void Draw();
+
+    /**
+    * @brief Preforms a picking test with a given ray on the vertices of this vertex buffer
+    * @param[in] origin (const XMFLOAT3&) The origin of the ray
+    * @param[in] dir (const XMFLOAT3&) The direction of the ray
+    * @param[in] world (const XMMATRIX&) The world matrix to transform with
+    * @param[out] distance (float*) The distance the ray hit at
+    * @return bool Was there an intersection at all?
+    */
+    bool Pick(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance, const XMMATRIX& world);
+
+    /**
+    * @brief Checks if a point is within a given triangle made up out of 3 vertices
+    * @param[in] v1 (const XMVECTOR&) The first vertex
+    * @param[in] v2 (const XMVECTOR&) The first vertex
+    * @param[in] v3 (const XMVECTOR&) The first vertex
+    * @param[in] point (const XMVECTOR&) The point to check for
+    * @return bool Is the point within the triangle?
+    */
+    bool PointInTriangle(const XMVECTOR& v1, const XMVECTOR& v2, const XMVECTOR& v3, const XMVECTOR& point);
 
     /**
     * @return const snuffbox::D3D11VertexBuffer::VertexBufferType& The type of the vertex buffer
@@ -112,6 +135,11 @@ namespace snuffbox
     * @return const D3D11_PRIMITIVE_TOPOLOGY& The topology this vertex buffer uses
     */
     const D3D11_PRIMITIVE_TOPOLOGY& topology() const;
+
+    /**
+    * @return const BoundingBox& The bounds of the vertices
+    */
+    const BoundingBox& bounds() const;
 
     /**
     * @brief Sets the primitive topology this vertex buffer uses
@@ -129,5 +157,6 @@ namespace snuffbox
 		unsigned int vertex_size_; //!< The number of vertices after creation
 		unsigned int index_size_; //!< The number of indices after creation
     bool valid_; //!< Is this vertex buffer valid and ready for use?
+    BoundingBox bounds_; //!< The boundaries of the vertices
   };
 }

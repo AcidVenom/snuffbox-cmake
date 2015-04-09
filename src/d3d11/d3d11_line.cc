@@ -22,13 +22,6 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	D3D11Line* D3D11Line::Instance()
-	{
-		static SharedPtr<D3D11Line> line = AllocatedMemory::Instance().Construct<D3D11Line>();
-		return line.get();
-	}
-
-	//---------------------------------------------------------------------------------------------------------
 	void D3D11Line::DrawLine(
 		const float& x1, const float& y1, const float& z1,
 		const float& r1, const float& g1, const float& b1,
@@ -62,19 +55,18 @@ namespace snuffbox
 			constant_buffer->Map({
 				XMMatrixIdentity(),
 				XMMatrixIdentity(),
-				XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
+				XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),
 				XMFLOAT3(1.0f, 1.0f, 1.0f),
 				1.0f,
 				material_->attributes()
 			});
 
 			vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-			vertex_buffer_->Create(vertices_, indices_);
+			vertex_buffer_->Create(vertices_, indices_, false);
 			vertex_buffer_->set_topology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-			material_->Apply();
-
-			render_device->default_effect()->Apply("Default", 0);
+      material_->Apply();
+			render_device->default_effect()->Apply("Diffuse", 0);
 			vertex_buffer_->Set();
 			vertex_buffer_->Draw();
 
@@ -87,39 +79,5 @@ namespace snuffbox
 	D3D11Line::~D3D11Line()
 	{
 
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	void D3D11Line::RegisterJS(JS_SINGLETON obj)
-	{
-		JSFunctionRegister funcs[] = {
-			{ "draw", JSDraw }
-		};
-
-		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	void D3D11Line::JSDraw(JS_ARGS args)
-	{
-		JSWrapper wrapper(args);
-
-		if (wrapper.Check("NNNNNNNNNNNN") == true)
-		{
-			D3D11Line::Instance()->DrawLine(
-				wrapper.GetValue<float>(0, 0.0f),
-				wrapper.GetValue<float>(1, 0.0f),
-				wrapper.GetValue<float>(2, 0.0f),
-				wrapper.GetValue<float>(3, 0.0f),
-				wrapper.GetValue<float>(4, 0.0f),
-				wrapper.GetValue<float>(5, 0.0f),
-				wrapper.GetValue<float>(6, 0.0f),
-				wrapper.GetValue<float>(7, 0.0f),
-				wrapper.GetValue<float>(8, 0.0f),
-				wrapper.GetValue<float>(9, 0.0f),
-				wrapper.GetValue<float>(10, 0.0f),
-				wrapper.GetValue<float>(11, 0.0f)
-				);
-		}
 	}
 }

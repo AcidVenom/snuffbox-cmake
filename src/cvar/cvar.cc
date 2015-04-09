@@ -430,7 +430,7 @@ namespace snuffbox
 
 			if (found == false)
 			{
-				SNUFF_LOG_ERROR("Could not retrieve CVar, no cvar with name '" + name + "' exists");
+				SNUFF_LOG_DEBUG("Could not retrieve CVar, no cvar with name '" + name + "' exists");
 				return;
 			}
 			

@@ -18,7 +18,6 @@
 #include "../d3d11/d3d11_camera.h"
 #include "../d3d11/d3d11_light.h"
 #include "../d3d11/d3d11_lighting.h"
-#include "../d3d11/d3d11_line.h"
 #include "../d3d11/d3d11_uniforms.h"
 
 #include "../d3d11/elements/d3d11_quad_element.h"
@@ -47,7 +46,6 @@ namespace snuffbox
 		JSObjectRegister<IOManager>::RegisterSingleton();
     JSObjectRegister<D3D11RenderSettings>::RegisterSingleton();
 		JSObjectRegister<D3D11Lighting>::RegisterSingleton();
-		JSObjectRegister<D3D11Line>::RegisterSingleton();
 		JSObjectRegister<D3D11Uniforms>::RegisterSingleton();
     JSObjectRegister<Window>::RegisterSingleton();
   }

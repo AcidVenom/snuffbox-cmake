@@ -10,18 +10,12 @@ namespace snuffbox
 	* @brief Provides auxillary utility to draw lines
 	* @author Daniël Konings
 	*/
-	class D3D11Line : public JSObject
+	class D3D11Line
 	{
 	public:
 
 		/// Default constructor
 		D3D11Line();
-
-		/**
-		* @brief Retrieves the singleton instance of this class
-		* @return snuffbox::D3D11Line* The pointer to the singleton instance
-		*/
-		static D3D11Line* Instance();
 
 		/**
 		* @brief Draws a line
@@ -55,9 +49,5 @@ namespace snuffbox
 		std::vector<int> indices_; //!< The current indices to draw
 		SharedPtr<D3D11VertexBuffer> vertex_buffer_; //!< The vertex buffer of the line drawing
 		SharedPtr<D3D11Material> material_; //!< The material used for line drawing
-	public:
-		JS_NAME("Line");
-		static void RegisterJS(JS_SINGLETON obj);
-		static void JSDraw(JS_ARGS args);
 	};
 }

@@ -28,6 +28,11 @@
       </property>
       <item>
        <widget class="QTextBrowser" name="terminal">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="tabStopWidth">
          <number>20</number>
         </property>
@@ -40,6 +45,11 @@
           <width>16777215</width>
           <height>64</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
         </property>
         <property name="tabStopWidth">
          <number>20</number>

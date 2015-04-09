@@ -129,7 +129,6 @@ namespace snuffbox
 		CreateDepthStencilView();
 
 		lighting_ = D3D11Lighting::Instance();
-		line_ = D3D11Line::Instance();
 		constant_buffer_ = D3D11ConstantBuffer::Instance();
 		constant_buffer_->Create();
 
@@ -375,10 +374,10 @@ namespace snuffbox
     attributes.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     attributes.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     attributes.emissive = 0.0f;
-    attributes.normal_scale = 0.0f;
+    attributes.normal_scale = 1.0f;
     attributes.reflectivity = 0.0f;
-    attributes.specular_power = 1.0f;
-    attributes.specular_intensity = 0.0f;
+    attributes.specular_power = 4.0f;
+    attributes.specular_intensity = 1.0f;
 
     default_material_->Validate();
 
@@ -564,7 +563,7 @@ namespace snuffbox
     target->Draw(context_);
 
 		MapGlobalBuffer();
-		line_->Draw();
+    target->line()->Draw();
 		
 		sampler_linear_->Set();
     back_buffer_->Set(context_);

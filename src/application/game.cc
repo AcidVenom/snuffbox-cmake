@@ -82,11 +82,6 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::UpdateInput()
 	{
-		if (started_ == false)
-		{
-			return;
-		}
-
 		window_->ProcessMessages();
 		keyboard_->Update();
 		mouse_->Update();
@@ -95,12 +90,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::Update()
 	{
-		if (started_ == false)
-		{
-			return;
-		}
-
 		js_update_.Call(delta_time_);
+
+    if (started_ == false)
+    {
+      return;
+    }
 
 		time_ += delta_time_;
 
@@ -110,11 +105,6 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Game::FixedUpdate()
 	{
-		if (started_ == false)
-		{
-			return;
-		}
-
 		accumulated_time_ += delta_time_ * 1000;
 		int time_steps = 0;
 		double fixed_delta = 1000.0f / fixed_step_;
