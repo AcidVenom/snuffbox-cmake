@@ -117,16 +117,6 @@ namespace snuffbox
     bool Pick(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance, const XMMATRIX& world);
 
     /**
-    * @brief Checks if a point is within a given triangle made up out of 3 vertices
-    * @param[in] v1 (const XMVECTOR&) The first vertex
-    * @param[in] v2 (const XMVECTOR&) The first vertex
-    * @param[in] v3 (const XMVECTOR&) The first vertex
-    * @param[in] point (const XMVECTOR&) The point to check for
-    * @return bool Is the point within the triangle?
-    */
-    bool PointInTriangle(const XMVECTOR& v1, const XMVECTOR& v2, const XMVECTOR& v3, const XMVECTOR& point);
-
-    /**
     * @return const snuffbox::D3D11VertexBuffer::VertexBufferType& The type of the vertex buffer
     */
     const VertexBufferType& type() const;

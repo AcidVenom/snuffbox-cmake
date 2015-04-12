@@ -1,5 +1,6 @@
 #include "../d3d11/d3d11_vertex_buffer.h"
 #include "../d3d11/d3d11_shader.h"
+#include "../d3d11/d3d11_render_settings.h"
 
 namespace snuffbox
 {
@@ -322,102 +323,93 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   bool D3D11VertexBuffer::Pick(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance, const XMMATRIX& world)
   {
-    XMVECTOR v1, v2, v3, u, v, n, p;
-    float a, b, c, d;
-    float ep1, ep2, t;
-    float pix, piy, piz;
-    XMVECTOR point;
+		float lowest;
+		bool found = false;
 
-    for (int i = 0; i < indices_.size() / 3; i++)
-    {
-      XMFLOAT3 tV1, tV2, tV3;
+		XMVECTOR deter;
+		XMMATRIX inv = XMMatrixInverse(&deter, world);
 
-      Vertex& vert_a = vertices_.at(indices_.at((i * 3) + 0));
-      Vertex& vert_b = vertices_.at(indices_.at((i * 3) + 1));
-      Vertex& vert_c = vertices_.at(indices_.at((i * 3) + 2));
+		XMVECTOR ray_dir = XMVector3Normalize(XMLoadFloat3(&dir));
+		XMVECTOR ray_pos = XMVector3TransformCoord(XMLoadFloat3(&origin), inv);
 
-      vert_a.position.y *= -1;
-      vert_b.position.y *= -1;
-      vert_c.position.y *= -1;
+		XMVECTOR v1, v2, v3;
+		XMVECTOR e1, e2;
 
-      v1 = XMLoadFloat4(&vert_a.position);
-      v2 = XMLoadFloat4(&vert_b.position);
-      v3 = XMLoadFloat4(&vert_c.position);
+		XMVECTOR edge_dir;
 
-      v1 = XMVector3TransformCoord(v1, world);
-      v2 = XMVector3TransformCoord(v2, world);
-      v3 = XMVector3TransformCoord(v3, world);
+		float d, inv_d;
 
-      u = v2 - v1;
-      v = v3 - v1;
+		XMVECTOR dist_vec;
 
-      n = XMVector3Normalize(XMVector3Cross(u, v));
+		float u, v;
+		float dist;
 
-      p = v1;
+		static const float tiny = 0.000001f;
 
-      a = XMVectorGetX(n);
-      b = XMVectorGetY(n);
-      c = XMVectorGetZ(n);
-      d = (-a * XMVectorGetX(p) - b * XMVectorGetY(p) - c * XMVectorGetZ(p));
+		XMVECTOR y_down = XMVectorSet(1.0f, D3D11RenderSettings::Instance()->invert_y() == false ? -1.0f : 1.0f, 1.0f, 1.0f);
 
-      t = 0.0f;
-      ep1 = (origin.x * a) + (origin.y * b) + (origin.z * c);
-      ep2 = (dir.x * a) + (dir.y * b) + (dir.z * c);
+		for (int i = 0; i < indices_.size() / 3; i++)
+		{
+			v1 = XMLoadFloat4(&vertices_.at(indices_.at((i * 3) + 0)).position);
+			v2 = XMLoadFloat4(&vertices_.at(indices_.at((i * 3) + 1)).position);
+			v3 = XMLoadFloat4(&vertices_.at(indices_.at((i * 3) + 2)).position);
 
-      if (ep2 != 0.0f)
-      {
-        t = -(ep1 + d) / (ep2);
-      }
+			v1 *= y_down;
+			v2 *= y_down;
+			v3 *= y_down;
 
-      if (t > 0.0f)
-      {
-        pix = origin.x + dir.x * t;
-        piy = origin.y + dir.y * t;
-        piz = origin.z + dir.z * t;
+			e1 = v2 - v1;
+			e2 = v3 - v1;
 
-        point = XMVectorSet(pix, piy, piz, 0.0f);
-        
-        if (PointInTriangle(v1, v2, v3, point) == true)
-        {
-          *distance = t / 2.0f;
-          return true;
-        }
-      }
-    }
+			edge_dir = XMVector3Cross(ray_dir, e2);
 
-    return false;
-  }
+			d = XMVectorGetX(XMVector3Dot(e1, edge_dir));
 
-  //-------------------------------------------------------------------------------------------
-  bool D3D11VertexBuffer::PointInTriangle(const XMVECTOR& v1, const XMVECTOR& v2, const XMVECTOR& v3, const XMVECTOR& point)
-  {
-    XMVECTOR cp1 = XMVector3Cross((v3 - v2), (point - v2));
-    XMVECTOR cp2 = XMVector3Cross((v3 - v2), (v1 - v2));
+			if (d < -tiny)
+			{
+				continue;
+			}
 
-    if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
-    {
-      cp1 = XMVector3Cross((v3 - v1), (point - v1));
-      cp2 = XMVector3Cross((v3 - v1), (v2 - v1));
-      if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
-      {
-        cp1 = XMVector3Cross((v2 - v1), (point - v1));
-        cp2 = XMVector3Cross((v2 - v1), (v3 - v1));
-        if (XMVectorGetX(XMVector3Dot(cp1, cp2)) >= 0)
-        {
-          return true;
-        }
-        else
-        {
-          return false;
-        }
-      }
-      else
-      {
-        return false;
-      }
-    }
+			inv_d = 1.0f / d;
 
-    return false;
+			dist_vec = ray_pos - v1;
+
+			u = XMVectorGetX(XMVector3Dot(dist_vec, edge_dir)) * inv_d;
+
+			if (u < -tiny || u > 1.0f + tiny)
+			{
+				continue;
+			}
+
+			edge_dir = XMVector3Cross(dist_vec, e1);
+
+			v = XMVectorGetX(XMVector3Dot(ray_dir, edge_dir)) * inv_d;
+
+			if (v < -tiny || u + v > 1.0f + tiny)
+			{
+				continue;
+			}
+
+			dist = XMVectorGetX(XMVector3Dot(e2, edge_dir)) * inv_d;
+
+			if (dist < 0.0f)
+			{
+				continue;
+			}
+
+			if (found == false)
+			{
+				found = true;
+				lowest = dist;
+			}
+			else if (dist < lowest)
+			{
+				lowest = dist;
+			}
+		}
+
+		*distance = lowest;
+    return found;
   }
 
   //-------------------------------------------------------------------------------------------

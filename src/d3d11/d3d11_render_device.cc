@@ -166,8 +166,6 @@ namespace snuffbox
 
 		D3D_FEATURE_LEVEL feature_levels_requested[] =
 		{
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
 			D3D_FEATURE_LEVEL_10_0,
 			D3D_FEATURE_LEVEL_9_3,
 			D3D_FEATURE_LEVEL_9_2,
@@ -340,8 +338,11 @@ namespace snuffbox
 
     pass.shader = content_manager->Get<D3D11Shader>("shaders/ui.fx");
 		pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
-
 		pass.blend_state->CreateFromJson(std::string("{}"));
+
+		pass.depth_state = AllocatedMemory::Instance().Construct<D3D11DepthState>();
+
+		pass.depth_state->CreateFromJson(std::string("{ \"DepthEnable\" : \"false\" }"));
 
     technique.name = "UI";
     technique.passes = { pass };
@@ -351,6 +352,9 @@ namespace snuffbox
     pass.sampling = D3D11SamplerState::SamplerTypes::kPoint;
     pass.shader = content_manager->Get<D3D11Shader>("shaders/text.fx");
 		pass.blend_state = AllocatedMemory::Instance().Construct<D3D11BlendState>();
+		pass.depth_state = AllocatedMemory::Instance().Construct<D3D11DepthState>();
+
+		pass.depth_state->CreateFromJson(std::string("{ \"DepthEnable\" : \"false\" }"));
 
 		pass.blend_state->CreateFromJson(std::string("{\
 			\"SrcBlend\" : \"SrcAlpha\",\
