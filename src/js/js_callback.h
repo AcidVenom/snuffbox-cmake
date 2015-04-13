@@ -7,12 +7,6 @@
 
 namespace snuffbox
 {
-	/// @todo Make more hacks like this
-	static void JSWeak(const v8::WeakCallbackData<v8::Function, JSObject>& data)
-	{
-		
-	}
-
   /**
   * @class snuffbox::JSCallback<...Args>
   * @brief Used to wrap callbacks to JavaScript
@@ -24,6 +18,10 @@ namespace snuffbox
   public:
     /// Default constructor
     JSCallback();
+
+		/// @todo Make more hacks like this
+		template <typename ...CArgs>
+		static void JSWeak(const v8::WeakCallbackData<v8::Function, JSCallback<CArgs...>>& data);
 
     /**
     * @brief Sets the callback to a field in the global object
@@ -82,6 +80,9 @@ namespace snuffbox
     */
     void Call(const Args& ...args);
 
+		/// Clears the weak data of the persistent callback handle
+		void Clear();
+
     /// Default destructor
     ~JSCallback();
   private:
@@ -122,8 +123,7 @@ namespace snuffbox
     }
 
     callback_.Reset(isolate, value.As<v8::Function>());
-		JSObject* null = nullptr;
-		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
+		callback_.SetWeak(static_cast<JSCallback<Args...>*>(this), JSWeak);
     valid_ = true;
 
     return true;
@@ -168,8 +168,7 @@ namespace snuffbox
     }
 
 		callback_.Reset(isolate, value.As<v8::Function>());
-		JSObject* null = nullptr;
-		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
+		callback_.SetWeak(static_cast<JSCallback<Args...>*>(this), JSWeak);
     valid_ = true;
 
     return true;
@@ -181,8 +180,7 @@ namespace snuffbox
   {
     v8::Handle<v8::Value> value = cb;
 		callback_.Reset(JSStateWrapper::Instance()->isolate(), value.As<v8::Function>());
-		JSObject* null = nullptr;
-		callback_.SetWeak(static_cast<JSObject*>(null), JSWeak);
+		callback_.SetWeak(static_cast<JSCallback<Args...>*>(this), JSWeak);
     valid_ = true;
   }
 
@@ -256,10 +254,36 @@ namespace snuffbox
     }
   }
 
+	//-------------------------------------------------------------------------------------------
+	template<typename ... Args>
+	inline void JSCallback<Args...>::Clear()
+	{
+		if (valid_ == false)
+		{
+			return;
+		}
+
+		if (callback_.IsEmpty() == false)
+		{
+			callback_.ClearWeak();
+			callback_.Reset();
+		}
+	}
+
   //-------------------------------------------------------------------------------------------
   template<typename ... Args>
   inline JSCallback<Args...>::~JSCallback()
   {
-		callback_.Reset();
+		Clear();
+		valid_ = false;
   }
+
+	//-------------------------------------------------------------------------------------------
+	template<typename ... Args> template<typename ... CArgs>
+	inline void JSCallback<Args...>::JSWeak(const v8::WeakCallbackData<v8::Function, JSCallback<CArgs...>>& data)
+	{
+		JSCallback* ptr = data.GetParameter();
+		ptr->Clear();
+		data.GetValue().Clear();
+	}
 }

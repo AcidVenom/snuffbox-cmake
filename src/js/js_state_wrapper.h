@@ -124,6 +124,14 @@ namespace snuffbox
 		/// Default destructor
 		~JSStateWrapper();
 
+		/// Opens the stack for use
+		static void OpenStack();
+
+		/**
+		* @return bool Can a stack dump be created?
+		*/
+		static bool StackDumpAvailable();
+
 	private:
 		v8::Isolate*	isolate_; //!< Used to create the isolated JavaScript state for this instance of the engine
 		v8::Persistent<v8::Context> context_; //!< The context we will use for this JavaScript state

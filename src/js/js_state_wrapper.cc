@@ -23,6 +23,9 @@ using namespace v8;
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
+	static bool stack_dump_available_ = false;
+
+	//-------------------------------------------------------------------------------------------
   JSStateWrapper::JSStateWrapper() :
     platform_(nullptr),
     running_(false)
@@ -221,15 +224,21 @@ namespace snuffbox
 	{
 		SNUFF_LOG_INFO("Collecting all JavaScript garbage");
 
+		//SNUFF_LOG_WARNING("Some handle scope");
 		HandleScope scope(isolate_);
+		//SNUFF_LOG_WARNING("That's fine, let's move on..");
+
+		//SNUFF_LOG_WARNING("This might go wrong..");
 		Local<Object> g = global();
+		//SNUFF_LOG_WARNING("But it didn't.");
+		
+		//SNUFF_LOG_WARNING("Retrieving property names");
 		for (unsigned int i = 0; i < g->GetPropertyNames()->Length(); ++i)
 		{
+			//SNUFF_LOG_WARNING("Undefining that bitch named " + std::string(*String::Utf8Value(g->GetPropertyNames()->Get(i))));
 			g->Set(g->GetPropertyNames()->Get(i), v8::Undefined(isolate_));
 		}
-
-		global_.Reset();
-		context_.Reset();
+		//SNUFF_LOG_WARNING("Well that worked too");
 
 		SNUFF_LOG_INFO("Collected all JavaScript garbage");
 	}
@@ -237,18 +246,36 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void JSStateWrapper::Dispose()
   {
+		stack_dump_available_ = false;
+		SNUFF_LOG_INFO("Disposing V8 and its state");
+
     Destroy();
 
+		//SNUFF_LOG_WARNING("This is where it really happens, collecting dat_garbage");
+		//SNUFF_LOG_WARNING("Address: 0x" + std::to_string(reinterpret_cast<int>(&isolate_)));
     isolate_->LowMemoryNotification();
+		//SNUFF_LOG_WARNING("Hooray");
+
+		//SNUFF_LOG_WARNING("Exiting that damned isolate");
     isolate_->Exit();
+		//SNUFF_LOG_WARNING("Seems like that was okay to do");
+
+		//SNUFF_LOG_WARNING("Disposing the isolate, because yeah.");
     isolate_->Dispose();
+		//SNUFF_LOG_WARNING("Man, we got far, but..");
 
+		//SNUFF_LOG_WARNING("Can we get further than that?");
     V8::Dispose();
+		//SNUFF_LOG_WARNING("Stars and beyond were reached, houston we have no problems.");
 
+		//SNUFF_LOG_WARNING("If this goes wrong I'm eating my toes");
     delete platform_;
     platform_ = nullptr;
+		//SNUFF_LOG_WARNING("Lovely toes.");
 
     running_ = false;
+
+		SNUFF_LOG_INFO("Disposed V8 and its state");
   }
 
 	//-------------------------------------------------------------------------------------------
@@ -278,7 +305,19 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
 	{
-    Dispose();
+    
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void JSStateWrapper::OpenStack()
+	{
+		stack_dump_available_ = true;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	bool JSStateWrapper::StackDumpAvailable()
+	{
+		return stack_dump_available_;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -294,9 +333,10 @@ namespace snuffbox
     JSObject* ptr = data.GetParameter();
 
     int64_t size = -static_cast<int64_t>(sizeof(ptr));
+		ptr->object().ClearWeak();
     ptr->object().Reset();
     AllocatedMemory::Instance().Destruct<JSObject>(ptr);
-    data.GetValue().Clear();
+		data.GetValue().Clear();
     JSStateWrapper::Instance()->isolate()->AdjustAmountOfExternalAllocatedMemory(size);
   }
 

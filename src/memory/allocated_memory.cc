@@ -35,13 +35,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void AllocatedMemory::IncreaseUsedMemory(const size_t size)
+	void AllocatedMemory::IncreaseUsedMemory(const size_t& size)
 	{
 		allocated_memory_ += size;
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void AllocatedMemory::DecreaseUsedMemory(const size_t size)
+	void AllocatedMemory::DecreaseUsedMemory(const size_t& size)
 	{
 		allocated_memory_ -= size;
 	}

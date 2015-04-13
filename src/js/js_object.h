@@ -2,6 +2,7 @@
 
 #include <v8.h>
 #include "../js/js_wrapper.h"
+#include <string>
 
 #define JS_SINGLETON const v8::Handle<v8::Object>&
 #define JS_CONSTRUCTABLE const v8::Handle<v8::ObjectTemplate>&
@@ -17,7 +18,7 @@ namespace snuffbox
 	class JSObject
 	{
 	public:
-    virtual ~JSObject(){}
+		virtual ~JSObject(){};
 
     /**
     * @return v8::Persistent<v8::Object>& The persistent handle of this object
