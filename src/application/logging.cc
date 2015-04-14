@@ -17,10 +17,10 @@ namespace snuffbox
 	{
     std::string msg = TypeToString(type) + " " + message + "\n";
 
-		JSStateWrapper* wrapper = JSStateWrapper::Instance();
-		if (wrapper != nullptr && type == LogType::kError || type == LogType::kFatal && dump == true && wrapper->running() == true)
+		bool can_dump = JSStateWrapper::StackDumpAvailable();
+		if (can_dump == true && (type == LogType::kError || type == LogType::kFatal) && dump == true)
 		{
-			msg += wrapper->StackDump();
+			msg += JSStateWrapper::Instance()->StackDump();
 		}
 
 #ifdef SNUFF_BUILD_CONSOLE

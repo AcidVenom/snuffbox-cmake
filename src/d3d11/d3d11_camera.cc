@@ -196,13 +196,18 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	XMFLOAT3 D3D11Camera::Unproject(const float& px, const float& py, const float& plane)
+	XMFLOAT3 D3D11Camera::Unproject(const float& px, const float& py, const float& pz)
 	{
 		const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
 
-		XMVECTOR coords = XMVector3Unproject(XMVectorSet(px, res.y - py, plane, 0.0f), 0.0f, 0.0f, res.x, res.y, near_plane_, far_plane_, projection_, view_, XMMatrixIdentity());
-	
-		return XMFLOAT3(XMVectorGetX(coords), XMVectorGetY(coords), XMVectorGetZ(coords));
+		XMVECTOR coords = XMVector3Unproject(XMVectorSet(px, res.y - py, pz, 1.0f), 0.0f, 0.0f, res.x, res.y, near_plane_, far_plane_, projection_, view_, XMMatrixIdentity());
+
+		XMFLOAT3 to_ret;
+		XMStoreFloat3(&to_ret, coords);
+
+		to_ret.y *= D3D11RenderSettings::Instance()->invert_y() == false ? -1.0f : 1.0f;
+
+		return to_ret;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

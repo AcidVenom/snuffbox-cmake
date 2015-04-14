@@ -40,7 +40,7 @@ namespace snuffbox
 
     /// Shows the console if hidden
     void Show();
-    
+
     /**
     * @brief Logs to the console
     * @param[in] colour (const snuffbox::DebugLogging::LogColour&) The colour scheme to log this message with

@@ -242,12 +242,16 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	CVar::~CVar()
 	{
+		SNUFF_LOG_INFO("Clearing CVars");
+
 		for (CVarMap::iterator it = vars_.begin(); it != vars_.end(); ++it)
 		{
 			AllocatedMemory::Instance().Destruct<CVar::Value>(it->second);
 		}
 
 		vars_.clear();
+
+		SNUFF_LOG_INFO("Cleared CVars");
 	}
 
 	//-------------------------------------------------------------------------------------------

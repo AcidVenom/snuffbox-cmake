@@ -156,13 +156,13 @@ namespace snuffbox
 		void RotateBy(const float& x, const float& y, const float& z);
 
 		/**
-		* @brief Unprojects 2 points onto a camera plane
+		* @brief Unprojects a screen position to a world position
 		* @param[in] px (const float&) The x position
 		* @param[in] py (const float&) The y position
-		* @param[in] plane (const float&) The plane to unproject on
+		* @param[in] pz (const float&) The y position
 		* @return XMFLOAT3 The unprojected coordinates in 3D space
 		*/
-		XMFLOAT3 Unproject(const float& px, const float& py, const float& plane);
+		XMFLOAT3 Unproject(const float& px, const float& py, const float& pz);
 
 		/// Default destructor
 		virtual ~D3D11Camera();

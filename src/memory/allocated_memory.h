@@ -42,15 +42,15 @@ namespace snuffbox
 
 		/**
 		* @brief Increments the allocated memory by a size
-		* @param[in] size (const size_t size) The allocated size of a new pointer
+		* @param[in] size (const size_t& size) The allocated size of a new pointer
 		*/
-		void IncreaseUsedMemory(const size_t size);
+		void IncreaseUsedMemory(const size_t& size);
 
 		/**
 		* @brief Decrements the allocated memory by a size
-		* @param[in] size (const size_t size) The allocated size of a destructed pointer
+		* @param[in] size (const size_t& size) The allocated size of a destructed pointer
 		*/
-		void DecreaseUsedMemory(const size_t size);
+		void DecreaseUsedMemory(const size_t& size);
 
     /// Checks the environment for memory leaks, if the console exists, keep it running to display the message
     void CheckForLeaks();

@@ -170,9 +170,9 @@ namespace snuffbox
 
     p = XMVector3Transform(p, XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), world_matrix()));
     xx = XMVectorGetX(p);
-    yy = XMVectorGetZ(p);
+		yy = XMVectorGetZ(p);
 
-		if (xx > width_)
+		if (xx >= width_)
 		{
       *in_bounds_x = false;
 		}
@@ -181,7 +181,7 @@ namespace snuffbox
       *in_bounds_x = false;
 		}
 
-		if (yy > height_)
+		if (yy >= height_)
 		{
       *in_bounds_y = false;
 		}
@@ -251,28 +251,25 @@ namespace snuffbox
 
 		auto clamp = [this](Indices& index)
 		{
-			if (index.x < 0)
+			if (index.x < 0 || index.x >= this->width_)
 			{
-				index.x = 0;
-			}
-			else if (index.x >= this->width_)
-			{
-				index.x = this->width_ - 1;
+				return true;
 			}
 
-			if (index.y < 0)
+			if (index.y < 0 || index.y >= this->height_)
 			{
-				index.y = 0;
+				return true;
 			}
-			else if (index.y >= this->height_)
-			{
-				index.y = this->height_ - 1;
-			}
+
+			return false;
 		};
 
-		for (unsigned int i = 0; i < indices.size(); ++i)
+		for (int i = static_cast<int>(indices.size() - 1); i >= 0; --i)
 		{
-			clamp(indices.at(i));
+			if (clamp(indices.at(i)) == true)
+			{
+				indices.erase(indices.begin() + i);
+			}
 		}
 
 		return indices;
@@ -392,6 +389,19 @@ namespace snuffbox
   float D3D11Terrain::GetBilinearHeight(const float& x, const float& y)
   {
     std::vector<D3D11Terrain::Indices>& indices = NearestVertices(x, y);
+
+		if (indices.size() == 1)
+		{
+			return IndexToWorld(indices.at(0).x, indices.at(0).y).y;
+		}
+		else if (indices.size() == 2)
+		{
+			return (IndexToWorld(indices.at(0).x, indices.at(0).y).y + IndexToWorld(indices.at(1).x, indices.at(1).y).y) / 2.0f;
+		}
+		else if (indices.size() == 0)
+		{
+			return 0.0f;
+		}
 
     WorldCoordinates p1 = IndexToWorld(indices.at(0).x, indices.at(0).y);
     WorldCoordinates p2 = IndexToWorld(indices.at(1).x, indices.at(1).y);

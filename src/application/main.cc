@@ -96,6 +96,7 @@ int main(int argc, char** argv)
 	fbx_loader->Initialise();
 
 	js_state_wrapper->Initialise();
+	js_state_wrapper->OpenStack();
   render_device->Initialise();
 
 	FontManager* font_manager = FontManager::Instance();
@@ -130,5 +131,6 @@ int main(int argc, char** argv)
 
 	SNUFF_LOG_INFO("Shutting down");
   render_device->Dispose();
+	js_state_wrapper->Dispose();
 	return 0;
 }

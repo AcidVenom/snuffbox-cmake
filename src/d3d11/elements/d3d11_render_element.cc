@@ -798,9 +798,9 @@ namespace snuffbox
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
     const XMVECTOR& v = self->offset();
-    float x = XMVectorGetX(v);
-    float y = XMVectorGetY(v);
-    float z = XMVectorGetZ(v);
+    float x = XMVectorGetX(v) * -1.0f;
+		float y = XMVectorGetY(v) * -1.0f;
+		float z = XMVectorGetZ(v) * -1.0f;
 
     v8::Handle<v8::Object> obj = JSWrapper::CreateObject();
 

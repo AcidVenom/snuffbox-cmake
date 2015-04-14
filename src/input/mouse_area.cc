@@ -291,8 +291,9 @@ namespace snuffbox
     if (parent_ != nullptr)
     {
       parent_->RemoveMouseArea(this);
-      Mouse::Instance()->RemoveMouseArea(this);
-    }
+		}
+
+		Mouse::Instance()->RemoveMouseArea(this);
   }
 
   //-------------------------------------------------------------------------------------------
