@@ -249,7 +249,7 @@ namespace snuffbox
 			{ "fov", JSFov },
 			{ "unproject", JSUnproject },
 			{ "setZoom", JSSetZoom },
-			{ "zoom", JSZoom }
+      { "zoom", JSZoom }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);

@@ -13,7 +13,7 @@ namespace snuffbox
 	class D3D11Camera : public JSObject
 	{
 	public:
-
+    
 		/**
 		* @enum snuffbox::D3D11Camera::CameraTypes
 		* @brief Contains enumerators for the different camera types
@@ -205,6 +205,6 @@ namespace snuffbox
 		static void JSFov(JS_ARGS args);
 		static void JSUnproject(JS_ARGS args);
 		static void JSSetZoom(JS_ARGS args);
-		static void JSZoom(JS_ARGS args);
+    static void JSZoom(JS_ARGS args);
 	};
 }
