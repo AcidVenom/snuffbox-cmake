@@ -244,6 +244,7 @@ namespace snuffbox
       if (it == area)
       {
         mouse_areas_.erase(mouse_areas_.begin() + i);
+				break;
       }
     }
   }
