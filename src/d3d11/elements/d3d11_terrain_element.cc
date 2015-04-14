@@ -286,7 +286,8 @@ namespace snuffbox
 		}
 
 		vertices_.at(idx).position.y = -h;
-		SetNormals(x, y);
+
+    SetNormals(x, y);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -305,39 +306,35 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Terrain::SetNormals(const int& x, const int& y)
 	{
-    auto clamp_get = [this, x, y](int xx, int yy)
+    auto get_index = [this](int xx, int yy)
     {
-      xx = x + xx;
-      yy = y + yy;
-
-      if (xx < 0)
-      {
-        xx = 0;
-      }
-
-      if (xx >= width_)
-      {
-        xx = width_ - 1;
-      }
-
-      if (yy < 0)
-      {
-        yy = 0;
-      }
-
-      if (yy >= height_)
-      {
-        yy = height_ - 1;
-      }
-
       return yy * width_ + xx;
     };
+
+    int new_x, new_y;
 
 		for (int xx = -1; xx <= 1; ++xx)
 		{
 			for (int yy = -1; yy <= 1; ++yy)
 			{
-				CalculateNormals(clamp_get(xx, yy), clamp_get(xx + 1, yy + 1), clamp_get(xx, yy + 1));
+        new_x = x + xx;
+        new_y = y + yy;
+
+        if (new_x >= 0 && new_y >= 0 && new_x < width_ && new_y < height_)
+        {
+          if (new_x + 1 < width_ && new_y + 1 < height_)
+          {
+            CalculateNormals(get_index(new_x, new_y), get_index(new_x + 1, new_y + 1), get_index(new_x, new_y + 1));
+          }
+          else if (new_x + 1 >= width_ && new_y + 1 < height_)
+          {
+            CalculateNormals(get_index(new_x, new_y), get_index(new_x, new_y + 1), get_index(new_x - 1, new_y));
+          }
+          else if (new_x + 1 < width_ && new_y + 1 >= height_)
+          {
+            CalculateNormals(get_index(new_x, new_y), get_index(new_x, new_y - 1), get_index(new_x + 1, new_y));
+          }
+        }
 			}
 		}
 	}
