@@ -323,7 +323,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   bool D3D11VertexBuffer::Pick(const XMFLOAT3& origin, const XMFLOAT3& dir, float* distance, const XMMATRIX& world)
   {
-		float lowest;
+		float lowest = 0.0f;
 		bool found = false;
 
 		XMVECTOR deter;
