@@ -35,7 +35,7 @@ namespace snuffbox
 		height_(256),
     texture_tiling_(1.0f, 1.0f),
     brush_shader_(ContentManager::Instance()->Get<D3D11Shader>("shaders/brush.fx")),
-		texture_size_(2048.0f)
+    texture_size_(2048.0f)
   {
 		Create(width_, height_);
   }
@@ -514,7 +514,7 @@ namespace snuffbox
       diffuse, 
       normal_map == nullptr ? render_device->default_normal() : normal_map,
       specular_map == nullptr ? render_device->default_texture() : specular_map
-    });
+    }, true);
     brush_vbo_->Draw();
   }
 
@@ -541,7 +541,7 @@ namespace snuffbox
 			target->resource()->GetResource(&texture);
 
 			hr = D3DX11SaveTextureToFileA(render_device->context(), texture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_TIFF, (full_path + append).c_str());
-			SNUFF_XASSERT(hr == S_OK, render_device->HRToString(hr, "D3DX10SaveTextureToFileA"), "D3D11Terrain::SaveTexture");
+			SNUFF_XASSERT(hr == S_OK, render_device->HRToString(hr, "D3DX11SaveTextureToFileA"), "D3D11Terrain::SaveTexture");
 		
 			texture->Release();
 		};
@@ -550,13 +550,13 @@ namespace snuffbox
 		save_texture(normals_.get(), "_normal.tiff");
 		save_texture(speculars_.get(), "_specular.tiff");
 
-		SNUFF_LOG_INFO("Saved terrain texture to '" + path + "'");
+		SNUFF_LOG_SUCCESS("Saved terrain texture to '" + path + "'");
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11Terrain::LoadTexture(const std::string& path)
 	{
-		SNUFF_LOG_INFO("Loading terrain texture");
+		SNUFF_LOG_INFO("Loading terrain texture from '" + path + "'");
 
 		std::vector<int> indices({ 0, 1, 3, 0, 3, 2 });
 
@@ -607,10 +607,10 @@ namespace snuffbox
 			diffuse_texture.is_valid() ? &diffuse_texture : default_texture,
 			normal_texture.is_valid() ? &normal_texture : render_device->default_normal(),
 			specular_texture.is_valid() ? &specular_texture : default_texture
-		});
+		}, true);
 		brush_vbo_->Draw();
 
-		SNUFF_LOG_INFO("Loaded terrain texture");
+		SNUFF_LOG_SUCCESS("Loaded terrain texture");
 	}
 
   //-------------------------------------------------------------------------------------------

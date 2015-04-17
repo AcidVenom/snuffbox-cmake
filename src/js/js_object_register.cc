@@ -32,6 +32,8 @@
 
 #include "../platform/platform_window.h"
 
+#include "../fmod/fmod_sound_system.h"
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -48,6 +50,7 @@ namespace snuffbox
 		JSObjectRegister<D3D11Lighting>::RegisterSingleton();
 		JSObjectRegister<D3D11Uniforms>::RegisterSingleton();
     JSObjectRegister<Window>::RegisterSingleton();
+    JSObjectRegister<SoundSystem>::RegisterSingleton();
   }
 
   //-------------------------------------------------------------------------------------------

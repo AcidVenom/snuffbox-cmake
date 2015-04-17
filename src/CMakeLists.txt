@@ -206,6 +206,13 @@ SET (FTSources
 	freetype/freetype_rich_text.cc
 )
 
+SET (FMODSources
+	fmod/fmod_sound.h
+	fmod/fmod_sound.cc
+	fmod/fmod_sound_system.h
+	fmod/fmod_sound_system.cc
+)
+
 SET (AnimationSources
 	animation/animation_base.h
 	animation/sprite_animation.h
@@ -230,6 +237,7 @@ SOURCE_GROUP("io" 				FILES ${IOSources})
 SOURCE_GROUP("fbx" 				FILES ${FBXSources})
 SOURCE_GROUP("freetype" 		FILES ${FTSources})
 SOURCE_GROUP("animation"		FILES ${AnimationSources})
+SOURCE_GROUP("fmod"		FILES ${FMODSources})
 
 #Create the actual snuffbox project
 SET (SNUFF_SOURCES
@@ -243,6 +251,7 @@ SET (SNUFF_SOURCES
 	${IOSources}
 	${FBXSources}
 	${FTSources}
+	${FMODSources}
 	${AnimationSources}
 )
 

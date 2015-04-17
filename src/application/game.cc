@@ -15,6 +15,8 @@
 #include "../platform/platform_file_watch.h"
 #include "../platform/platform_render_device.h"
 
+#include "../fmod/fmod_sound_system.h"
+
 #undef min
 
 #ifdef SNUFF_BUILD_CONSOLE
@@ -28,17 +30,18 @@ using namespace std::chrono;
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
-	Game::Game() : 
-		window_(nullptr),
-		keyboard_(nullptr),
-		mouse_(nullptr),
-		render_device_(nullptr),
-		started_(true),
-		delta_time_(0.0),
-		fixed_step_(16.67),
-		left_over_delta_(0.0),
-		accumulated_time_(0.0),
-		time_(0.0)
+  Game::Game() :
+    window_(nullptr),
+    keyboard_(nullptr),
+    mouse_(nullptr),
+    render_device_(nullptr),
+    started_(true),
+    delta_time_(0.0),
+    fixed_step_(16.67),
+    left_over_delta_(0.0),
+    accumulated_time_(0.0),
+    time_(0.0),
+    sound_system_(nullptr)
 	{
 		CVar* cvar = CVar::Instance();
 		bool found_dir = false;
@@ -75,7 +78,8 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	void Game::Initialise()
-	{
+  {
+    sound_system_ = SoundSystem::Instance();
 		js_init_.Call();
 	}
 
@@ -150,6 +154,7 @@ namespace snuffbox
 		{
 			return;
 		}
+    sound_system_->Update();
 		CalculateDeltaTime();
     UpdateConsole();
 		UpdateInput();

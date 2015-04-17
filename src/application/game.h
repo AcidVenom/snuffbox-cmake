@@ -12,6 +12,7 @@ namespace snuffbox
 	class Window;
 	class Keyboard;
 	class Mouse;
+  class SoundSystem;
 
 	class Game : public JSObject
 	{
@@ -174,6 +175,7 @@ namespace snuffbox
 		Window* window_; //!< The window the game is running in
 		Keyboard* keyboard_; //!< The keyboard the game currently uses
 		Mouse* mouse_; //!< The mouse the game currently uses
+    SoundSystem* sound_system_; //!< The sound system of the engine
 		PlatformRenderDevice* render_device_; //!< The render device the game currently uses
 		bool started_; //!< Is the game started?
 		double delta_time_; //!< The delta time since the previous frame

@@ -20,6 +20,7 @@
 #include "../fbx/fbx_loader.h"
 
 #include "../freetype/freetype_font_manager.h"
+#include "../fmod/fmod_sound_system.h"
 
 #ifdef SNUFF_BUILD_CONSOLE
 #include <qapplication.h>
@@ -107,6 +108,8 @@ int main(int argc, char** argv)
 	game->Verify();
 
 	window->Show();
+
+  SoundSystem* sound_system = SoundSystem::Instance();
 
 	game->Initialise();
 

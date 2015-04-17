@@ -12,6 +12,7 @@
 #include "../d3d11/d3d11_material.h"
 #include "../fbx/fbx_model.h"
 #include "../animation/anim.h"
+#include "../fmod/fmod_sound.h"
 
 namespace snuffbox
 {
@@ -94,6 +95,10 @@ namespace snuffbox
 			{
 				content = AllocatedMemory::Instance().Construct<Anim>();
 			}
+      else if (type == ContentTypes::kSound)
+      {
+        content = AllocatedMemory::Instance().Construct<Sound>();
+      }
 			else
 			{
 				SNUFF_LOG_WARNING("No content loader was specified for the content type of '" + path + "'");

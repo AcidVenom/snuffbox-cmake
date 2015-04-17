@@ -248,7 +248,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11Texture::SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures)
+	void D3D11Texture::SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures, const bool& force_set)
 	{
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
     D3D11Texture** old = render_device->set_textures();
@@ -270,7 +270,7 @@ namespace snuffbox
       old[start + i] = current;
     }
 
-    if (set == true)
+    if (set == true || force_set == true)
     {
       render_device->context()->PSSetShaderResources(start, num, resources);
     }

@@ -73,8 +73,9 @@ namespace snuffbox
 		* @param[in] start (const int&) The start slot to register from
 		* @param[in] num (const int&) The number of textures to register
 		* @param[in] textures (const std::vector<D3D11Texture*>& The textures to register
+    * @param[in] force_set (const bool&) Force the textures to be set
 		*/
-    static void SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures);
+    static void SetMultipleTextures(const int& start, const int& num, const std::vector<D3D11Texture*>& textures, const bool& force_set = false);
 
 		/**
 		* @return const int& The width of the texture
