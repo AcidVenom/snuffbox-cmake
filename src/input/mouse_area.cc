@@ -12,7 +12,8 @@ namespace snuffbox
   MouseArea::MouseArea() :
     metrics_({1.0f, 1.0f, 0.0f, 0.0f }),
     parent_(nullptr),
-    entered_(false)
+    entered_(false),
+    activated_(true)
   {
     ResetWasPressed();
   }
@@ -21,7 +22,8 @@ namespace snuffbox
   MouseArea::MouseArea(JS_ARGS args) :
     metrics_({1.0f, 1.0f, 0.0f, 0.0f }),
     parent_(nullptr),
-    entered_(false)
+    entered_(false),
+    activated_(true)
   {
     JSWrapper wrapper(args);
 
@@ -266,6 +268,12 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  const bool& MouseArea::activated() const
+  {
+    return activated_;
+  }
+
+  //-------------------------------------------------------------------------------------------
   void MouseArea::set_parent(D3D11Widget* parent)
   {
     parent_ = parent;
@@ -283,6 +291,12 @@ namespace snuffbox
   {
     metrics_.ox = x;
     metrics_.oy = y;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void MouseArea::set_activated(const bool& activated)
+  {
+    activated_ = activated;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -308,7 +322,9 @@ namespace snuffbox
       { "setOnLeave", JSSetOnLeave },
       { "setOnDown", JSSetOnDown },
       { "setOnPressed", JSSetOnPressed },
-      { "setOnReleased", JSSetOnReleased }
+      { "setOnReleased", JSSetOnReleased },
+      { "setActivated", JSSetActivated },
+      { "activated", JSActivated }
     };
 
     JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -426,5 +442,26 @@ namespace snuffbox
     {
       self->SetOnReleased(args[0]);
     }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void MouseArea::JSSetActivated(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    MouseArea* self = wrapper.GetPointer<MouseArea>(args.This());
+
+    if (wrapper.Check("B") == true)
+    {
+      self->set_activated(wrapper.GetValue<bool>(0, true));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void MouseArea::JSActivated(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    MouseArea* self = wrapper.GetPointer<MouseArea>(args.This());
+
+    wrapper.ReturnValue<bool>(self->activated());
   }
 }

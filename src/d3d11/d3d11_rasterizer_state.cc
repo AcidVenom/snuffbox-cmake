@@ -80,11 +80,11 @@ namespace snuffbox
 
 			if (field == "CullMode")
 			{
-				StringToCullMode(value);
+				desc.CullMode = StringToCullMode(value);
 			}
 			else if (field == "FillMode")
 			{
-				StringToFillMode(value);
+				desc.FillMode = StringToFillMode(value);
 			}
 			else if (field == "ScissorEnable")
 			{
@@ -124,7 +124,7 @@ namespace snuffbox
 	{
 		if (other == nullptr)
 		{
-			return false;
+      return false;
 		}
 
 		const D3D11_RASTERIZER_DESC& other_desc = other->description();
@@ -180,8 +180,8 @@ namespace snuffbox
 		}
 		else
 		{
-			SNUFF_LOG_ERROR("Unknown cull mode '" + str + "', defaulting to 'Front'");
-			return D3D11_CULL_MODE::D3D11_CULL_FRONT;
+			SNUFF_LOG_ERROR("Unknown cull mode '" + str + "', defaulting to 'Back'");
+      return D3D11_CULL_MODE::D3D11_CULL_BACK;
 		}
 	}
 

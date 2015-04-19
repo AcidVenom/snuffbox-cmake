@@ -626,7 +626,7 @@ namespace snuffbox
 	{
 		TranslateBy(shadow_offset_.x, shadow_offset_.y, 0.0f);
 		set_blend(shadow_colour_.x, shadow_colour_.y, shadow_colour_.z);
-		set_alpha(shadow_colour_.w);
+		set_alpha(shadow_colour_.w * alpha());
 	}
 
 	//-------------------------------------------------------------------------------------------

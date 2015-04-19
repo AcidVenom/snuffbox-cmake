@@ -120,6 +120,10 @@ namespace snuffbox
 		bool callback = true;
     for (unsigned int i = 0; i < mouse_areas_.size(); ++i)
     {
+      if (mouse_areas_.at(i)->activated() == false)
+      {
+        continue;
+      }
       do_callback = !mouse_areas_.at(i)->Check(this, callback);
 
 			if (do_callback == false)

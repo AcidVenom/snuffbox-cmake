@@ -122,10 +122,16 @@ namespace snuffbox
     */
     float GetZ();
 
+
     /**
     * @return const snuffbox::MouseArea::Metrics& The metrics of this mouse area
     */
     const Metrics& metrics() const;
+
+    /**
+    * @return const bool& Is this mouse area activated?
+    */
+    const bool& activated() const;
 
     /**
     * @brief Sets the parent of this mouse area
@@ -147,6 +153,12 @@ namespace snuffbox
     */
     void set_offset(const float& ox, const float& oy);
 
+    /**
+    * @brief Sets if this mouse area is currently activated
+    * @param[in] activated (const bool&) The boolean value
+    */
+    void set_activated(const bool& activated);
+
     /// Default destructor
     virtual ~MouseArea();
 
@@ -155,6 +167,7 @@ namespace snuffbox
     D3D11Widget* parent_; //!< The parent of this mouse area
     bool entered_; //!< Was this mouse area entered?
     bool was_pressed_[3]; //!< Was this mouse area pressed?
+    bool activated_; //!< Is this mouse area activated?
     JSCallback<> on_enter_; //!< The on enter callback
     JSCallback<> on_leave_; //!< The on leave callback
     JSCallback<int> on_down_; //!< The on down callback
@@ -173,5 +186,7 @@ namespace snuffbox
     static void JSSetOnDown(JS_ARGS args);
     static void JSSetOnPressed(JS_ARGS args);
     static void JSSetOnReleased(JS_ARGS args);
+    static void JSSetActivated(JS_ARGS args);
+    static void JSActivated(JS_ARGS args);
   };
 }
