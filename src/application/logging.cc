@@ -26,11 +26,7 @@ namespace snuffbox
 #ifdef SNUFF_BUILD_CONSOLE
     Console* console = Console::Instance();
     console->Log(TypeToColour(type), msg);
-
-		if (Game::Instance()->started() == false)
-		{
-			qApp->processEvents();
-		}
+		qApp->processEvents();
 #endif
 
     printf(msg.c_str());

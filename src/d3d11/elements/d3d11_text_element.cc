@@ -29,7 +29,8 @@ namespace snuffbox
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
 		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
 		font_("fonts/arial.ttf"),
-		font_size_(16.0f)
+		font_size_(16.0f),
+    text_("")
 	{
 		Create();
 	}
@@ -46,7 +47,8 @@ namespace snuffbox
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
 		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
 		font_("fonts/arial.ttf"),
-		font_size_(16.0f)
+		font_size_(16.0f),
+    text_("")
 	{
 		Create();
 	}
