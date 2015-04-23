@@ -89,6 +89,12 @@ namespace snuffbox
 		void Propagate();
 
     /**
+    * @brief Sets the z of this render element
+    * @param[in] z (const float&) The new z value
+    */
+    void SetZ(const float& z);
+
+    /**
     * @return BoundingBox The bounds of this render element, transformed with the world matrix
     */
     BoundingBox Bounds();

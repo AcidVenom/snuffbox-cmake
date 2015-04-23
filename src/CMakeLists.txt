@@ -94,6 +94,8 @@ SET (D3DSources
 	d3d11/d3d11_uniforms.cc
 	d3d11/d3d11_rasterizer_state.h
 	d3d11/d3d11_rasterizer_state.cc
+	d3d11/d3d11_scroll_area.h
+	d3d11/d3d11_scroll_area.cc
 )
 
 SET (D3DElements

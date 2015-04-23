@@ -6,6 +6,8 @@
 #include "../d3d11/elements/d3d11_widget_element.h"
 #include "../d3d11/d3d11_render_settings.h"
 
+#include "../d3d11/d3d11_scroll_area.h"
+
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
@@ -13,7 +15,8 @@ namespace snuffbox
     metrics_({1.0f, 1.0f, 0.0f, 0.0f }),
     parent_(nullptr),
     entered_(false),
-    activated_(true)
+    activated_(true),
+    scroll_area_(nullptr)
   {
     ResetWasPressed();
   }
@@ -23,7 +26,8 @@ namespace snuffbox
     metrics_({1.0f, 1.0f, 0.0f, 0.0f }),
     parent_(nullptr),
     entered_(false),
-    activated_(true)
+    activated_(true),
+    scroll_area_(nullptr)
   {
     JSWrapper wrapper(args);
 
@@ -183,12 +187,20 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void MouseArea::OnEnter()
   {
+    if (scroll_area_ != nullptr)
+    {
+      scroll_area_->set_focussed(true);
+    }
     on_enter_.Call();
   }
 
   //-------------------------------------------------------------------------------------------
   void MouseArea::OnLeave()
   {
+    if (scroll_area_ != nullptr)
+    {
+      scroll_area_->set_focussed(false);
+    }
     on_leave_.Call();
   }
 
@@ -280,6 +292,12 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  void MouseArea::set_scroll_area(D3D11ScrollArea* area)
+  {
+    scroll_area_ = area;
+  }
+
+  //-------------------------------------------------------------------------------------------
   void MouseArea::set_scale(const float& x, const float& y)
   {
     metrics_.sx = x;
@@ -306,6 +324,11 @@ namespace snuffbox
     {
       parent_->RemoveMouseArea(this);
 		}
+
+    if (scroll_area_ != nullptr)
+    {
+      scroll_area_->set_focussed(false);
+    }
 
 		Mouse::Instance()->RemoveMouseArea(this);
   }

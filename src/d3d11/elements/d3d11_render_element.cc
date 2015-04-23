@@ -37,7 +37,8 @@ namespace snuffbox
 		override_specular_(nullptr),
 		override_light_(nullptr),
 		override_effect_(nullptr),
-		target_(nullptr)
+		target_(nullptr),
+    parent_(nullptr)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -234,6 +235,12 @@ namespace snuffbox
 		blend_changed_ = false;
 		alpha_changed_ = false;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::SetZ(const float& z)
+  {
+    XMVectorSetZ(translation_, z);
+  }
 
   //-------------------------------------------------------------------------------------------
   BoundingBox D3D11RenderElement::Bounds()
@@ -676,8 +683,7 @@ namespace snuffbox
 
 		if (wrapper.Check("N") == true)
 		{
-			const XMVECTOR& v = self->translation();
-			self->set_translation(XMVectorGetX(v), XMVectorGetY(v), wrapper.GetValue<float>(0, 0.0f));
+			self->SetZ(wrapper.GetValue<float>(0, 0.0f));
 		}
 	}
 

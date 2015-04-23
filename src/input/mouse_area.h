@@ -12,6 +12,7 @@ using namespace DirectX;
 namespace snuffbox
 {
   class D3D11Widget;
+  class D3D11ScrollArea;
   class Mouse;
 
   /**
@@ -158,6 +159,12 @@ namespace snuffbox
     * @param[in] activated (const bool&) The boolean value
     */
     void set_activated(const bool& activated);
+    
+    /**
+    * @brief Sets the scroll area of this mouse area
+    * @param[in] area (snuffbox::D3D11ScrollArea*) The scroll area to set
+    */
+    void set_scroll_area(D3D11ScrollArea* area);
 
     /// Default destructor
     virtual ~MouseArea();
@@ -165,6 +172,7 @@ namespace snuffbox
   private:
     Metrics metrics_; //!< The metrics of this mouse area
     D3D11Widget* parent_; //!< The parent of this mouse area
+    D3D11ScrollArea* scroll_area_; //!< The assigned scroll area if it was ever assigned
     bool entered_; //!< Was this mouse area entered?
     bool was_pressed_[3]; //!< Was this mouse area pressed?
     bool activated_; //!< Is this mouse area activated?
