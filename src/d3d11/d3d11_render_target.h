@@ -8,6 +8,7 @@ namespace snuffbox
   class D3D11RenderQueue;
 	class D3D11Uniforms;
   class D3D11RenderElement;
+  class D3D11ScrollArea;
 
 	/**
 	* @class snuffbox::D3D11RenderTarget
@@ -17,6 +18,16 @@ namespace snuffbox
 	class D3D11RenderTarget : public JSObject
 	{
 	public:
+    /**
+    * @struct snuffbox::D3D11RenderTarget::ScrollAreaSorter
+    * @brief Used to sort the scroll areas by their z-index
+    * @author Daniël Konings
+    */
+    struct ScrollAreaSorter
+    {
+      bool operator()(D3D11ScrollArea* a, D3D11ScrollArea* b);
+    };
+
 		/**
 		* @enum snuffbox::D3D11RenderTarget::RenderTargets
 		* @brief Contains different types of render targets
@@ -113,6 +124,24 @@ namespace snuffbox
 
 		/// Releases all referenced D3D11 com objects
 		void Release();
+
+    /**
+    * @brief Adds a scroll area to this render target
+    * @param[in] area (snuffbox::D3D11ScrollArea*) The area to add to this render target
+    */
+    void AddScrollArea(D3D11ScrollArea* area);
+
+    /**
+    * @brief Removes a scroll area from this render target
+    * @param[in] area (snuffbox::D3D11ScrollArea*) The scroll area to remove
+    */
+    void RemoveScrollArea(D3D11ScrollArea* area);
+
+    /**
+    * @brief Draws the scroll areas of this render target
+    * @param[in] context (ID3D11DeviceContext*) The context to draw in
+    */
+    void DrawScrollAreas(ID3D11DeviceContext* context);
 
 		/**
 		* @return const std::string& The name of this render target
@@ -224,6 +253,7 @@ namespace snuffbox
 		SharedPtr<D3D11Uniforms> uniforms_; //!< The uniforms buffer
     SharedPtr<D3D11Viewport> viewport_; //!< The viewport that can be overrided from JavaScript
     SharedPtr<D3D11Line> line_; //!< The line system for this target
+    std::vector<D3D11ScrollArea*> scroll_areas_; //!< The scroll areas of this render target
 		D3D11Effect* post_processing_; //! The post processing effect for this render target
 		std::string technique_; //!< The technique of this render target
     std::vector<D3D11RenderTarget*> mrts_; //!< Multiple render targets

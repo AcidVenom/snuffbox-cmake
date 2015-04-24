@@ -5,6 +5,7 @@
 #include "../d3d11/d3d11_viewport.h"
 #include "../d3d11/d3d11_render_settings.h"
 #include "../d3d11/d3d11_line.h"
+#include "../d3d11/d3d11_scroll_area.h"
 
 #include "../content/content_manager.h"
 
@@ -12,6 +13,12 @@
 
 namespace snuffbox
 {
+  //---------------------------------------------------------------------------------------------------------
+  bool D3D11RenderTarget::ScrollAreaSorter::operator()(D3D11ScrollArea* a, D3D11ScrollArea* b)
+  {
+    return a == nullptr || b == nullptr ? false : a->z() > b->z();
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	D3D11RenderTarget::D3D11RenderTarget(std::string name) :
 		valid_(false),
@@ -230,6 +237,7 @@ namespace snuffbox
   void D3D11RenderTarget::Draw(ID3D11DeviceContext* context)
   {
     queue_->Draw(context);
+    DrawScrollAreas(context);
   }
 
 	//---------------------------------------------------------------------------------------------------------
@@ -238,6 +246,35 @@ namespace snuffbox
 		queue_->Clear();
 	}
 
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::AddScrollArea(D3D11ScrollArea* area)
+  {
+    scroll_areas_.push_back(area);
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::RemoveScrollArea(D3D11ScrollArea* area)
+  {
+    for (unsigned int i = 0; i < scroll_areas_.size(); ++i)
+    {
+      if (scroll_areas_.at(i) == area)
+      {
+        scroll_areas_.erase(scroll_areas_.begin() + i);
+      }
+    }
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11RenderTarget::DrawScrollAreas(ID3D11DeviceContext* context)
+  {
+    std::sort(scroll_areas_.begin(), scroll_areas_.end(), ScrollAreaSorter());
+
+    for (int i = static_cast<int>(scroll_areas_.size()) - 1; i >= 0; --i)
+    {
+      scroll_areas_.at(i)->Draw(context);
+    }
+  }
+  
   //---------------------------------------------------------------------------------------------------------
   void D3D11RenderTarget::SetViewport(const float& x, const float& y, const float& w, const float& h)
   {
@@ -292,6 +329,11 @@ namespace snuffbox
 			SNUFF_SAFE_RELEASE(resource_, "D3D11RenderTarget::~D3D11RenderTarget::resource_");
       queue_->Clear();
 		}
+
+    for (unsigned int i = 0; i < scroll_areas_.size(); ++i)
+    {
+      scroll_areas_.at(i)->set_target(nullptr);
+    }
 
 		valid_ = false;
 	}

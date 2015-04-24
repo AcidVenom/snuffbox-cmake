@@ -47,6 +47,9 @@ namespace snuffbox
     */
     void Spawn(const std::string& target);
 
+    /// Spawn without a render target, useful for e.g scroll areas
+    void Spawn();
+
     /// Destroys the render element
     void Destroy();
 
@@ -366,6 +369,11 @@ namespace snuffbox
 		* @param[in] effect (snuffbox::D3D11Effect*) The pointer to the effect
 		*/
 		void set_override_effect(D3D11Effect* effect);
+
+    /**
+    * @return const std::vector<snuffbox::D3D11RenderElement*>& The children of this render element
+    */
+    const std::vector<D3D11RenderElement*>& children() const;
 
   private:
     XMVECTOR translation_; //!< The translation vector of this render element

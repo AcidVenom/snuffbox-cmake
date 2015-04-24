@@ -80,6 +80,12 @@ namespace snuffbox
     */
     void Remove(D3D11RenderElement* ptr);
 
+    /**
+    * @brief Sets the render target of this queue
+    * @param[in] target (snuffbox::D3D11RenderTarget*) The render target to set
+    */
+    void set_target(D3D11RenderTarget* target);
+
   private:
     std::vector<D3D11RenderElement*> world_; //!< A list of world elements to sort and / or draw
 		std::vector<D3D11RenderElement*> ui_; //!< A list of UI elements to sort and / or draw

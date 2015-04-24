@@ -71,7 +71,7 @@ namespace snuffbox
 		ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
 		desc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 		desc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-		desc.ScissorEnable = false;
+		desc.ScissorEnable = true;
 
 		for (unsigned int i = 0; i < properties->Length(); ++i)
 		{

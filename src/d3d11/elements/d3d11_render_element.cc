@@ -105,6 +105,15 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::Spawn()
+  {
+    if (spawned_ == false)
+    {
+      spawned_ = true;
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::Destroy()
   {
     spawned_ = false;
@@ -585,6 +594,12 @@ namespace snuffbox
 	{
 		override_effect_ = effect;
 	}
+  
+  //-------------------------------------------------------------------------------------------
+  const std::vector<D3D11RenderElement*>& D3D11RenderElement::children() const
+  {
+    return children_;
+  }
 
   //-------------------------------------------------------------------------------------------
   D3D11RenderElement::~D3D11RenderElement()
@@ -972,9 +987,14 @@ namespace snuffbox
     JSWrapper wrapper(args);
     D3D11RenderElement* self = wrapper.GetPointer<D3D11RenderElement>(args.This());
 
+    wrapper.set_error_checks(false);
     if (wrapper.Check("S") == true)
     {
       self->Spawn(wrapper.GetValue<std::string>(0, "undefined"));
+    }
+    else
+    {
+      self->Spawn();
     }
   }
 

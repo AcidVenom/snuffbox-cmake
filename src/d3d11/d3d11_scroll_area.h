@@ -11,6 +11,7 @@ namespace snuffbox
   class D3D11Widget;
   class D3D11RenderQueue;
   class MouseArea;
+  class D3D11RenderElement;
 
   /**
   * @class snuffbox::D3D11ScrollArea
@@ -37,6 +38,36 @@ namespace snuffbox
     
     /// Clears this scroll area of elements
     void Clear();
+
+    /**
+    * @brief Draws this scroll area
+    * @param[in] context (ID3D11DeviceContext*) The device context to draw in
+    */
+    void Draw(ID3D11DeviceContext* context);
+
+    /**
+    * @brief Adds a child to this scroll area
+    * @param[in] child (snuffbox::D3D11Widget*) The child to add
+    */
+    void AddChild(D3D11Widget* child);
+
+    /**
+    * @brief Recursively add all children of an added child
+    * @param[in] head (snuffbox::D3D11RenderElement*) The head element to add from
+    */
+    void RecursiveAdd(D3D11RenderElement* head);
+
+    /**
+    * @brief Recursively remove all children of a removed child
+    * @param[in] head (snuffbox::D3D11RenderElement*) The head element to remove from
+    */
+    void RecursiveRemove(D3D11RenderElement* head);
+
+    /**
+    * @brief Removes a child of this scroll area
+    * @param[in] child (snuffbox::D3D11Widget*) The child to remove
+    */
+    void RemoveChild(D3D11Widget* child);
 
     /**
     * @return XMFLOAT2 The current scroll values
@@ -85,6 +116,12 @@ namespace snuffbox
     void set_focussed(const bool& focus);
 
     /**
+    * @brief Sets the render target parent of this scroll area
+    * @param[in] target (snuffbox::D3D11RenderTarget*) The render target to set
+    */
+    void set_target(D3D11RenderTarget* target);
+
+    /**
     * @return const XMFLOAT2& The size of this scroll area, representing the scissor rect
     */
     const XMFLOAT2& size() const;
@@ -122,6 +159,7 @@ namespace snuffbox
     XMFLOAT2 position_; //!< Sets the position of this scroll area
     XMFLOAT2 max_; //!< The maximum value of this scroll area
     bool is_focussed_; //!< Is this scroll area focussed?
+    std::vector<D3D11RenderElement*> top_level_; //!< All the widgets that were added to this scroll area
 
   public:
     JS_NAME("ScrollArea");
@@ -139,5 +177,7 @@ namespace snuffbox
     static void JSClear(JS_ARGS args);
     static void JSSetZ(JS_ARGS args);
     static void JSZIndex(JS_ARGS args);
+    static void JSAddChild(JS_ARGS args);
+    static void JSRemoveChild(JS_ARGS args);
   };
 }

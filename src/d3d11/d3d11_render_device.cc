@@ -551,10 +551,7 @@ namespace snuffbox
     D3D11Viewport* vp = target->viewport();
     if (vp->valid() == true)
     {
-      D3D11Viewport projected;
-      const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
-      projected.Create(vp->x(), vp->y(), vp->width() * viewport_render_target_->width() / res.x, vp->height() * viewport_render_target_->height() / res.y);
-      projected.Set();
+      vp->Set();
     }
 
     MapGlobalBuffer();
@@ -564,7 +561,17 @@ namespace snuffbox
     target->Clear(context_);
 		default_depth_state_->Set();
     target->Set(context_, camera_->type() == D3D11Camera::CameraTypes::kPerspective ? depth_stencil_view_ : nullptr);
+    const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
+   
+    D3D11_RECT rect;
+    rect.left = 0;
+    rect.right = static_cast<LONG>(res.x);
+    rect.top = 0;
+    rect.bottom = static_cast<LONG>(res.y);
+
+    context_->RSSetScissorRects(1, &rect);
     target->Draw(context_);
+    context_->RSSetScissorRects(1, &rect);
 
 		MapGlobalBuffer();
     target->line()->Draw();
