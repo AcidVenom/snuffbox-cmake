@@ -500,6 +500,14 @@ namespace snuffbox
     
     D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 
+    D3D11_RECT scissor;
+    scissor.top = 0;
+    scissor.left = 0;
+    scissor.right = static_cast<LONG>(texture_size_);
+    scissor.bottom = static_cast<LONG>(texture_size_);
+
+    render_device->context()->RSSetScissorRects(1, &scissor);
+
     render_device->default_blend_state()->Set();
     render_device->default_rasterizer_state()->Set();
 
@@ -599,6 +607,14 @@ namespace snuffbox
 		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat4, "Brush", coords);
 		brush_uniform_->SetUniform(D3D11Uniforms::UniformTypes::kFloat, "Opacity", &opacity);
 		brush_uniform_->Apply();
+
+    D3D11_RECT scissor;
+    scissor.top = 0;
+    scissor.left = 0;
+    scissor.right = static_cast<LONG>(texture_size_);
+    scissor.bottom = static_cast<LONG>(texture_size_);
+
+    render_device->context()->RSSetScissorRects(1, &scissor);
 
 		D3D11Texture* default_texture = render_device->default_texture();
 

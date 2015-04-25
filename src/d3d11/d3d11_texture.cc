@@ -150,6 +150,14 @@ namespace snuffbox
 		viewport.Create(0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
 		viewport.Set();
 
+    D3D11_RECT scissor;
+    scissor.top = 0;
+    scissor.left = 0;
+    scissor.right = static_cast<LONG>(w);
+    scissor.bottom = static_cast<LONG>(h);
+
+    render_device->context()->RSSetScissorRects(1, &scissor);
+
 		D3D11_TEXTURE2D_DESC d;
 		ZeroMemory(&d, sizeof(D3D11_TEXTURE2D_DESC));
 
