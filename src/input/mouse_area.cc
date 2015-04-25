@@ -49,6 +49,13 @@ namespace snuffbox
       return false;
     }
 
+    D3D11ScrollArea* scroll_area = parent_->scroll_area();
+
+    if ((scroll_area != nullptr && scroll_area->visible() == false) || (scroll_area_ != nullptr && scroll_area_->visible() == false))
+    {
+      return false;
+    }
+
     const XMFLOAT2& res = D3D11RenderSettings::Instance()->resolution();
     D3D11Viewport* vp = nullptr;
 
@@ -65,8 +72,21 @@ namespace snuffbox
     XMMATRIX wp = parent_->world_matrix() * proj;
 
     Mouse::float2 screen = mouse->Position(Mouse::MousePosition::kScreen);
+    Mouse::float2 relative = mouse->Position(Mouse::MousePosition::kRelative);
 
-    if (screen.x > 1.0f || screen.x < -1.0f || screen.y > 1.0f || screen.y < -1.0f)
+    XMFLOAT2 scroll_pos, scroll_size;
+
+    if (scroll_area != nullptr)
+    {
+      scroll_pos = scroll_area->position();
+      scroll_size = scroll_area->size();
+    }
+
+    bool screen_test = screen.x > 1.0f || screen.x < -1.0f || screen.y > 1.0f || screen.y < -1.0f;
+    bool scroll_test = scroll_area == nullptr ? false :
+      (relative.x > scroll_pos.x + scroll_size.x || relative.x < scroll_pos.x || relative.y > scroll_pos.y + scroll_size.y || relative.y < scroll_pos.y);
+
+    if (screen_test == true || scroll_test == true)
     {
       if (entered_ == true)
       {
@@ -191,6 +211,13 @@ namespace snuffbox
     {
       scroll_area_->set_focussed(true);
     }
+
+    D3D11ScrollArea* scroll_area = parent_->scroll_area();
+    if (scroll_area != nullptr)
+    {
+      scroll_area->set_focus_override(true);
+    }
+
     on_enter_.Call();
   }
 
@@ -201,6 +228,13 @@ namespace snuffbox
     {
       scroll_area_->set_focussed(false);
     }
+
+    D3D11ScrollArea* scroll_area = parent_->scroll_area();
+    if (scroll_area != nullptr)
+    {
+      scroll_area->set_focus_override(false);
+    }
+
     on_leave_.Call();
   }
 

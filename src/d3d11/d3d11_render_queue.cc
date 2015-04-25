@@ -227,14 +227,25 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::Clear()
   {
+    D3D11RenderElement* it = nullptr;
     for (unsigned int i = 0; i < world_.size(); ++i)
     {
-      world_.at(i)->Destroy();
+      it = world_.at(i);
+
+      if (it != nullptr)
+      {
+        it->Destroy();
+      }
     }
 
     for (unsigned int i = 0; i < ui_.size(); ++i)
     {
-      ui_.at(i)->Destroy();
+      it = ui_.at(i);
+
+      if (it != nullptr)
+      {
+        it->Destroy();
+      }
     }
 
     world_.clear();
@@ -244,19 +255,24 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderQueue::Remove(D3D11RenderElement* ptr)
   {
+    D3D11RenderElement* it = nullptr;
     for (unsigned int i = 0; i < world_.size(); ++i)
     {
-      if (world_.at(i) == ptr)
+      it = world_.at(i);
+      if (it == ptr && it != nullptr)
       {
         world_.at(i) = nullptr;
+        it->Destroy();
       }
     }
 
     for (unsigned int i = 0; i < ui_.size(); ++i)
     {
-      if (world_.at(i) == ptr)
+      it = ui_.at(i);
+      if (it == ptr && it != nullptr)
       {
-        world_.at(i) = nullptr;
+        ui_.at(i) = nullptr;
+        it->Destroy();
       }
     }
   }

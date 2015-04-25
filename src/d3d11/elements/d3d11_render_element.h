@@ -9,6 +9,7 @@ namespace snuffbox
   class D3D11VertexBuffer;
 	class D3D11Material;
 	class D3D11Uniforms;
+  class D3D11ScrollArea;
 	class Animation;
 
   /**
@@ -371,9 +372,20 @@ namespace snuffbox
 		void set_override_effect(D3D11Effect* effect);
 
     /**
+    * @brief Sets the scroll area of this render element
+    * @param[in] area (snuffbox::D3D11ScrollArea*) The scroll area to set
+    */
+    void set_scroll_area(D3D11ScrollArea* area);
+
+    /**
     * @return const std::vector<snuffbox::D3D11RenderElement*>& The children of this render element
     */
     const std::vector<D3D11RenderElement*>& children() const;
+
+    /**
+    * @return snuffbox::D3D11ScrollArea* The scroll area parent of this render element
+    */
+    D3D11ScrollArea* scroll_area();
 
   private:
     XMVECTOR translation_; //!< The translation vector of this render element
@@ -402,6 +414,7 @@ namespace snuffbox
 		D3D11Texture* override_specular_; //!< An override texture to override the material texture
 		D3D11Texture* override_light_; //!< An override texture to override the material texture
 		D3D11Effect* override_effect_; //!< And override effect to override the material effect
+    D3D11ScrollArea* scroll_area_; //!< The scroll area parent of this render element
 
   public:
     static void Register(JS_CONSTRUCTABLE obj);

@@ -47,9 +47,9 @@ namespace snuffbox
 
     /**
     * @brief Adds a child to this scroll area
-    * @param[in] child (snuffbox::D3D11Widget*) The child to add
+    * @param[in] child (snuffbox::D3D11RenderElement*) The child to add
     */
-    void AddChild(D3D11Widget* child);
+    void AddChild(D3D11RenderElement* child);
 
     /**
     * @brief Recursively add all children of an added child
@@ -65,9 +65,9 @@ namespace snuffbox
 
     /**
     * @brief Removes a child of this scroll area
-    * @param[in] child (snuffbox::D3D11Widget*) The child to remove
+    * @param[in] child (snuffbox::D3D11RenderElement*) The child to remove
     */
-    void RemoveChild(D3D11Widget* child);
+    void RemoveChild(D3D11RenderElement* child);
 
     /**
     * @return XMFLOAT2 The current scroll values
@@ -122,6 +122,18 @@ namespace snuffbox
     void set_target(D3D11RenderTarget* target);
 
     /**
+    * @brief Sets the focus override for mouse areas within this scroll area
+    * @param[in] focus (const bool&) The boolean value
+    */
+    void set_focus_override(const bool& focus);
+
+    /**
+    * @brief Sets if this scroll area is visible
+    * @param[in] visible (const bool&) The boolean value
+    */
+    void set_visible(const bool& visible);
+
+    /**
     * @return const XMFLOAT2& The size of this scroll area, representing the scissor rect
     */
     const XMFLOAT2& size() const;
@@ -142,9 +154,14 @@ namespace snuffbox
     const XMFLOAT2& max() const;
 
     /**
-    * @return const bool& Is this scroll area focussed or not? 
+    * @return bool Is this scroll area focussed or not? 
     */
-    const bool& is_foccused() const;
+    bool is_foccused();
+
+    /**
+    * @return const bool& Is this scroll area visible?
+    */
+    const bool& visible() const;
 
     /// Default destructor
     virtual ~D3D11ScrollArea();
@@ -159,6 +176,8 @@ namespace snuffbox
     XMFLOAT2 position_; //!< Sets the position of this scroll area
     XMFLOAT2 max_; //!< The maximum value of this scroll area
     bool is_focussed_; //!< Is this scroll area focussed?
+    bool focus_override_; //!< The focus override for mouse areas within the scroll area
+    bool visible_; //!< Is this scroll area visible?
     std::vector<D3D11RenderElement*> top_level_; //!< All the widgets that were added to this scroll area
 
   public:
@@ -179,5 +198,7 @@ namespace snuffbox
     static void JSZIndex(JS_ARGS args);
     static void JSAddChild(JS_ARGS args);
     static void JSRemoveChild(JS_ARGS args);
+    static void JSSetVisible(JS_ARGS args);
+    static void JSVisible(JS_ARGS args);
   };
 }

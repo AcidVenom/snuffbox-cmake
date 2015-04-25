@@ -11,6 +11,8 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   D3D11ScrollArea::D3D11ScrollArea() :
     is_focussed_(false),
+    focus_override_(false),
+    visible_(true),
     size_(0.0f, 0.0f),
     position_(0.0f, 0.0f),
     max_(0.0f, 0.0f)
@@ -21,6 +23,8 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   D3D11ScrollArea::D3D11ScrollArea(JS_ARGS args) :
     is_focussed_(false),
+    focus_override_(false),
+    visible_(true),
     size_(0.0f, 0.0f),
     position_(0.0f, 0.0f),
     max_(0.0f, 0.0f)
@@ -72,6 +76,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11ScrollArea::Draw(ID3D11DeviceContext* context)
   {
+    if (visible_ == false)
+    {
+      return;
+    }
+
     D3D11RenderDevice* device = D3D11RenderDevice::Instance();
 
     const D3D11Viewport* vp = device->viewport_render_target();
@@ -94,7 +103,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11ScrollArea::AddChild(D3D11Widget* child)
+  void D3D11ScrollArea::AddChild(D3D11RenderElement* child)
   {
     if (child == nullptr)
     {
@@ -105,6 +114,8 @@ namespace snuffbox
 
     D3D11RenderElement* top = child;
     D3D11RenderElement* parent = child->parent();
+
+    top->set_scroll_area(this);
     while (parent != nullptr)
     {
       children_->Add(parent);
@@ -113,6 +124,7 @@ namespace snuffbox
       if (parent != nullptr)
       {
         top = parent;
+        top->set_scroll_area(this);
       }
     }
 
@@ -148,13 +160,14 @@ namespace snuffbox
       if (found_child != nullptr)
       {
         children_->Add(found_child);
+        found_child->set_scroll_area(this);
         RecursiveAdd(found_child);
       }
     }
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11ScrollArea::RemoveChild(D3D11Widget* child)
+  void D3D11ScrollArea::RemoveChild(D3D11RenderElement* child)
   {
     if (child == nullptr)
     {
@@ -163,10 +176,12 @@ namespace snuffbox
 
     children_->Remove(child);
 
+    child->set_scroll_area(nullptr);
     D3D11RenderElement* parent = child->parent();
     while (parent != nullptr)
     {
       children_->Remove(parent);
+      parent->set_scroll_area(nullptr);
       parent = parent->parent();
     }
 
@@ -195,6 +210,7 @@ namespace snuffbox
       if (found_child != nullptr)
       {
         children_->Remove(found_child);
+        found_child->set_scroll_area(nullptr);
         RecursiveRemove(found_child);
       }
     }
@@ -285,9 +301,15 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  const bool& D3D11ScrollArea::is_foccused() const
+  bool D3D11ScrollArea::is_foccused()
   {
-    return is_focussed_;
+    return is_focussed_ || focus_override_;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  const bool& D3D11ScrollArea::visible() const
+  {
+    return visible_;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -297,11 +319,23 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
+  void D3D11ScrollArea::set_focus_override(const bool& focus)
+  {
+    focus_override_ = focus;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11ScrollArea::set_visible(const bool& visible)
+  {
+    visible_ = visible;
+  }
+
+  //-------------------------------------------------------------------------------------------
   D3D11ScrollArea::~D3D11ScrollArea()
   {
     for (unsigned int i = 0; i < top_level_.size(); ++i)
     {
-      top_level_.at(i)->set_parent(nullptr);
+      RemoveChild(top_level_.at(i));
     }
 
     children_->Clear();
@@ -331,7 +365,9 @@ namespace snuffbox
       { "setZ", JSSetZ },
       { "z", JSZIndex },
       { "addChild", JSAddChild },
-      { "removeChild", JSRemoveChild }
+      { "removeChild", JSRemoveChild },
+      { "setVisible", JSSetVisible },
+      { "visible", JSVisible }
     };
 
     JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -470,5 +506,26 @@ namespace snuffbox
     {
       self->RemoveChild(wrapper.GetPointer<D3D11Widget>(0));
     }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11ScrollArea::JSSetVisible(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11ScrollArea* self = wrapper.GetPointer<D3D11ScrollArea>(args.This());
+
+    if (wrapper.Check("B") == true)
+    {
+      self->set_visible(wrapper.GetValue<bool>(0, true));
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11ScrollArea::JSVisible(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11ScrollArea* self = wrapper.GetPointer<D3D11ScrollArea>(args.This());
+
+    wrapper.ReturnValue<bool>(self->visible());
   }
 }

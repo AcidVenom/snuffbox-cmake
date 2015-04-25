@@ -7,6 +7,7 @@
 #include "../../d3d11/d3d11_render_settings.h"
 #include "../../d3d11/d3d11_camera.h"
 #include "../../d3d11/d3d11_uniforms.h"
+#include "../../d3d11/d3d11_scroll_area.h"
 
 #include "../../content/content_manager.h"
 #include "../../animation/animation_base.h"
@@ -38,7 +39,8 @@ namespace snuffbox
 		override_light_(nullptr),
 		override_effect_(nullptr),
 		target_(nullptr),
-    parent_(nullptr)
+    parent_(nullptr),
+    scroll_area_(nullptr)
   {
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
@@ -67,7 +69,8 @@ namespace snuffbox
 		override_specular_(nullptr),
 		override_light_(nullptr),
 		override_effect_(nullptr),
-		target_(nullptr)
+		target_(nullptr),
+    scroll_area_(nullptr)
 	{
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
@@ -248,7 +251,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void D3D11RenderElement::SetZ(const float& z)
   {
-    XMVectorSetZ(translation_, z);
+    translation_ = XMVectorSetZ(translation_, z);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -594,11 +597,23 @@ namespace snuffbox
 	{
 		override_effect_ = effect;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::set_scroll_area(D3D11ScrollArea* area)
+  {
+    scroll_area_ = area;
+  }
   
   //-------------------------------------------------------------------------------------------
   const std::vector<D3D11RenderElement*>& D3D11RenderElement::children() const
   {
     return children_;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  D3D11ScrollArea* D3D11RenderElement::scroll_area()
+  {
+    return scroll_area_;
   }
 
   //-------------------------------------------------------------------------------------------
