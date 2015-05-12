@@ -60,9 +60,10 @@ namespace snuffbox
 		/**
 		* @brief Retrieves the files in a directory and returns the names
 		* @param[in] path (const std::string&) The path of the directory to look for files
-		* @return std::vector<std::string> The list of file names
+		* @param[in] directories (const bool&) Should directories be included too?
+		* @return std::vector<std::string> The list of file/directory names
 		*/
-		std::vector<std::string> FilesInDirectory(const std::string& path);
+		std::vector<std::string> FilesInDirectory(const std::string& path, const bool& directories = false);
 
 	public:
 		JS_NAME("IO");

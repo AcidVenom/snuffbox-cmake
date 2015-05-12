@@ -74,7 +74,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	std::vector<std::string> IOManager::FilesInDirectory(const std::string& path)
+	std::vector<std::string> IOManager::FilesInDirectory(const std::string& path, const bool& directories)
 	{
 		HANDLE dir;
 		WIN32_FIND_DATA file_data;
@@ -83,10 +83,12 @@ namespace snuffbox
 
 		if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
 		{
+			SNUFF_LOG_ERROR("Could not retrieve directory listing for directory '" + path + "'");
 			return out;
 		}
 
-		do {
+		do 
+		{
 			std::string file_name = file_data.cFileName;
 			bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
@@ -95,7 +97,7 @@ namespace snuffbox
 				continue;
 			}
 
-			if (is_directory == true)
+			if (is_directory == true && directories == false)
 			{
 				continue;
 			}
@@ -213,7 +215,9 @@ namespace snuffbox
 
 		if (wrapper.Check("S") == true)
 		{
-			std::vector<std::string> names = IOManager::Instance()->FilesInDirectory(wrapper.GetValue<std::string>(0, "undefined"));
+			std::vector<std::string> names = IOManager::Instance()->FilesInDirectory(
+				wrapper.GetValue<std::string>(0, "undefined"),
+				wrapper.GetValue<bool>(1, false));
 
 			v8::Handle<v8::Array> arr = JSWrapper::CreateArray();
 
