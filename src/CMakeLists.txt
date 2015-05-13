@@ -117,6 +117,15 @@ SET (D3DElements
 	d3d11/elements/d3d11_polygon_element.cc
 )
 
+SET (D3DParticles
+	d3d11/elements/particles/d3d11_particle.h
+	d3d11/elements/particles/d3d11_particle.cc
+	d3d11/elements/particles/d3d11_particle_system.h
+	d3d11/elements/particles/d3d11_particle_system.cc
+	d3d11/elements/particles/d3d11_particle_effect.h
+	d3d11/elements/particles/d3d11_particle_effect.cc
+)
+
 SET (D3DShaders
 	d3d11/shaders/d3d11_base_shader.h
 	d3d11/shaders/d3d11_ui_shader.h
@@ -229,6 +238,7 @@ SOURCE_GROUP("application" 	FILES ${ApplicationSources})
 SOURCE_GROUP("d3d11" 			FILES ${D3DSources})
 SOURCE_GROUP("d3d11\\elements" 	FILES ${D3DElements})
 SOURCE_GROUP("d3d11\\shaders" 		FILES ${D3DShaders})
+SOURCE_GROUP("d3d11\\elements\\particles" FILES ${D3DParticles})
 SOURCE_GROUP("ogl" 				FILES ${OGLSources})
 SOURCE_GROUP("memory" 		FILES ${MemorySources})
 SOURCE_GROUP("input" 			FILES ${InputSources})
@@ -272,6 +282,7 @@ IF (WIN32 AND NOT SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DSources})
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DElements})
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DShaders})
+	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${D3DParticles})
 ELSEIF (SNUFF_BUILD_OPENGL)
 	SET (SNUFF_SOURCES ${SNUFF_SOURCES} ${OGLSources})
 ELSE ()

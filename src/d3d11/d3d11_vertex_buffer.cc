@@ -11,6 +11,7 @@ namespace snuffbox
     index_buffer_(nullptr),
     vertex_size_(0),
     index_size_(0),
+		num_indices_(-1),
     valid_(false),
     topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
   {
@@ -289,7 +290,7 @@ namespace snuffbox
       render_device->set_current_model(this);
 
       UINT offset = 0;
-      ctx->IASetVertexBuffers(0, 1, &vertex_buffer_, &Vertex::stride_size, &offset);
+      ctx->IASetVertexBuffers(0, 1, &vertex_buffer_, &Vertex::STRIDE_SIZE, &offset);
       ctx->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
     }
 
@@ -317,7 +318,7 @@ namespace snuffbox
 			return;
 		}
 		
-    render_device->context()->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+    render_device->context()->DrawIndexed(num_indices_ >= 0 ? num_indices_ : static_cast<UINT>(indices_.size()), 0, 0);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -435,6 +436,12 @@ namespace snuffbox
   {
     topology_ = topology;
   }
+
+	//-------------------------------------------------------------------------------------------
+	void D3D11VertexBuffer::set_num_indices(const int& n)
+	{
+		num_indices_ = n;
+	}
 
   //-------------------------------------------------------------------------------------------
   D3D11VertexBuffer::~D3D11VertexBuffer()

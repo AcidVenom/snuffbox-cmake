@@ -1,7 +1,8 @@
 Game.targets = Game.targets || {
 	gbuffer: new RenderTarget("G-Buffer"),
 	normals: new RenderTarget("Normals"),
-	light: new RenderTarget("Light")
+	light: new RenderTarget("Light"),
+	diffuse: new RenderTarget("Diffuse")
 }
 
 var TestSphere = function(x, y, z)
@@ -43,8 +44,10 @@ Game.Initialise = function()
 	ContentManager.load("texture", "metal.png");
 	ContentManager.load("texture", "metal_normal.png");
 	ContentManager.load("texture", "metal_specular.png");
+	ContentManager.load("texture", "pfx.png");
 	ContentManager.load("model", "sphere.fbx");
 	ContentManager.load("material", "test.material");
+	ContentManager.load("effect", "pfx.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
 
@@ -60,6 +63,10 @@ Game.Initialise = function()
 	Game.targets.gbuffer.setLightingEnabled(true);
 	Game.targets.gbuffer.addMultiTarget(Game.targets.normals);
 	Game.targets.gbuffer.addMultiTarget(Game.targets.light);
+
+	Game.targets.diffuse.setClearDepth(true);
+	Game.targets.diffuse.setLightingEnabled(false);
+	Game.targets.diffuse.setTechnique("Diffuse");
 
 	Game.light = new Light(LightType.Directional);
 	Game.light.setDirection(0, -1, -1);
@@ -78,6 +85,11 @@ Game.Initialise = function()
 	Game.terrain.setMaterial("test.material");
 	Game.terrain.setTranslation(0, -9, 0);
 	Game.terrain.setOffset(64, 0, 64);
+
+	Game.p = new ParticleSystem();
+	Game.p.spawn("Diffuse");
+	Game.p.setDiffuseMap("pfx.png");
+	Game.p.setEffect("pfx.effect");
 }
 
 Game.Update = function(dt)
@@ -136,6 +148,7 @@ Game.FixedUpdate = function(timeSteps, fixedDelta)
 Game.Draw = function(dt)
 {
 	Game.render(Game.camera, Game.targets.gbuffer);
+	Game.render(Game.camera, Game.targets.diffuse);
 }
 
 Game.Shutdown = function()

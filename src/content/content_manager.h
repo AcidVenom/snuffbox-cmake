@@ -27,6 +27,7 @@ namespace snuffbox
 		kCustom,
     kBox,
 		kAnim,
+		kParticleEffect,
     kUnknown
 	};
 

@@ -28,6 +28,7 @@
 #include "../d3d11/elements/d3d11_billboard_element.h"
 #include "../d3d11/elements/d3d11_text_element.h"
 #include "../d3d11/elements/d3d11_polygon_element.h"
+#include "../d3d11/elements/particles/d3d11_particle_system.h"
 
 #include "../js/js_object_register.h"
 
@@ -70,7 +71,8 @@ namespace snuffbox
 		JSObjectRegister<D3D11Billboard>::Register();
     JSObjectRegister<D3D11Text>::Register();
     JSObjectRegister<D3D11Polygon>::Register();
-    JSObjectRegister<D3D11ScrollArea>::Register();
+		JSObjectRegister<D3D11ScrollArea>::Register();
+		JSObjectRegister<D3D11ParticleSystem>::Register();
 
 		JSObjectRegister<SpriteAnimation>::Register();
   }

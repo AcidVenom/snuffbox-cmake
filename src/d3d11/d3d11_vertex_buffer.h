@@ -45,7 +45,7 @@ namespace snuffbox
     XMFLOAT3 tangent; //!< The tangent of this vertex
 		XMFLOAT3 bitangent; //!< The bitangent of this vertex
 
-    static const UINT stride_size = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3);
+    static const UINT STRIDE_SIZE = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3);
   };
 
   /**
@@ -137,6 +137,12 @@ namespace snuffbox
     */
     void set_topology(const D3D11_PRIMITIVE_TOPOLOGY& topology);
 
+		/**
+		* @brief Sets the number of indices to draw
+		* @param[in] n (const int&) The new value, set to < 0 to disable the override
+		*/
+		void set_num_indices(const int& n);
+
   private:
     std::vector<Vertex> vertices_; //!< The vertices of this vertex buffer
     std::vector<int> indices_; //!< The indices of this vertex buffer
@@ -148,5 +154,6 @@ namespace snuffbox
 		unsigned int index_size_; //!< The number of indices after creation
     bool valid_; //!< Is this vertex buffer valid and ready for use?
     BoundingBox bounds_; //!< The boundaries of the vertices
+		int num_indices_; //!< The number of indices to draw, defaults to -1, overrideable by setting to a number > 0
   };
 }
