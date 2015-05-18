@@ -13,7 +13,6 @@ namespace snuffbox
 		max_particles_(DEFAULT_MAX_PARTICLES),
 		spawn_type_(DEFAULT_SPAWN_TYPE),
 		particles_per_second_(DEFAULT_PER_SECOND),
-		shape_(DEFAULT_PARTICLE_SHAPE),
 		blend_mode_(DEFAULT_BLEND_MODE)
 	{
 		set_technique("Diffuse");
@@ -30,7 +29,6 @@ namespace snuffbox
 		max_particles_(DEFAULT_MAX_PARTICLES),
 		spawn_type_(DEFAULT_SPAWN_TYPE),
 		particles_per_second_(DEFAULT_PER_SECOND),
-		shape_(DEFAULT_PARTICLE_SHAPE),
 		blend_mode_(DEFAULT_BLEND_MODE)
 	{
 		set_technique("Diffuse");
@@ -186,7 +184,7 @@ namespace snuffbox
 			0.0f
 		};
 
-		if (spawn_type_ == SpawnType::kInstant)
+		if (spawn_type_ == ParticleSpawnType::kInstant)
 		{
 			if (particles_.size() == 0)
 			{
@@ -196,11 +194,11 @@ namespace snuffbox
 				}
 			}
 		}
-		else if (spawn_type_ == SpawnType::kOvertime)
+		else if (spawn_type_ == ParticleSpawnType::kOvertime)
 		{
 
 		}
-		else if (spawn_type_ == SpawnType::kPerSecond)
+		else if (spawn_type_ == ParticleSpawnType::kPerSecond)
 		{
 			float interval = 1.0f / particles_per_second_;
 			accumulated_time_ += elapsed_time_ - last_time_;

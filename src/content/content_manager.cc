@@ -10,6 +10,7 @@
 #include "../d3d11/d3d11_depth_state.h"
 #include "../d3d11/d3d11_texture.h"
 #include "../d3d11/d3d11_material.h"
+#include "../d3d11/elements/particles/d3d11_particle_effect.h"
 #include "../fbx/fbx_model.h"
 #include "../animation/anim.h"
 #include "../fmod/fmod_sound.h"
@@ -99,6 +100,10 @@ namespace snuffbox
       {
         content = AllocatedMemory::Instance().Construct<Sound>();
       }
+			else if (type == ContentTypes::kParticleEffect)
+			{
+				content = AllocatedMemory::Instance().Construct<D3D11ParticleEffect>();
+			}
 			else
 			{
 				SNUFF_LOG_WARNING("No content loader was specified for the content type of '" + path + "'");
@@ -229,6 +234,10 @@ namespace snuffbox
 		else if (type == "anim")
 		{
 			return ContentTypes::kAnim;
+		}
+		else if (type == "particle")
+		{
+			return ContentTypes::kParticleEffect;
 		}
     else
     {

@@ -70,7 +70,6 @@ namespace snuffbox
 		std::vector<D3D11Particle> particles_; //!< The particles created by this emitter
 		SharedPtr<D3D11VertexBuffer> vertex_buffer_; //!< The vertex buffer of all particles together
 		int max_particles_; //!< The maximum particles of this particle system
-		ParticleShape shape_; //!< The particle shape of this particle system
 		ParticleSpawnType spawn_type_; //!< The spawn type of this particle system
 		BlendMode blend_mode_; //!< The blend mode this particle system is using for its particles
 		int particles_per_second_; //!< The particles per second
@@ -84,7 +83,6 @@ namespace snuffbox
 		static const int DEFAULT_MAX_PARTICLES = 200; //!< The default maximum particles
 		static const int DEFAULT_PER_SECOND = 100; //!< The default particles per second
 		static const ParticleSpawnType DEFAULT_SPAWN_TYPE = ParticleSpawnType::kPerSecond; //!< The default spawn type
-		static const ParticleShape DEFAULT_PARTICLE_SHAPE = ParticleShape::kSphere; //!< The default particle shape
 		static const BlendMode DEFAULT_BLEND_MODE = BlendMode::kAdditive; //!< The default particle blend mode
 
 	public:

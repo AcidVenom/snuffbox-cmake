@@ -48,6 +48,7 @@ Game.Initialise = function()
 	ContentManager.load("model", "sphere.fbx");
 	ContentManager.load("material", "test.material");
 	ContentManager.load("effect", "pfx.effect");
+	ContentManager.load("particle", "particle.pfx");
 
 	Game.camera = new Camera(CameraType.Perspective);
 

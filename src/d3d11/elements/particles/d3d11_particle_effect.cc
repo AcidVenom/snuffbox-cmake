@@ -5,20 +5,225 @@
 
 using namespace v8;
 
+#undef min
+#undef max
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
-	RangedValue::RangedValue(const float& a, const float& b) : 
-		min_val(a), 
-		max_val(b)
+	RangedValue::RangedValue()
 	{
 	
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	float RangedValue::Get()
+	RangedValue::RangedValue(const float& a, const float& b) :
+		min_val(a),
+		max_val(b)
 	{
-		return 0.0f;
+		Randomise();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedValue::RangedValue(const v8::Handle<v8::Value>& val)
+	{
+		if (val->IsNumber() == true)
+		{
+			min_val = max_val = static_cast<float>(val->ToNumber()->Value());
+			
+			Randomise();
+			
+			return;
+		}
+		else if (val->IsArray() == true)
+		{
+			v8::Handle<v8::Object> arr = val->ToObject();
+			v8::Handle<v8::Value> num;
+
+			num = arr->Get(0);
+			min_val = num->IsNumber() == true ? static_cast<float>(num->ToNumber()->Value()) : 0.0f;
+
+			num = arr->Get(1);
+			max_val = num->IsNumber() == true ? static_cast<float>(num->ToNumber()->Value()) : 0.0f;
+
+			Randomise();
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void RangedValue::Randomise()
+	{
+		value = min_val + (max_val - min_val) * (static_cast<float>(rand()) / 0x7FFF);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec3::RangedVec3()
+	{
+
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec3::RangedVec3(const XMFLOAT3& a, const XMFLOAT3& b) :
+		x(a.x, b.x),
+		y(a.y, b.y),
+		z(a.z, b.z)
+	{
+
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec3::RangedVec3(const v8::Handle<v8::Value>& vec)
+	{
+		if (vec->IsObject() == true)
+		{
+			v8::Handle<v8::Object> inner = vec->ToObject();
+			v8::Handle<v8::Value> is_number = inner->Get(0);
+			if (is_number->IsNumber() == true)
+			{
+				x = RangedValue(is_number->ToNumber());
+				is_number = inner->Get(1);
+				y = RangedValue(is_number->ToNumber());
+				is_number = inner->Get(2);
+				z = RangedValue(is_number->ToNumber());
+			}
+			else if (is_number->IsObject() == true)
+			{
+				v8::Handle<v8::Object> first = is_number->ToObject();
+				v8::Handle<v8::Object> second = inner->Get(1)->ToObject();
+
+				x = RangedValue(static_cast<float>(first->Get(0)->ToNumber()->Value()), static_cast<float>(second->Get(0)->ToNumber()->Value()));
+				y = RangedValue(static_cast<float>(first->Get(1)->ToNumber()->Value()), static_cast<float>(second->Get(1)->ToNumber()->Value()));
+				z = RangedValue(static_cast<float>(first->Get(2)->ToNumber()->Value()), static_cast<float>(second->Get(2)->ToNumber()->Value()));
+			}
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void RangedVec3::Randomise()
+	{
+		x.Randomise();
+		y.Randomise();
+		z.Randomise();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT3 RangedVec3::value() const
+	{
+		return XMFLOAT3(x.value, y.value, z.value);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec4::RangedVec4()
+	{
+
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec4::RangedVec4(const XMFLOAT4& a, const XMFLOAT4& b) :
+		x(a.x, b.x),
+		y(a.y, b.y),
+		z(a.z, b.z),
+		w(a.w, b.w)
+	{
+
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	RangedVec4::RangedVec4(const v8::Handle<v8::Value>& vec)
+	{
+		if (vec->IsObject() == true)
+		{
+			v8::Handle<v8::Object> inner = vec->ToObject();
+			v8::Handle<v8::Value> is_number = inner->Get(0);
+			if (is_number->IsNumber() == true)
+			{
+				x = RangedValue(is_number->ToNumber());
+				is_number = inner->Get(1);
+				y = RangedValue(is_number->ToNumber());
+				is_number = inner->Get(2);
+				z = RangedValue(is_number->ToNumber());
+				is_number = inner->Get(3);
+				w = RangedValue(is_number->ToNumber());
+			}
+			else if (is_number->IsObject() == true)
+			{
+				v8::Handle<v8::Object> first = is_number->ToObject();
+				v8::Handle<v8::Object> second = inner->Get(1)->ToObject();
+
+				x = RangedValue(static_cast<float>(first->Get(0)->ToNumber()->Value()), static_cast<float>(second->Get(0)->ToNumber()->Value()));
+				y = RangedValue(static_cast<float>(first->Get(1)->ToNumber()->Value()), static_cast<float>(second->Get(1)->ToNumber()->Value()));
+				z = RangedValue(static_cast<float>(first->Get(2)->ToNumber()->Value()), static_cast<float>(second->Get(2)->ToNumber()->Value()));
+				w = RangedValue(static_cast<float>(first->Get(3)->ToNumber()->Value()), static_cast<float>(second->Get(3)->ToNumber()->Value()));
+			}
+		}
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	void RangedVec4::Randomise()
+	{
+		x.Randomise();
+		y.Randomise();
+		z.Randomise();
+		w.Randomise();
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT4 RangedVec4::value() const
+	{
+		return XMFLOAT4(x.value, y.value, z.value, w.value);
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	D3D11ParticleEffect::ControlPoint::ControlPoint(const v8::Handle<v8::Value>& val, const std::string& path, const int& idx)
+	{
+		if (val->IsObject() == false)
+		{
+			SNUFF_LOG_ERROR("Attempted to create an invalid control point in particle effect '" + path + "' at index " + std::to_string(idx));
+			return;
+		}
+
+		v8::Handle<v8::Object> obj = val->ToObject();
+
+		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
+
+		auto GetNumber = [obj, isolate](const std::string& key, const float& def)
+		{
+			v8::Handle<v8::Value> num = obj->Get(String::NewFromUtf8(isolate, key.c_str()));
+
+			if (num->IsNumber() == false)
+			{
+				return def;
+			}
+
+			return static_cast<float>(num->ToNumber()->Value());
+		};
+
+		ratio = GetNumber("Ratio", 0.0f);
+		velocity = RangedVec3(obj->Get(String::NewFromUtf8(isolate, "Velocity")));
+		colour = RangedVec4(obj->Get(String::NewFromUtf8(isolate, "Colour")));
+		size = RangedValue(obj->Get(String::NewFromUtf8(isolate, "Size")));
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	D3D11ParticleEffect::ControlPoint::Result D3D11ParticleEffect::ControlPoint::Interpolate(const D3D11ParticleEffect::ControlPoint& other, const float& current)
+	{
+		float d = other.ratio - ratio;
+		float r = (current - ratio) / d;
+
+		r = std::max(0.0f, std::min(r, 1.0f));
+
+		Result ret_val;
+		ret_val.size = D3D11Particle::Lerp(size.value, other.size.value, r);
+		ret_val.velocity = D3D11Particle::Lerp3(velocity.value(), other.velocity.value(), r);
+		ret_val.colour = D3D11Particle::Lerp4(colour.value(), other.colour.value(), r);
+
+		return ret_val;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	bool D3D11ParticleEffect::ControlPoint::Sorter::operator()(D3D11ParticleEffect::ControlPoint& a, D3D11ParticleEffect::ControlPoint& b)
+	{
+		return a.ratio < b.ratio;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -84,11 +289,11 @@ namespace snuffbox
 				}
 
 				*found = false;
-				return def;
+				return std::string(def.c_str());
 			}
 			
 			*found = true;
-			return const std::string(*String::Utf8Value(val->ToString()));
+			return std::string(*String::Utf8Value(val->ToString()));
 		};
 
 		auto GetNumber = [obj, isolate, path](const std::string& key, const float& def, const bool& required, bool* found)
@@ -111,12 +316,26 @@ namespace snuffbox
 		};
 
 		bool found = false;
+		definition_.life_time = GetNumber("LifeTime", 1.0f, true, &found);
 		definition_.max_particles = static_cast<int>(GetNumber("MaxParticles", 1000, true, &found));
 		definition_.spawn_type = StringToSpawnType(GetString("SpawnType", "PerSecond", true, &found));
 		definition_.particles_per_second = static_cast<int>(GetNumber("ParticlesPerSecond", 5, definition_.spawn_type == ParticleSpawnType::kPerSecond, &found));
-		definition_.shape = StringToShape(GetString("Shape", "Sphere", true, &found));
 		definition_.loop = GetString("Loop", "true", false, &found) == "true";
+		definition_.loop_length = static_cast<int>(GetNumber("LoopLength", 0, found, &found));
+		definition_.start_position = RangedVec3(obj->Get(String::NewFromUtf8(isolate, "StartPosition")));
 
+		v8::Handle<v8::Value> cp = obj->Get(String::NewFromUtf8(isolate, "ControlPoints"));
+		if (cp->IsArray() == true)
+		{
+			v8::Handle<v8::Object> arr = cp->ToObject();
+
+			for (unsigned int i = 0; i < arr->GetPropertyNames()->Length(); ++i)
+			{
+				control_points_.push_back(ControlPoint(arr->Get(i), path, i));
+			}
+		}
+
+		std::sort(control_points_.begin(), control_points_.end(), ControlPoint::Sorter());
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -140,29 +359,6 @@ namespace snuffbox
 		}
 
 		return ParticleSpawnType::kPerSecond;
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	ParticleShape D3D11ParticleEffect::StringToShape(const std::string& str)
-	{
-		if (str == "Sphere")
-		{
-			return ParticleShape::kSphere;
-		}
-		else if (str == "Cone")
-		{
-			return ParticleShape::kCone;
-		}
-		else if (str == "Linear")
-		{
-			return ParticleShape::kLinear;
-		}
-		else
-		{
-			SNUFF_LOG_WARNING("Could not find particle shape '" + str + "' defaulting to 'Sphere'");
-		}
-
-		return ParticleShape::kSphere;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

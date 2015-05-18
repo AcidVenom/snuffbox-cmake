@@ -87,6 +87,7 @@ namespace snuffbox
 		float size_; //!< The size of this particle
 		bool finished_; //!< Has this particle finished its lifetime yet?
 
+	public:
 		/**
 		* @brief Lerps one value to another with a given, normalised, ratio
 		* @param[in] a (const float&) The starting value
