@@ -31,6 +31,8 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 }
 
 Texture2D Target : register(t0);
+Texture2D ParticleDepth : register(t1);
+Texture2D Depth : register(t2);
 SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET

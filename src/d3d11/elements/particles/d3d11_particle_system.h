@@ -35,11 +35,8 @@ namespace snuffbox
 		*/
 		void Update(D3D11Camera* camera, const float& dt);
 
-		/// Plays the particle system
-		void Play();
-
-		/// Pauses the particle system
-		void Pause();
+		/// Starts the particle system
+		void Start();
 
 		/// Stops the particle system
 		void Stop();
@@ -52,6 +49,19 @@ namespace snuffbox
 		* @param[in] effect (const std::string&) The relative path to the effect to set
 		*/
 		void set_particle_effect(const std::string& effect);
+
+    /**
+    * @brief Sets the position of the emitter
+    * @param[in] x (const float&) The new x position
+    * @param[in] y (const float&) The new y position
+    * @param[in] z (const float&) The new z position
+    */
+    void set_position(const float& x, const float& y, const float& z);
+
+    /**
+    * @return const XMFLOAT3& The position of the emitter
+    */
+    const XMFLOAT3& position() const;
 
 		/// @see snuffbox::D3D11RenderElement
 		D3D11VertexBuffer* vertex_buffer();
@@ -74,10 +84,14 @@ namespace snuffbox
 		static const int INDICES_PER_PARTICLE = 6; //!< The number of indices a particle uses
 
 		D3D11ParticleEffect* particle_effect_; //!< The particle effect definition of this system
+    XMFLOAT3 position_; //!< The position of the emitter
 
 	public:
 		JS_NAME("ParticleSystem");
 		static void RegisterJS(JS_CONSTRUCTABLE obj);
-		static void JSSetParticleEffect(JS_ARGS args);
+    static void JSSetParticleEffect(JS_ARGS args);
+    static void JSStart(JS_ARGS args);
+    static void JSStop(JS_ARGS args);
+    static void JSSetPosition(JS_ARGS args);
 	};
 }

@@ -1,11 +1,12 @@
 {
 	"techniques" : {
-		"Diffuse" : {
+		"Particles" : {
 			 "passes" : [
 			 	{
 			 		"shader" : "shaders/base_diffuse.fx",
 			 		"depth" : {
-			 			"DepthEnable" : "false"
+			 			"DepthEnable" : "true",
+			 			"DepthWriteMask" : "Zero"
 			 		},
 
 			 		"blend" : {

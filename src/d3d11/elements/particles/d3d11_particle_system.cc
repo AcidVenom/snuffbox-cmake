@@ -12,10 +12,11 @@ namespace snuffbox
 		elapsed_time_(0.0f),
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
-		particle_effect_(nullptr)
+		particle_effect_(nullptr),
+    position_(0.0f, 0.0f, 0.0f)
 	{
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
-		set_technique("Diffuse");
+		set_technique("Particles");
 		Create();
 	}
 
@@ -26,7 +27,8 @@ namespace snuffbox
 		elapsed_time_(0.0f),
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
-		particle_effect_(nullptr)
+		particle_effect_(nullptr),
+    position_(0.0f, 0.0f, 0.0f)
 	{
 		JSWrapper wrapper(args);
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
@@ -37,7 +39,7 @@ namespace snuffbox
 		}
 
 		set_particle_effect(wrapper.GetValue<std::string>(0, "undefined"));
-		set_technique("Diffuse");
+		set_technique("Particles");
 		Create();
 	}
 
@@ -86,7 +88,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11ParticleSystem::Update(D3D11Camera* camera, const float& dt)
 	{
-		if (paused_ == true || particle_effect_ == nullptr || particle_effect_->is_valid() == false || particle_effect_->valid() == false)
+		if (particle_effect_ == nullptr || particle_effect_->is_valid() == false || particle_effect_->valid() == false)
 		{
 			particle_effect_ = nullptr;
 			return;
@@ -161,6 +163,12 @@ namespace snuffbox
 		SpawnParticles();
 	}
 
+  //---------------------------------------------------------------------------------------------------------
+  const XMFLOAT3& D3D11ParticleSystem::position() const
+  {
+    return position_;
+  }
+
 	//---------------------------------------------------------------------------------------------------------
 	D3D11VertexBuffer* D3D11ParticleSystem::vertex_buffer()
 	{
@@ -169,27 +177,28 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ParticleSystem::Play()
+	void D3D11ParticleSystem::Start()
 	{
 		paused_ = false;
-	}
-
-	//---------------------------------------------------------------------------------------------------------
-	void D3D11ParticleSystem::Pause()
-	{
-		paused_ = true;
+    elapsed_time_ = 0.0f;
+    last_time_ = 0.0f;
+    accumulated_time_ = 0.0f;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11ParticleSystem::Stop()
 	{
 		paused_ = true;
-		elapsed_time_ = 0.0f;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11ParticleSystem::SpawnParticles()
 	{
+    if (paused_ == true)
+    {
+      return;
+    }
+
 		ParticleDefinition& definition = particle_effect_->definition();
 
 		if (definition.spawn_type == ParticleSpawnType::kInstant)
@@ -205,7 +214,31 @@ namespace snuffbox
 		}
 		else if (definition.spawn_type == ParticleSpawnType::kOvertime)
 		{
+      float interval = definition.life_time / definition.max_particles;
+      accumulated_time_ += elapsed_time_ - last_time_;
 
+      while (accumulated_time_ > 0.0f)
+      {
+        if (accumulated_time_ - interval >= 0.0f)
+        {
+          accumulated_time_ -= interval;
+
+          if (particles_.size() < definition.max_particles)
+          {
+            definition.start_position.Randomise();
+            XMVECTOR p = XMLoadFloat3(&definition.start_position.value());
+            p += XMLoadFloat3(&position_);
+
+            XMFLOAT3 pos;
+            XMStoreFloat3(&pos, p);
+            particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, pos));
+          }
+        }
+        else
+        {
+          break;
+        }
+      }
 		}
 		else if (definition.spawn_type == ParticleSpawnType::kPerSecond)
 		{
@@ -221,7 +254,13 @@ namespace snuffbox
 					if (particles_.size() < definition.max_particles)
 					{
 						definition.start_position.Randomise();
-						particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, definition.start_position.value()));
+            XMVECTOR p = XMLoadFloat3(&definition.start_position.value());
+            p += XMLoadFloat3(&position_);
+
+            XMFLOAT3 pos;
+            XMStoreFloat3(&pos, p);
+
+						particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, pos));
 					}
 				}
 				else
@@ -233,6 +272,14 @@ namespace snuffbox
 
 		last_time_ = elapsed_time_;
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11ParticleSystem::set_position(const float& x, const float& y, const float& z)
+  {
+    position_.x = x;
+    position_.y = y;
+    position_.z = z;
+  }
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11ParticleSystem::set_particle_effect(const std::string& effect)
@@ -253,7 +300,10 @@ namespace snuffbox
 	{
 		D3D11RenderElement::Register(obj);
 		JSFunctionRegister funcs[] = {
-			{ "setParticleEffect", JSSetParticleEffect }
+			{ "setParticleEffect", JSSetParticleEffect },
+      { "start", JSStart },
+      { "stop", JSStop },
+      { "setPosition", JSSetPosition }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -270,4 +320,38 @@ namespace snuffbox
 			self->set_particle_effect(wrapper.GetValue<std::string>(0, "undefined"));
 		}
 	}
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11ParticleSystem::JSStart(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11ParticleSystem* self = wrapper.GetPointer<D3D11ParticleSystem>(args.This());
+
+    self->Start();
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11ParticleSystem::JSStop(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11ParticleSystem* self = wrapper.GetPointer<D3D11ParticleSystem>(args.This());
+
+    self->Stop();
+  }
+
+  //---------------------------------------------------------------------------------------------------------
+  void D3D11ParticleSystem::JSSetPosition(JS_ARGS args)
+  {
+    JSWrapper wrapper(args);
+    D3D11ParticleSystem* self = wrapper.GetPointer<D3D11ParticleSystem>(args.This());
+
+    if (wrapper.Check("NN") == true)
+    {
+      self->set_position(
+        wrapper.GetValue<float>(0, 0.0f),
+        wrapper.GetValue<float>(1, 0.0f),
+        wrapper.GetValue<float>(2, self->position().z)
+        );
+    }
+  }
 }

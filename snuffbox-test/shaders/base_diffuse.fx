@@ -28,6 +28,7 @@ struct VOut
 	float3 normal : TEXCOORD2;
 	float3 tangent : TEXCOORD3;
 	float3 bitangent : TEXCOORD4;
+	float2 depth : TEXCOORD5;
 };
 
 VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TEXCOORD0, float3 normal : NORMAL, float3 tangent : TANGENT, float3 bitangent : BITANGENT)
@@ -42,20 +43,31 @@ VOut VS(float4 position : POSITION, float4 colour : COLOUR, float2 texcoord : TE
 	output.normal = normalize(mul(normal, (float3x3)InvWorld));
 	output.tangent = normalize(mul(tangent, (float3x3)InvWorld));
 	output.bitangent = normalize(mul(bitangent, (float3x3)InvWorld));
+	output.depth = output.position.zw;
 	return output;
 }
 
 Texture2D TexDiffuse : register(t1);
 SamplerState Sampler;
 
-float4 PS(VOut input) : SV_TARGET
+struct PSOut
 {
+	float4 diffuse : SV_Target0;
+	float depth : SV_Target1;
+};
+
+PSOut PS(VOut input)
+{
+	PSOut final;
 	float x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;
 	float y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;
 	float2 coords = float2(x, y);
 	float4 diffuse = TexDiffuse.Sample(Sampler, coords);
 	diffuse.rgb *= input.colour.rgb * Blend;
 	diffuse.rgb *= Alpha * input.colour.a;
+
+	final.diffuse = diffuse;
+	final.depth = input.depth.x / input.depth.y;
 	
-	return diffuse;
+	return final;
 }

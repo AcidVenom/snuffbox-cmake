@@ -2,7 +2,8 @@ Game.targets = Game.targets || {
 	gbuffer: new RenderTarget("G-Buffer"),
 	normals: new RenderTarget("Normals"),
 	light: new RenderTarget("Light"),
-	diffuse: new RenderTarget("Diffuse")
+	diffuse: new RenderTarget("Diffuse"),
+	particleDepth: new RenderTarget("ParticleDepth")
 }
 
 var TestSphere = function(x, y, z)
@@ -70,6 +71,7 @@ Game.Initialise = function()
 	Game.targets.diffuse.setLightingEnabled(false);
 	Game.targets.diffuse.setTechnique("Diffuse");
 	Game.targets.diffuse.setPostProcessing("additive.effect");
+	Game.targets.diffuse.addMultiTarget(Game.targets.particleDepth);
 
 	Game.light = new Light(LightType.Directional);
 	Game.light.setDirection(0, -1, -1);
@@ -101,6 +103,8 @@ Game.Update = function(dt)
 	{
 		Game.quit();
 	}
+
+	Game.p.setPosition(6, 0, 6);
 
 	var mz = 0,
 		mx = 0,
