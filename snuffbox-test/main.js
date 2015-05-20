@@ -49,6 +49,7 @@ Game.Initialise = function()
 	ContentManager.load("material", "test.material");
 	ContentManager.load("effect", "pfx.effect");
 	ContentManager.load("particle", "particle.pfx");
+	ContentManager.load("effect", "additive.effect");
 
 	Game.camera = new Camera(CameraType.Perspective);
 
@@ -65,9 +66,10 @@ Game.Initialise = function()
 	Game.targets.gbuffer.addMultiTarget(Game.targets.normals);
 	Game.targets.gbuffer.addMultiTarget(Game.targets.light);
 
-	Game.targets.diffuse.setClearDepth(true);
+	Game.targets.diffuse.setClearDepth(false);
 	Game.targets.diffuse.setLightingEnabled(false);
 	Game.targets.diffuse.setTechnique("Diffuse");
+	Game.targets.diffuse.setPostProcessing("additive.effect");
 
 	Game.light = new Light(LightType.Directional);
 	Game.light.setDirection(0, -1, -1);
@@ -87,7 +89,7 @@ Game.Initialise = function()
 	Game.terrain.setTranslation(0, -9, 0);
 	Game.terrain.setOffset(64, 0, 64);
 
-	Game.p = new ParticleSystem();
+	Game.p = new ParticleSystem("particle.pfx");
 	Game.p.spawn("Diffuse");
 	Game.p.setDiffuseMap("pfx.png");
 	Game.p.setEffect("pfx.effect");

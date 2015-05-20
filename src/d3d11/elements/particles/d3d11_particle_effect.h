@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../../../d3d11/elements/particles/d3d11_particle.h"
 #include "../../../content/content.h"
+#include "../../../d3d11/d3d11_render_device.h"
+
+#include <vector>
 
 namespace snuffbox
 {
@@ -169,7 +171,6 @@ namespace snuffbox
 			*/
 			struct Result
 			{
-				float velocity_modifier; //!< The resulting velocity modifier
 				XMFLOAT3 velocity; //!< The resulting velocity
 				XMFLOAT4 colour; //!< The resulting colour
 				float size; //!< The resulting size
@@ -213,6 +214,16 @@ namespace snuffbox
 		*/
 		const bool& valid() const;
 
+		/**
+		* @return D3D11ParticleEffect::ParticleDefinition& The definition of this particle effect
+		*/
+		ParticleDefinition& definition();
+
+		/**
+		* @return std::vector<snuffbox::D3D11ParticleEffect::ControlPoint>&) The vector of control points
+		*/
+		std::vector<ControlPoint>& control_points();
+
 		/// Default destructor
 		virtual ~D3D11ParticleEffect();
 
@@ -227,5 +238,30 @@ namespace snuffbox
 		ParticleDefinition definition_; //!< The definition describing this particle effect
 		bool valid_; //!< Is this particle effect valid?
 		std::vector<ControlPoint> control_points_; //!< The control points of this particle effect
+
+	public:
+		/**
+		* @brief Lerps one value to another with a given, normalised, ratio
+		* @param[in] a (const float&) The starting value
+		* @param[in] b (const float&) The end value
+		* @param[in] r (const float&) The ratio, this value will be clamped within [0 - 1]
+		*/
+		static float Lerp(const float& a, const float& b, const float& r);
+
+		/**
+		* @brief Lerps an XMFLOAT3 value to another with a given, normalised, ratio
+		* @param[in] a (const XMFLOAT3&) The starting value
+		* @param[in] b (const XMFLOAT3&) The end value
+		* @param[in] r (const float&) The ratio, this value will be clamped within [0 - 1]
+		*/
+		static XMFLOAT3 Lerp3(const XMFLOAT3& a, const XMFLOAT3& b, const float& r);
+
+		/**
+		* @brief Lerps an XMFLOAT4 value to another with a given, normalised, ratio
+		* @param[in] a (const XMFLOAT4&) The starting value
+		* @param[in] b (const XMFLOAT4&) The end value
+		* @param[in] r (const float&) The ratio, this value will be clamped within [0 - 1]
+		*/
+		static XMFLOAT4 Lerp4(const XMFLOAT4& a, const XMFLOAT4& b, const float& r);
 	};
 }

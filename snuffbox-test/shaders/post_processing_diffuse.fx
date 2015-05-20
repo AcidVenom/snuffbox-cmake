@@ -35,5 +35,6 @@ SamplerState Sampler;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	return Target.Sample(Sampler, input.texcoord);
+	float4 final = Target.Sample(Sampler, input.texcoord);
+	return final;
 }

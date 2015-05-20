@@ -1,14 +1,10 @@
 {
 	"techniques" : {
 		"Diffuse" : {
-			 "passes" : [
-			 	{
-			 		"shader" : "shaders/base_diffuse.fx",
-			 		"depth" : {
-			 			"DepthEnable" : "false"
-			 		},
-
-			 		"blend" : {
+			"passes" : [
+				{
+				 	"shader" : "shaders/post_processing_diffuse.fx",
+				 	"blend" : {
 			 			"BlendEnable" : "true",
 			 			"SrcBlend" : "One",
 			 			"DestBlend" : "One",
@@ -17,8 +13,8 @@
 			 			"DestBlendAlpha" : "Zero",
 			 			"BlendOpAlpha" : "Add"
 			 		}
-			 	}
-			 ]
+				}
+			]
 		}
 	}
 }

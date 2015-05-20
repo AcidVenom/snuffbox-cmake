@@ -213,9 +213,9 @@ namespace snuffbox
 		r = std::max(0.0f, std::min(r, 1.0f));
 
 		Result ret_val;
-		ret_val.size = D3D11Particle::Lerp(size.value, other.size.value, r);
-		ret_val.velocity = D3D11Particle::Lerp3(velocity.value(), other.velocity.value(), r);
-		ret_val.colour = D3D11Particle::Lerp4(colour.value(), other.colour.value(), r);
+		ret_val.size = D3D11ParticleEffect::Lerp(size.value, other.size.value, r);
+		ret_val.velocity = D3D11ParticleEffect::Lerp3(velocity.value(), other.velocity.value(), r);
+		ret_val.colour = D3D11ParticleEffect::Lerp4(colour.value(), other.colour.value(), r);
 
 		return ret_val;
 	}
@@ -228,7 +228,8 @@ namespace snuffbox
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11ParticleEffect::D3D11ParticleEffect() :
-		Content(ContentTypes::kParticleEffect)
+		Content(ContentTypes::kParticleEffect),
+		valid_(false)
 	{
 
 	}
@@ -274,6 +275,9 @@ namespace snuffbox
 			SNUFF_LOG_ERROR("Input JSON is not of an object type for a particle effect '" + path + "'");
 			return;
 		}
+
+		control_points_.clear();
+		valid_ = false;
 
 		Local<Object> obj = json->ToObject();
 
@@ -336,6 +340,25 @@ namespace snuffbox
 		}
 
 		std::sort(control_points_.begin(), control_points_.end(), ControlPoint::Sorter());
+		valid_ = true;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	ParticleDefinition& D3D11ParticleEffect::definition()
+	{
+		return definition_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const bool& D3D11ParticleEffect::valid() const
+	{
+		return valid_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	std::vector<D3D11ParticleEffect::ControlPoint>& D3D11ParticleEffect::control_points()
+	{
+		return control_points_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -365,5 +388,24 @@ namespace snuffbox
 	D3D11ParticleEffect::~D3D11ParticleEffect()
 	{
 
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	float D3D11ParticleEffect::Lerp(const float& a, const float& b, const float& r)
+	{
+		float ratio = std::fminf(std::fmaxf(0.0f, r), 1.0f);
+		return a * (1 - ratio) + ratio * b;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT3 D3D11ParticleEffect::Lerp3(const XMFLOAT3& a, const XMFLOAT3& b, const float& r)
+	{
+		return XMFLOAT3(Lerp(a.x, b.x, r), Lerp(a.y, b.y, r), Lerp(a.z, b.z, r));
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	XMFLOAT4 D3D11ParticleEffect::Lerp4(const XMFLOAT4& a, const XMFLOAT4& b, const float& r)
+	{
+		return XMFLOAT4(Lerp(a.x, b.x, r), Lerp(a.y, b.y, r), Lerp(a.z, b.z, r), Lerp(a.w, b.w, r));
 	}
 }

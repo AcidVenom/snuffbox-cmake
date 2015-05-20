@@ -165,6 +165,5 @@ float4 PS(VOut input) : SV_TARGET
 
 	float4 final = saturate(saturate(diffuse * ambient) * (Shadow + result.Diffuse)  + result.Specular + emissive);
 	final.a = result.Specular.a;
-
 	return final;
 }
