@@ -13,7 +13,8 @@ namespace snuffbox
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
 		particle_effect_(nullptr),
-    position_(0.0f, 0.0f, 0.0f)
+    position_(0.0f, 0.0f, 0.0f),
+		old_max_(-1)
 	{
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
 		set_technique("Particles");
@@ -28,7 +29,8 @@ namespace snuffbox
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
 		particle_effect_(nullptr),
-    position_(0.0f, 0.0f, 0.0f)
+		position_(0.0f, 0.0f, 0.0f),
+		old_max_(-1)
 	{
 		JSWrapper wrapper(args);
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
@@ -58,8 +60,12 @@ namespace snuffbox
 		}
 
 		const ParticleDefinition& definition = particle_effect_->definition();
-		int vertex_count = definition.max_particles * VERTICES_PER_PARTICLE;
-		int index_count = definition.max_particles * INDICES_PER_PARTICLE;
+		const int& max_particles = definition.max_particles;
+
+		int vertex_count = max_particles * VERTICES_PER_PARTICLE;
+		int index_count = max_particles * INDICES_PER_PARTICLE;
+
+		old_max_ = max_particles;
 
 		vertices_.resize(vertex_count);
 		indices_.resize(index_count);
@@ -92,6 +98,12 @@ namespace snuffbox
 		{
 			particle_effect_ = nullptr;
 			return;
+		}
+
+		const ParticleDefinition& definition = particle_effect_->definition();
+		if (definition.max_particles != old_max_)
+		{
+			Create();
 		}
 
 		elapsed_time_ += dt;
@@ -200,6 +212,16 @@ namespace snuffbox
     }
 
 		ParticleDefinition& definition = particle_effect_->definition();
+		const float& life = definition.life_time;
+
+		if (elapsed_time_ >= life && (definition.loop == false && elapsed_time_ / life >= definition.loop_length))
+		{
+			if (spawned() == true)
+			{
+				Destroy();
+			}
+			return;
+		}
 
 		if (definition.spawn_type == ParticleSpawnType::kInstant)
 		{

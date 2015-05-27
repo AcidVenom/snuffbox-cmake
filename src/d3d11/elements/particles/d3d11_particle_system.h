@@ -79,6 +79,7 @@ namespace snuffbox
 		std::vector<Vertex> vertices_; //!< The vertices of this particle system
 		std::vector<int> indices_; //!< The indices of this particle system
 		int num_particles_; //!< The current number of particles
+		int old_max_; //!< The old maximum number of particles
 
 		static const int VERTICES_PER_PARTICLE = 4; //!< The number of vertices a particle uses
 		static const int INDICES_PER_PARTICLE = 6; //!< The number of indices a particle uses

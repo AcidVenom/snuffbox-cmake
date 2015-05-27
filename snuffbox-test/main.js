@@ -46,6 +46,7 @@ Game.Initialise = function()
 	ContentManager.load("texture", "metal_normal.png");
 	ContentManager.load("texture", "metal_specular.png");
 	ContentManager.load("texture", "pfx.png");
+	ContentManager.load("texture", "quad.png");
 	ContentManager.load("model", "sphere.fbx");
 	ContentManager.load("material", "test.material");
 	ContentManager.load("effect", "pfx.effect");
@@ -93,7 +94,7 @@ Game.Initialise = function()
 
 	Game.p = new ParticleSystem("particle.pfx");
 	Game.p.spawn("Diffuse");
-	Game.p.setDiffuseMap("pfx.png");
+	Game.p.setDiffuseMap("quad.png");
 	Game.p.setEffect("pfx.effect");
 }
 

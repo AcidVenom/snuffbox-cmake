@@ -145,12 +145,25 @@ namespace snuffbox
 	public:
 
 		/**
-		* @struct snuffbox::ControlPoint
+		* @struct snuffbox::D3D11ParticleEffect::ControlPoint
 		* @brief A control point to use with the interpolation of particle systems
 		* @author Daniël Konings
 		*/
 		struct ControlPoint
 		{
+			/**
+			* @enum snuffbox::D3D11ParticleEffect::ControlPoint::IsSet
+			* @brief Used to check if values are set for this control point
+			* @author Daniël Konings
+			*/
+			enum IsSet : int
+			{
+				kRatio,
+				kVelocity,
+				kColour,
+				kSize
+			};
+
 			/**
 			* @brief Constructs a control point from a JSON value
 			* @param[in] val (const v8::Handle<v8::Value>&) The input value to convert
@@ -163,6 +176,7 @@ namespace snuffbox
 			RangedVec3 velocity; //!< The velocity at this control point
 			RangedVec4 colour; //!< The colour at this control point
 			RangedValue size; //!< The size at this control point
+			bool is_set[4]; //!< A list of booleans to check if a value is set
 
 			/**
 			* @struct snuffbox::D3D11ParticleEffect::ControlPoint::Result
@@ -178,11 +192,11 @@ namespace snuffbox
 
 			/**
 			* @brief Interpolates this control point to another
-			* @param[in] other (const snuffbox::D3D11ParticleEffect::ControlPoint&) The control point to interpolate to
+			* @param[in] other (snuffbox::D3D11ParticleEffect::ControlPoint&) The control point to interpolate to
 			* @param[in] current (const float&) The current, absolute, ratio
 			* @return snuffbox::D3D11ParticleEffect::ControlPoint::Result The resulting data
 			*/
-			Result Interpolate(const ControlPoint& other, const float& current);
+			Result Interpolate(ControlPoint& other, const float& current);
 
 			/**
 			* @struct snuffbox::D3D11ParticleEffect::ControlPoint::Sorter

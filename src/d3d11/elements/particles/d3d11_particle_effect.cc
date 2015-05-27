@@ -186,33 +186,49 @@ namespace snuffbox
 
 		v8::Isolate* isolate = JSStateWrapper::Instance()->isolate();
 
-		auto GetNumber = [obj, isolate](const std::string& key, const float& def)
+		auto GetNumber = [obj, isolate](const std::string& key, const float& def, bool* set)
 		{
 			v8::Handle<v8::Value> num = obj->Get(String::NewFromUtf8(isolate, key.c_str()));
 
 			if (num->IsNumber() == false)
 			{
+				*set = false;
 				return def;
 			}
 
+			*set = true;
 			return static_cast<float>(num->ToNumber()->Value());
 		};
 
-		ratio = GetNumber("Ratio", 0.0f);
-		velocity = RangedVec3(obj->Get(String::NewFromUtf8(isolate, "Velocity")));
-		colour = RangedVec4(obj->Get(String::NewFromUtf8(isolate, "Colour")));
-		size = RangedValue(obj->Get(String::NewFromUtf8(isolate, "Size")));
+		ratio = GetNumber("Ratio", 0.0f, &is_set[IsSet::kRatio]);
+
+		v8::Handle<v8::Value> v = obj->Get(String::NewFromUtf8(isolate, "Velocity"));
+		is_set[IsSet::kVelocity] = !v->IsUndefined() && !v.IsEmpty();
+		velocity = RangedVec3(v);
+
+		v = obj->Get(String::NewFromUtf8(isolate, "Colour"));
+		is_set[IsSet::kColour] = !v->IsUndefined() && !v.IsEmpty();
+		colour = RangedVec4(v);
+
+		v = obj->Get(String::NewFromUtf8(isolate, "Size"));
+		is_set[IsSet::kSize] = !v->IsUndefined() && !v.IsEmpty();
+		size = RangedValue(v);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	D3D11ParticleEffect::ControlPoint::Result D3D11ParticleEffect::ControlPoint::Interpolate(const D3D11ParticleEffect::ControlPoint& other, const float& current)
+	D3D11ParticleEffect::ControlPoint::Result D3D11ParticleEffect::ControlPoint::Interpolate(D3D11ParticleEffect::ControlPoint& other, const float& current)
 	{
 		float d = other.ratio - ratio;
 		float r = (current - ratio) / d;
 
 		r = std::max(0.0f, std::min(r, 1.0f));
 
+		other.size = other.is_set[IsSet::kSize] ? other.size : size;
+		other.velocity = other.is_set[IsSet::kVelocity] ? other.velocity : velocity;
+		other.colour = other.is_set[IsSet::kColour] ? other.colour : colour;
+
 		Result ret_val;
+
 		ret_val.size = D3D11ParticleEffect::Lerp(size.value, other.size.value, r);
 		ret_val.velocity = D3D11ParticleEffect::Lerp3(velocity.value(), other.velocity.value(), r);
 		ret_val.colour = D3D11ParticleEffect::Lerp4(colour.value(), other.colour.value(), r);
