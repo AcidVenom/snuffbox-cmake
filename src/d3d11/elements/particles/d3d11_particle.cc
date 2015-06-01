@@ -3,17 +3,19 @@ namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------------
 	D3D11Particle::D3D11Particle() :
-		finished_(false)
+		finished_(false),
+		angle_(0.0f)
 	{
 
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	D3D11Particle::D3D11Particle(const float& start_time, D3D11ParticleEffect* effect, const XMFLOAT3& position) :
+	D3D11Particle::D3D11Particle(const float& start_time, D3D11ParticleEffect* effect, const XMFLOAT3& position, const float& angle) :
 		start_time_(start_time),
 		effect_(effect),
 		finished_(false),
-		position_(position)
+		position_(position),
+		angle_(angle)
 	{
 		if (effect_ == nullptr || effect_->is_valid() == false || effect_->valid() == false)
 		{
@@ -29,6 +31,7 @@ namespace snuffbox
 			it.colour.Randomise();
 			it.size.Randomise();
 			it.velocity.Randomise();
+			it.angular_velocity.Randomise();
 		}
 	}
 
@@ -97,6 +100,7 @@ namespace snuffbox
 		XMStoreFloat3(&position_, p);
 
 		size_ = result.size;
+		angle_ += result.angular_velocity * dt;
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -115,6 +119,12 @@ namespace snuffbox
 	const float& D3D11Particle::size() const
 	{
 		return size_;
+	}
+
+	//---------------------------------------------------------------------------------------------------------
+	const float& D3D11Particle::angle() const
+	{
+		return angle_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------

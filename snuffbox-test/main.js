@@ -94,7 +94,7 @@ Game.Initialise = function()
 
 	Game.p = new ParticleSystem("particle.pfx");
 	Game.p.spawn("Diffuse");
-	Game.p.setDiffuseMap("quad.png");
+	Game.p.setDiffuseMap("pfx.png");
 	Game.p.setEffect("pfx.effect");
 }
 
@@ -105,7 +105,7 @@ Game.Update = function(dt)
 		Game.quit();
 	}
 
-	Game.p.setPosition(6, 0, 6);
+	Game.p.setTranslation(Math.sin(Game.time())*100, 0, 6);
 
 	var mz = 0,
 		mx = 0,

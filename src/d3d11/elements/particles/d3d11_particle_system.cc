@@ -1,5 +1,6 @@
 #include "../../../d3d11/elements/particles/d3d11_particle_system.h"
 #include "../../../d3d11/elements/particles/d3d11_particle_effect.h"
+#include "../../../d3d11/d3d11_render_settings.h"
 #include "../../../d3d11/d3d11_camera.h"
 #include "../../../application/game.h"
 #include "../../../content/content_manager.h"
@@ -13,8 +14,8 @@ namespace snuffbox
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
 		particle_effect_(nullptr),
-    position_(0.0f, 0.0f, 0.0f),
-		old_max_(-1)
+		old_max_(-1),
+		num_particles_(0)
 	{
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
 		set_technique("Particles");
@@ -29,8 +30,8 @@ namespace snuffbox
 		last_time_(0.0f),
 		accumulated_time_(0.0f),
 		particle_effect_(nullptr),
-		position_(0.0f, 0.0f, 0.0f),
-		old_max_(-1)
+		old_max_(-1),
+		num_particles_(0)
 	{
 		JSWrapper wrapper(args);
 		vertex_buffer_ = AllocatedMemory::Instance().Construct<D3D11VertexBuffer>(D3D11VertexBuffer::VertexBufferType::kOther);
@@ -51,6 +52,7 @@ namespace snuffbox
 		vertices_.clear();
 		indices_.clear();
 		particles_.clear();
+		num_particles_ = 0;
 
 		if (particle_effect_ == nullptr || particle_effect_->is_valid() == false || particle_effect_->valid() == false)
 		{
@@ -116,30 +118,43 @@ namespace snuffbox
 		static const XMVECTOR bottom_left = XMVectorSet(-0.5f, 0.5f, 0.0f, 1.0f);
 		static const XMVECTOR bottom_right = XMVectorSet(0.5f, 0.5f, 0.0f, 1.0f);
 
-		float size;
+		float size, angle;
 		XMVECTOR trans;
 
-		auto billboard = [camera](const XMVECTOR& p, const XMVECTOR& trans, const float& size)
-		{
-			XMMATRIX billboard = XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), camera->view());
-			XMFLOAT4X4 matrix;
-			XMStoreFloat4x4(&matrix, billboard);
-			matrix._14 = matrix._24 = matrix._34 = matrix._41 = matrix._42 = matrix._43 = 0;
-			matrix._44 = 1;
+		XMMATRIX billboard_matrix = XMMatrixInverse(&XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), camera->view());
+		XMFLOAT4X4 matrix;
+		XMStoreFloat4x4(&matrix, billboard_matrix);
+		matrix._14 = matrix._24 = matrix._34 = matrix._41 = matrix._42 = matrix._43 = 0;
+		matrix._44 = 1;
 
+		billboard_matrix = XMLoadFloat4x4(&matrix);
+
+		XMMATRIX world_matrix;
+		CalculateWorldMatrix(&world_matrix, D3D11RenderSettings::Instance()->invert_y() == true);
+
+		XMVECTOR world_trans;
+		XMFLOAT4X4 world;
+
+		XMStoreFloat4x4(&world, world_matrix);
+
+		world_trans = XMVectorSet(world._41, world._42, world._43, world._44);
+
+		auto billboard = [camera, billboard_matrix, world_trans](const XMVECTOR& p, const XMVECTOR& trans, const float& size, const float& angle)
+		{
 			XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f) * size;
 
-			return XMVector4Transform(p, XMMatrixScalingFromVector(scale) * XMLoadFloat4x4(&matrix) * XMMatrixTranslationFromVector(trans));
+			return XMVector4Transform(p, XMMatrixScalingFromVector(scale) * XMMatrixRotationZ(angle) * billboard_matrix * XMMatrixTranslationFromVector(trans - world_trans));
 		};
 
-		for (int i = 0; i < particles_.size(); ++i)
+		for (int i = 0; i < num_particles_; ++i)
 		{
 			D3D11Particle& particle = particles_.at(i);
 			particle.Update(elapsed_time_, dt);
 
 			if (particle.finished() == true)
 			{
-				particles_.erase(particles_.begin() + i);
+				particles_.pop_front();
+				--num_particles_;
 				++i;
 				continue;
 			}
@@ -159,27 +174,22 @@ namespace snuffbox
 
 			trans = XMLoadFloat3(&particle.position());
 			size = particle.size();
+			angle = particle.angle();
 
-			XMStoreFloat4(&v1.position, billboard(top_left, trans, size));
-			XMStoreFloat4(&v2.position, billboard(bottom_left, trans, size));
-			XMStoreFloat4(&v3.position, billboard(top_right, trans, size));
-			XMStoreFloat4(&v4.position, billboard(bottom_right, trans, size));
+			XMStoreFloat4(&v1.position, billboard(top_left, trans, size, angle));
+			XMStoreFloat4(&v2.position, billboard(bottom_left, trans, size, angle));
+			XMStoreFloat4(&v3.position, billboard(top_right, trans, size, angle));
+			XMStoreFloat4(&v4.position, billboard(bottom_right, trans, size, angle));
 
 			v1.position.w = v2.position.w = v3.position.w = v4.position.w = 1.0f;
 			v1.colour = v2.colour = v3.colour = v4.colour = particle.colour();
 		}
 
-		vertex_buffer_->set_num_indices(static_cast<int>(particles_.size() * 6));
+		vertex_buffer_->set_num_indices(num_particles_ * 6);
 		vertex_buffer_->Update(vertices_, indices_, false);
 
-		SpawnParticles();
+		SpawnParticles(world_trans);
 	}
-
-  //---------------------------------------------------------------------------------------------------------
-  const XMFLOAT3& D3D11ParticleSystem::position() const
-  {
-    return position_;
-  }
 
 	//---------------------------------------------------------------------------------------------------------
 	D3D11VertexBuffer* D3D11ParticleSystem::vertex_buffer()
@@ -204,7 +214,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------------------------------
-	void D3D11ParticleSystem::SpawnParticles()
+	void D3D11ParticleSystem::SpawnParticles(const XMVECTOR& trans)
 	{
     if (paused_ == true)
     {
@@ -229,8 +239,7 @@ namespace snuffbox
 			{
 				for (unsigned int i = 0; i < static_cast<unsigned int>(definition.max_particles); ++i)
 				{
-					definition.start_position.Randomise();
-					particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, definition.start_position.value()));
+					SpawnParticle(definition, trans);
 				}
 			}
 		}
@@ -247,13 +256,7 @@ namespace snuffbox
 
           if (particles_.size() < definition.max_particles)
           {
-            definition.start_position.Randomise();
-            XMVECTOR p = XMLoadFloat3(&definition.start_position.value());
-            p += XMLoadFloat3(&position_);
-
-            XMFLOAT3 pos;
-            XMStoreFloat3(&pos, p);
-            particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, pos));
+						SpawnParticle(definition, trans);
           }
         }
         else
@@ -275,14 +278,7 @@ namespace snuffbox
 					
 					if (particles_.size() < definition.max_particles)
 					{
-						definition.start_position.Randomise();
-            XMVECTOR p = XMLoadFloat3(&definition.start_position.value());
-            p += XMLoadFloat3(&position_);
-
-            XMFLOAT3 pos;
-            XMStoreFloat3(&pos, p);
-
-						particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, pos));
+						SpawnParticle(definition, trans);
 					}
 				}
 				else
@@ -295,13 +291,22 @@ namespace snuffbox
 		last_time_ = elapsed_time_;
 	}
 
-  //---------------------------------------------------------------------------------------------------------
-  void D3D11ParticleSystem::set_position(const float& x, const float& y, const float& z)
-  {
-    position_.x = x;
-    position_.y = y;
-    position_.z = z;
-  }
+	//---------------------------------------------------------------------------------------------------------
+	void D3D11ParticleSystem::SpawnParticle(ParticleDefinition& definition, const XMVECTOR& trans)
+	{
+		++num_particles_;
+
+		definition.start_position.Randomise();
+		definition.start_angle.Randomise();
+
+		XMVECTOR p = XMLoadFloat3(&definition.start_position.value());
+		p -= trans;
+
+		XMFLOAT3 pos;
+		XMStoreFloat3(&pos, p);
+
+		particles_.push_back(D3D11Particle(elapsed_time_, particle_effect_, pos, definition.start_angle.value));
+	}
 
 	//---------------------------------------------------------------------------------------------------------
 	void D3D11ParticleSystem::set_particle_effect(const std::string& effect)
@@ -324,8 +329,7 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = {
 			{ "setParticleEffect", JSSetParticleEffect },
       { "start", JSStart },
-      { "stop", JSStop },
-      { "setPosition", JSSetPosition }
+      { "stop", JSStop }
 		};
 
 		JSFunctionRegister::Register(funcs, sizeof(funcs) / sizeof(JSFunctionRegister), obj);
@@ -359,21 +363,5 @@ namespace snuffbox
     D3D11ParticleSystem* self = wrapper.GetPointer<D3D11ParticleSystem>(args.This());
 
     self->Stop();
-  }
-
-  //---------------------------------------------------------------------------------------------------------
-  void D3D11ParticleSystem::JSSetPosition(JS_ARGS args)
-  {
-    JSWrapper wrapper(args);
-    D3D11ParticleSystem* self = wrapper.GetPointer<D3D11ParticleSystem>(args.This());
-
-    if (wrapper.Check("NN") == true)
-    {
-      self->set_position(
-        wrapper.GetValue<float>(0, 0.0f),
-        wrapper.GetValue<float>(1, 0.0f),
-        wrapper.GetValue<float>(2, self->position().z)
-        );
-    }
   }
 }

@@ -133,6 +133,7 @@ namespace snuffbox
 		bool loop; //!< Should the particle system loop?
 		int loop_length; //!< The loop length of this particle system
 		RangedVec3 start_position; //!< The start position of each particle relative to the particle systems translation
+		RangedValue start_angle; //!< The start angle of each particle
 	};
 
 	/**
@@ -161,7 +162,8 @@ namespace snuffbox
 				kRatio,
 				kVelocity,
 				kColour,
-				kSize
+				kSize,
+				kAngularVelocity
 			};
 
 			/**
@@ -176,7 +178,8 @@ namespace snuffbox
 			RangedVec3 velocity; //!< The velocity at this control point
 			RangedVec4 colour; //!< The colour at this control point
 			RangedValue size; //!< The size at this control point
-			bool is_set[4]; //!< A list of booleans to check if a value is set
+			RangedValue angular_velocity; //!< The angular velocity at this control point
+			bool is_set[5]; //!< A list of booleans to check if a value is set
 
 			/**
 			* @struct snuffbox::D3D11ParticleEffect::ControlPoint::Result
@@ -188,6 +191,7 @@ namespace snuffbox
 				XMFLOAT3 velocity; //!< The resulting velocity
 				XMFLOAT4 colour; //!< The resulting colour
 				float size; //!< The resulting size
+				float angular_velocity; //!< The resulting angular velocity
 			};
 
 			/**

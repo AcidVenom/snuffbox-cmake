@@ -21,8 +21,9 @@ namespace snuffbox
 		* @param[in] start_time (const float&) The start time
 		* @param[in] effect (snuffbox::D3D11ParticleEffect*) The definition of the particle system
 		* @param[in] position (const XMFLOAT3&) The start position of the particle
+		* @param[in] angle (const float&) The start angle of the particle
 		*/
-		D3D11Particle(const float& start_time, D3D11ParticleEffect* effect, const XMFLOAT3& position);
+		D3D11Particle(const float& start_time, D3D11ParticleEffect* effect, const XMFLOAT3& position, const float& angle);
 
 		/**
 		* @brief Updates and interpolates this particle with a given time
@@ -67,6 +68,7 @@ namespace snuffbox
 		XMFLOAT3 position_; //!< The position of this particle
 		float size_; //!< The size of this particle
 		bool finished_; //!< Has this particle finished its lifetime yet?
+		float angle_; //!< The angle of this particle
 		std::vector<D3D11ParticleEffect::ControlPoint> points_; //!< The copied control points
 	};
 }

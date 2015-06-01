@@ -48,6 +48,10 @@ namespace snuffbox
 
 			Randomise();
 		}
+		else
+		{
+			min_val = max_val = 0.0f;
+		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -213,6 +217,10 @@ namespace snuffbox
 		v = obj->Get(String::NewFromUtf8(isolate, "Size"));
 		is_set[IsSet::kSize] = !v->IsUndefined() && !v.IsEmpty();
 		size = RangedValue(v);
+
+		v = obj->Get(String::NewFromUtf8(isolate, "AngularVelocity"));
+		is_set[IsSet::kAngularVelocity] = !v->IsUndefined() && !v.IsEmpty();
+		angular_velocity = RangedValue(v);
 	}
 
 	//---------------------------------------------------------------------------------------------------------
@@ -226,12 +234,14 @@ namespace snuffbox
 		other.size = other.is_set[IsSet::kSize] ? other.size : size;
 		other.velocity = other.is_set[IsSet::kVelocity] ? other.velocity : velocity;
 		other.colour = other.is_set[IsSet::kColour] ? other.colour : colour;
+		other.angular_velocity = other.is_set[IsSet::kAngularVelocity] ? other.angular_velocity : angular_velocity;
 
 		Result ret_val;
 
 		ret_val.size = D3D11ParticleEffect::Lerp(size.value, other.size.value, r);
 		ret_val.velocity = D3D11ParticleEffect::Lerp3(velocity.value(), other.velocity.value(), r);
 		ret_val.colour = D3D11ParticleEffect::Lerp4(colour.value(), other.colour.value(), r);
+		ret_val.angular_velocity = D3D11ParticleEffect::Lerp(angular_velocity.value, other.angular_velocity.value, r);
 
 		return ret_val;
 	}
@@ -343,6 +353,7 @@ namespace snuffbox
 		definition_.loop = GetString("Loop", "true", false, &found) == "true";
 		definition_.loop_length = static_cast<int>(GetNumber("LoopLength", 0, found, &found));
 		definition_.start_position = RangedVec3(obj->Get(String::NewFromUtf8(isolate, "StartPosition")));
+		definition_.start_angle = RangedValue(obj->Get(String::NewFromUtf8(isolate, "StartAngle")));
 
 		v8::Handle<v8::Value> cp = obj->Get(String::NewFromUtf8(isolate, "ControlPoints"));
 		if (cp->IsArray() == true)
