@@ -9,11 +9,11 @@ FIND_PATH( V8_INCLUDE NAMES v8.h
 SET (V8_LIBD "${V8_LIBRARY_DIR}/Debug/lib")
 SET (V8_LIB "${V8_LIBRARY_DIR}/Release/lib")
 
-FIND_LIBRARY( V8_BASE_DEBUG_LIB NAMES v8_base.lib
+FIND_LIBRARY( V8_BASE_DEBUG_LIB NAMES v8_base.x64.lib
 	PATHS "${V8_LIBD}"
 	DOC "Path to where v8 base debug is located" )
 	
-FIND_LIBRARY( V8_BASE_LIB NAMES v8_base.lib
+FIND_LIBRARY( V8_BASE_LIB NAMES v8_base.x64.lib
 	PATHS "${V8_LIB}"
 	DOC "Path to where v8 base is located" )
 
@@ -23,8 +23,8 @@ SET ( V8_LIBRARY_BASE
 )
 	
 SET( V8_LIBRARY_NOSNAPSHOT 
-	debug "${V8_LIBD}/v8_nosnapshot.lib" 
-	optimized "${V8_LIB}/v8_nosnapshot.lib" )
+	debug "${V8_LIBD}/v8_nosnapshot.x64.lib" 
+	optimized "${V8_LIB}/v8_nosnapshot.x64.lib" )
 
 SET( V8_LIBRARY_SNAPSHOT 
 	debug "${V8_LIBD}/v8_snapshot.lib" 
