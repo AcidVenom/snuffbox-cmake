@@ -263,6 +263,7 @@ namespace snuffbox
       {
         world_.at(i) = nullptr;
         it->Destroy();
+				break;
       }
     }
 
@@ -273,6 +274,7 @@ namespace snuffbox
       {
         ui_.at(i) = nullptr;
         it->Destroy();
+				break;
       }
     }
   }

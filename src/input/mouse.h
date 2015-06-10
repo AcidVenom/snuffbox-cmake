@@ -208,6 +208,11 @@ namespace snuffbox
 		*/
 		const int& dy() const;
 
+		/**
+		* @return const bool& Is the mouse currently available?
+		*/
+		static const bool& mouse_available();
+
 	private:
 		std::queue<MouseData> queue_; //!< The message queue that still needs processing
 		ButtonState						states_[3]; //!< A list of button states
@@ -220,6 +225,7 @@ namespace snuffbox
 		int										prev_x_; //!< The previous x position
 		int										prev_y_; //!< The previous y position
     std::vector<MouseArea*> mouse_areas_; //!< A list of mouse areas to check
+		static bool						mouse_available_; //!< Is the mouse currently available?
 
 		/// Enumerates all mouse used enumerations
 		static void JSEnumerate();

@@ -19,6 +19,7 @@ namespace snuffbox
     scroll_area_(nullptr)
   {
     ResetWasPressed();
+		Mouse::Instance()->AddMouseArea(this);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -359,12 +360,10 @@ namespace snuffbox
       parent_->RemoveMouseArea(this);
 		}
 
-    if (scroll_area_ != nullptr)
-    {
-      scroll_area_->set_focussed(false);
-    }
-
-		Mouse::Instance()->RemoveMouseArea(this);
+		if (Mouse::mouse_available() == true)
+		{
+			Mouse::Instance()->RemoveMouseArea(this);
+		}
   }
 
   //-------------------------------------------------------------------------------------------

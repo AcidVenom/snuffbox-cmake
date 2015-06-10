@@ -53,8 +53,6 @@ namespace snuffbox
 
     root_->set_parent(frame_.get());
 
-    Mouse::Instance()->AddMouseArea(mouse_area_.get());
-
     if (target_ != nullptr)
     {
       target_->AddScrollArea(this);

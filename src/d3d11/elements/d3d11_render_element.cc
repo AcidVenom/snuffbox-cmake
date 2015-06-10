@@ -638,6 +638,11 @@ namespace snuffbox
     {
       target_->FindAndRemove(this);
     }
+
+		if (scroll_area_ != nullptr)
+		{
+			scroll_area_->RemoveChild(this);
+		}
   }
 
   //-------------------------------------------------------------------------------------------

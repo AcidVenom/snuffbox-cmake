@@ -12,6 +12,15 @@
 
 namespace snuffbox
 {
+	//-------------------------------------------------------------------------------------------
+	bool Mouse::mouse_available_ = false;
+
+	//-------------------------------------------------------------------------------------------
+	const bool& Mouse::mouse_available()
+	{
+		return mouse_available_;
+	}
+
   //-------------------------------------------------------------------------------------------
   bool Mouse::MouseAreaSorter::operator()(MouseArea* a, MouseArea* b)
   {
@@ -27,6 +36,7 @@ namespace snuffbox
 		prev_x_(0),
 		prev_y_(0)
 	{
+		mouse_available_ = true;
 		ResetStates();
 	}
 
@@ -233,6 +243,13 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void Mouse::AddMouseArea(MouseArea* area)
   {
+		for (MouseArea* it : mouse_areas_)
+		{
+			if (it == area)
+			{
+				return;
+			}
+		}
     mouse_areas_.push_back(area);
   }
 
@@ -292,6 +309,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	Mouse::~Mouse()
 	{
+		mouse_available_ = false;
 		ResetStates();
 	}
 
