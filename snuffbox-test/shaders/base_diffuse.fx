@@ -66,7 +66,7 @@ PSOut PS(VOut input)
 	diffuse.rgb *= input.colour.rgb * Blend;
 	diffuse.rgb *= Alpha * input.colour.a;
 
-	final.diffuse = diffuse;
+	final.diffuse = diffuse * input.colour;
 	final.depth = input.depth.x / input.depth.y;
 	
 	return final;

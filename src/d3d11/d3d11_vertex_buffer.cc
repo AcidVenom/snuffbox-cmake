@@ -255,6 +255,17 @@ namespace snuffbox
 			Vertex& v = vertices_.at(indices_.at(i));
 			average_tangents(v, i);
 		}
+
+    XMVECTOR n;
+    for (unsigned int i = 0; i < indices_.size(); ++i)
+    {
+      Vertex& v = vertices_.at(indices_.at(i));
+      n = XMVector3Normalize(XMLoadFloat3(&v.tangent));
+      XMStoreFloat3(&v.tangent, n);
+
+      n = XMVector3Normalize(XMLoadFloat3(&v.bitangent));
+      XMStoreFloat3(&v.bitangent, n);
+    }
   }
 
   //-------------------------------------------------------------------------------------------

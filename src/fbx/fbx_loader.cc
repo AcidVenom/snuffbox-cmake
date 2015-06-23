@@ -106,47 +106,24 @@ namespace snuffbox
 	{
 		FbxStringList uv_names;
 		mesh->GetUVSetNames(uv_names);
+    FbxArray<int> m_indices;
+    FbxLayerElementArrayTemplate<int>* material_array = nullptr;
+    
+    if (mesh->GetLayerCount() >= 1){
+      FbxLayerElementMaterial* layer_material = mesh->GetLayer(0)->GetMaterials();
+      FbxLayerElementMaterial::EReferenceMode ref_mode;
 
-		FbxLayer* layer = mesh->GetLayerCount() > 0 ? mesh->GetLayer(0) : nullptr;
-		FbxLayerElementMaterial* material_layer = nullptr;
-		FbxLayerElement::EMappingMode material_mapping;
-		FbxLayerElement::EReferenceMode material_reference;
-		bool assign_materials = false;
-		int material_id = -1;
-		int material_count = 0;
+      if (layer_material != nullptr)
+      {
+        ref_mode = layer_material->GetReferenceMode();
 
-		if (layer != nullptr)
-		{
-			material_layer = layer->GetMaterials();
-			if (material_layer != nullptr)
-			{
-				material_mapping = material_layer->GetMappingMode();
-				material_reference = material_layer->GetReferenceMode();
-
-				assign_materials = material_reference != FbxLayerElement::EReferenceMode::eIndex;
-
-				if (material_mapping == FbxLayerElement::EMappingMode::eAllSame && material_layer->GetIndexArray().GetCount() > 0)
-				{
-					material_id = material_layer->GetIndexArray().GetAt(0);
-
-					if (material_id == -1)
-					{
-						material_id = 0;
-					}
-
-					assign_materials = false;
-				}
-				else if (material_mapping == FbxLayerElement::EMappingMode::eByPolygon)
-				{
-					if (material_reference == FbxLayerElement::EReferenceMode::eIndex || material_reference == FbxLayerElement::EReferenceMode::eIndexToDirect)
-					{
-						material_count = material_layer->GetIndexArray().GetCount();
-						assign_materials = true;
-					}
-				}
-			}
-		}
-
+        if (ref_mode == FbxLayerElementMaterial::EReferenceMode::eIndexToDirect || ref_mode == FbxLayerElementMaterial::EReferenceMode::eIndex)
+        {
+          material_array = &layer_material->GetIndexArray();
+          SNUFF_LOG_INFO("Found " + std::to_string(material_array->GetCount()) + " material sub-groups");
+        }
+      }
+    }
 
 		for (unsigned int i = 0; i < static_cast<unsigned int>(uv_names.GetCount()); ++i)
 		{
@@ -180,11 +157,15 @@ namespace snuffbox
 					vert.position.z = static_cast<float>(-vertices[control_point].mData[1]);
 					vert.position.y = static_cast<float>(-vertices[control_point].mData[2]);
 					vert.position.w = 1.0f;
-					vert.normal.x = static_cast<float>(normal.mData[0]);
-          vert.normal.z = static_cast<float>(-normal.mData[1]);
+					vert.normal.x = static_cast<float>(-normal.mData[0]);
+          vert.normal.z = static_cast<float>(normal.mData[1]);
           vert.normal.y = static_cast<float>(normal.mData[2]);
-					vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-					vert.material_id = assign_materials == false ? material_id : -1;
+          vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+          if (material_array != nullptr)
+          {
+            vert.material_id = material_array->GetAt(polygon);
+          }
 
 					verts->push_back(vert);
 					indices->push_back(polygon * 3 + vertex);
@@ -212,18 +193,6 @@ namespace snuffbox
 						vert.tex_coords.x = static_cast<float>(uv.mData[0]);
 						vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
 
-						if (assign_materials == true)
-						{
-							m_idx = material_layer->GetIndexArray().GetAt(count);
-
-							if (m_idx >= material_count || m_idx < 0)
-							{
-								m_idx = 0;
-							}
-
-							vert.material_id = m_idx;
-						}
-
 						++count;
 					}
 				}
@@ -249,18 +218,6 @@ namespace snuffbox
 							vert.tex_coords.x = static_cast<float>(uv.mData[0]);
 							vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
 
-							if (assign_materials == true)
-							{
-								m_idx = material_layer->GetIndexArray().GetAt(count);
-
-								if (m_idx >= material_count || m_idx < 0)
-								{
-									m_idx = 0;
-								}
-
-								vert.material_id = m_idx;
-							}
-
 							++count;
 							++poly_counter;
 						}
@@ -268,44 +225,6 @@ namespace snuffbox
 				}
 			}
 		}
-
-		std::map<int, Vertex*> vert_map;
-		Vertex* it = nullptr;
-		int old_index = -1;
-
-		for (unsigned int i = 0; i < indices->size(); ++i)
-		{
-			old_index = indices->at(i);
-			vert_map.emplace(old_index, &verts->at(old_index));
-		}
-
-		std::sort(verts->begin(), verts->end(), VertexSorter());
-
-		std::vector<int> new_indices;
-		new_indices.resize(indices->size());
-
-		auto find_vertex = [verts](Vertex* vert)
-		{
-			for (int i = 0; i < verts->size(); ++i)
-			{
-				if (&verts->at(i) == vert)
-				{
-					return i;
-				}
-			}
-
-			return -1;
-		};
-
-		int new_index = -1;
-		for (std::map<int, Vertex*>::iterator it = vert_map.begin(); it != vert_map.end(); ++it)
-		{
-			new_index = find_vertex(it->second);
-			SNUFF_XASSERT(new_index > -1, "Could not retrieve resorted index for a resorted vertex buffer", "FBXLoader::GetMeshData");
-			new_indices.at(it->first) = new_index;
-		}
-
-		*indices = new_indices;
 
 		SNUFF_LOG_INFO("Vertices: " + std::to_string(verts->size()));
 	}
