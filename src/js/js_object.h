@@ -1,8 +1,8 @@
 #pragma once
 
-#include <v8.h>
-#include "../js/js_wrapper.h"
 #include <string>
+
+#include "../js/js_wrapper.h"
 
 #define JS_SINGLETON const v8::Handle<v8::Object>&
 #define JS_CONSTRUCTABLE const v8::Handle<v8::ObjectTemplate>&

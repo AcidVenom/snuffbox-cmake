@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../js/js_function_register.h"
-#include "../js/js_state_wrapper.h"
 
 namespace snuffbox
 {

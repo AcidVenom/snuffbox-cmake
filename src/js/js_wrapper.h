@@ -1,6 +1,5 @@
 #pragma once
 
-#include <v8.h>
 #include <string>
 
 #include "../js/js_function_register.h"

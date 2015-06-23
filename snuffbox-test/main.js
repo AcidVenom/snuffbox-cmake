@@ -52,6 +52,7 @@ Game.Initialise = function()
 	ContentManager.load("effect", "pfx.effect");
 	ContentManager.load("particle", "particle.pfx");
 	ContentManager.load("effect", "additive.effect");
+	ContentManager.load("model", "test.fbx");
 
 	Game.camera = new Camera(CameraType.Perspective);
 
@@ -96,6 +97,9 @@ Game.Initialise = function()
 	Game.p.spawn("Diffuse");
 	Game.p.setDiffuseMap("pfx.png");
 	Game.p.setEffect("pfx.effect");
+
+	Game.cube = new Model("test.fbx");
+	Game.cube.spawn("G-Buffer");
 }
 
 Game.Update = function(dt)

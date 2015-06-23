@@ -29,6 +29,18 @@ namespace snuffbox
 	class FBXLoader
 	{
 	public:
+
+		/**
+		* @class snuffbox::FBXLoader::VertexSorter
+		* @brief Sorts vertices by their ascending material IDs
+		* @author Daniël Konings
+		*/
+		struct VertexSorter
+		{
+			bool operator()(Vertex& a, Vertex& b);
+		};
+
+	public:
 		/// Default constructor
 		FBXLoader();
 

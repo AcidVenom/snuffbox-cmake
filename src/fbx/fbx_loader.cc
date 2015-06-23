@@ -3,10 +3,18 @@
 
 #include "../d3d11/d3d11_vertex_buffer.h"
 
+#include <algorithm>
+
 using namespace fbxsdk_2015_1;
 
 namespace snuffbox
 {
+	//----------------------------------------------------------------------------------------
+	bool FBXLoader::VertexSorter::operator()(Vertex& a, Vertex& b)
+	{
+		return a.material_id < b.material_id;
+	}
+
 	//----------------------------------------------------------------------------------------
 	FBXLoader::FBXLoader() : 
 		fbx_manager_(nullptr),
@@ -79,11 +87,11 @@ namespace snuffbox
 		{
 			SNUFF_LOG_INFO("FBX file version " + std::to_string(file_major_version) + "." + std::to_string(file_minor_version) + "." + std::to_string(file_revision));
 			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_MATERIAL, false);
-			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_TEXTURE, true);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_TEXTURE, false);
 			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_LINK, false);
 			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_SHAPE, true);
 			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_GOBO, false);
-			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_ANIMATION, false);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_ANIMATION, true);
 			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
 		}
 
@@ -98,6 +106,47 @@ namespace snuffbox
 	{
 		FbxStringList uv_names;
 		mesh->GetUVSetNames(uv_names);
+
+		FbxLayer* layer = mesh->GetLayerCount() > 0 ? mesh->GetLayer(0) : nullptr;
+		FbxLayerElementMaterial* material_layer = nullptr;
+		FbxLayerElement::EMappingMode material_mapping;
+		FbxLayerElement::EReferenceMode material_reference;
+		bool assign_materials = false;
+		int material_id = -1;
+		int material_count = 0;
+
+		if (layer != nullptr)
+		{
+			material_layer = layer->GetMaterials();
+			if (material_layer != nullptr)
+			{
+				material_mapping = material_layer->GetMappingMode();
+				material_reference = material_layer->GetReferenceMode();
+
+				assign_materials = material_reference != FbxLayerElement::EReferenceMode::eIndex;
+
+				if (material_mapping == FbxLayerElement::EMappingMode::eAllSame && material_layer->GetIndexArray().GetCount() > 0)
+				{
+					material_id = material_layer->GetIndexArray().GetAt(0);
+
+					if (material_id == -1)
+					{
+						material_id = 0;
+					}
+
+					assign_materials = false;
+				}
+				else if (material_mapping == FbxLayerElement::EMappingMode::eByPolygon)
+				{
+					if (material_reference == FbxLayerElement::EReferenceMode::eIndex || material_reference == FbxLayerElement::EReferenceMode::eIndexToDirect)
+					{
+						material_count = material_layer->GetIndexArray().GetCount();
+						assign_materials = true;
+					}
+				}
+			}
+		}
+
 
 		for (unsigned int i = 0; i < static_cast<unsigned int>(uv_names.GetCount()); ++i)
 		{
@@ -135,6 +184,7 @@ namespace snuffbox
           vert.normal.z = static_cast<float>(-normal.mData[1]);
           vert.normal.y = static_cast<float>(normal.mData[2]);
 					vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+					vert.material_id = assign_materials == false ? material_id : -1;
 
 					verts->push_back(vert);
 					indices->push_back(polygon * 3 + vertex);
@@ -142,6 +192,7 @@ namespace snuffbox
 			}
 
 			unsigned int count = 0;
+			int m_idx = -1;
 
 			if (uv_element->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 			{
@@ -156,9 +207,22 @@ namespace snuffbox
 						unsigned int uv_index = use_index ? uv_element->GetIndexArray().GetAt(control_point) : control_point;
 				
 						FbxVector2 uv = uv_element->GetDirectArray().GetAt(uv_index);
+						Vertex& vert = verts->at(count);
 						
-						verts->at(count).tex_coords.x = static_cast<float>(uv.mData[0]);
-						verts->at(count).tex_coords.y = static_cast<float>(-uv.mData[1]);
+						vert.tex_coords.x = static_cast<float>(uv.mData[0]);
+						vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
+
+						if (assign_materials == true)
+						{
+							m_idx = material_layer->GetIndexArray().GetAt(count);
+
+							if (m_idx >= material_count || m_idx < 0)
+							{
+								m_idx = 0;
+							}
+
+							vert.material_id = m_idx;
+						}
 
 						++count;
 					}
@@ -180,8 +244,22 @@ namespace snuffbox
 
 							FbxVector2 uv = uv_element->GetDirectArray().GetAt(uv_index);
 
-							verts->at(count).tex_coords.x = static_cast<float>(uv.mData[0]);
-							verts->at(count).tex_coords.y = static_cast<float>(-uv.mData[1]);
+							Vertex& vert = verts->at(count);
+
+							vert.tex_coords.x = static_cast<float>(uv.mData[0]);
+							vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
+
+							if (assign_materials == true)
+							{
+								m_idx = material_layer->GetIndexArray().GetAt(count);
+
+								if (m_idx >= material_count || m_idx < 0)
+								{
+									m_idx = 0;
+								}
+
+								vert.material_id = m_idx;
+							}
 
 							++count;
 							++poly_counter;
@@ -190,6 +268,44 @@ namespace snuffbox
 				}
 			}
 		}
+
+		std::map<int, Vertex*> vert_map;
+		Vertex* it = nullptr;
+		int old_index = -1;
+
+		for (unsigned int i = 0; i < indices->size(); ++i)
+		{
+			old_index = indices->at(i);
+			vert_map.emplace(old_index, &verts->at(old_index));
+		}
+
+		std::sort(verts->begin(), verts->end(), VertexSorter());
+
+		std::vector<int> new_indices;
+		new_indices.resize(indices->size());
+
+		auto find_vertex = [verts](Vertex* vert)
+		{
+			for (int i = 0; i < verts->size(); ++i)
+			{
+				if (&verts->at(i) == vert)
+				{
+					return i;
+				}
+			}
+
+			return -1;
+		};
+
+		int new_index = -1;
+		for (std::map<int, Vertex*>::iterator it = vert_map.begin(); it != vert_map.end(); ++it)
+		{
+			new_index = find_vertex(it->second);
+			SNUFF_XASSERT(new_index > -1, "Could not retrieve resorted index for a resorted vertex buffer", "FBXLoader::GetMeshData");
+			new_indices.at(it->first) = new_index;
+		}
+
+		*indices = new_indices;
 
 		SNUFF_LOG_INFO("Vertices: " + std::to_string(verts->size()));
 	}

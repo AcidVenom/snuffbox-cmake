@@ -19,7 +19,8 @@ namespace snuffbox
 			tex_coords(XMFLOAT2(0.0f, 0.0f)),
 			normal(XMFLOAT3(0.0f, 0.0f, 0.0f)),
 			tangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
-			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f))
+			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
+			material_id(-1)
 		{}
 
 		/**
@@ -35,7 +36,8 @@ namespace snuffbox
 			tex_coords(t),
 			normal(n),
 			tangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
-			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f))
+			bitangent(XMFLOAT3(0.0f, 0.0f, 0.0f)),
+			material_id(-1)
 		{}
 
     XMFLOAT4 position; //!< The position of the vertex
@@ -44,8 +46,9 @@ namespace snuffbox
     XMFLOAT3 normal; //!< The normal of the vertex
     XMFLOAT3 tangent; //!< The tangent of this vertex
 		XMFLOAT3 bitangent; //!< The bitangent of this vertex
+		int material_id; //!< The material ID of this vertex, only used in models
 
-    static const UINT STRIDE_SIZE = sizeof(XMFLOAT4)+sizeof(XMFLOAT4)+sizeof(XMFLOAT2)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3)+sizeof(XMFLOAT3);
+    static const UINT STRIDE_SIZE = sizeof(XMFLOAT4) + sizeof(XMFLOAT4) + sizeof(XMFLOAT2) + sizeof(XMFLOAT3) + sizeof(XMFLOAT3) + sizeof(XMFLOAT3) + sizeof(int);
   };
 
   /**
