@@ -315,7 +315,7 @@ namespace snuffbox
   }
 
   //-------------------------------------------------------------------------------------------
-  void D3D11VertexBuffer::Draw()
+  void D3D11VertexBuffer::Draw(const int& start)
   {
     if (valid_ == false)
     {
@@ -329,7 +329,7 @@ namespace snuffbox
 			return;
 		}
 		
-    render_device->context()->DrawIndexed(num_indices_ >= 0 ? num_indices_ : static_cast<UINT>(indices_.size()), 0, 0);
+    render_device->context()->DrawIndexed(num_indices_ >= 0 ? num_indices_ : static_cast<UINT>(indices_.size()), start, 0);
   }
 
   //-------------------------------------------------------------------------------------------

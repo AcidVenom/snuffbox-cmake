@@ -19,6 +19,29 @@ namespace snuffbox
   */
   class D3D11RenderElement
   {
+  public:
+
+    /**
+    * @struct snuffbox::D3D11RenderElement::MaterialGroup
+    * @brief A structure to hold texture and material information for a certain render element or material indices
+    * @author Daniël Konings
+    */
+    struct MaterialGroup
+    {
+      /// Default constructor
+      MaterialGroup();
+
+      D3D11Material* material; //!< The material of this material group
+      D3D11Texture* override_diffuse; //!< An override texture to override the material texture
+      D3D11Texture* override_normal; //!< An override texture to override the material texture
+      D3D11Texture* override_specular; //!< An override texture to override the material texture
+      D3D11Texture* override_light; //!< An override texture to override the material texture
+      D3D11Effect* override_effect; //!< An override effect to override the material effect
+
+      /// Applies this entire material group
+      void Apply();
+    };
+
 	public:
 
 		/**
@@ -153,9 +176,9 @@ namespace snuffbox
     const bool& spawned() const;
 
 		/**
-		* @return snuffbox::D3D11Material* The material of this render element
+		* @return snuffbox::D3D11RenderElement::MaterialGroup& The material group of this render element
 		*/
-		virtual D3D11Material* material();
+		virtual MaterialGroup& material_group();
 
 		/**
 		* @return const std::string& The technique of this render element
@@ -206,31 +229,6 @@ namespace snuffbox
 		* @return snuffbox::Animation* The animation of this render element
 		*/
 		Animation* animation();
-
-		/**
-		* @return snuffbox::D3D11Texture* The override diffuse map to override the material diffuse map
-		*/
-		D3D11Texture* override_diffuse();
-
-		/**
-		* @return snuffbox::D3D11Texture* The override normal map to override the material normal map
-		*/
-		D3D11Texture* override_normal();
-
-		/**
-		* @return snuffbox::D3D11Texture* The override specular map to override the material specular map
-		*/
-		D3D11Texture* override_specular();
-
-		/**
-		* @return snuffbox::D3D11Texture* The override light map to override the material light map
-		*/
-		D3D11Texture* override_light();
-
-		/**
-		* @return snuffbox::D3D11Effect* The override effect to override the material effect
-		*/
-		D3D11Effect* override_effect();
 
     /**
     * @brief Sets the translation of this render element
@@ -395,7 +393,6 @@ namespace snuffbox
     XMVECTOR size_; //!< The size vector of this render element
     XMMATRIX world_matrix_; //!< The world matrix of this render element
     bool spawned_; //!< Is this render element spawned?
-		D3D11Material* material_; //!< The effect of this render element
 		std::string technique_; //!< The technique of this render element
 		D3D11RenderElement* parent_; //!< The parent of this render element
 		LayerType layer_type_; //!< The layer type of this render element
@@ -409,11 +406,7 @@ namespace snuffbox
 		std::vector<D3D11RenderElement*> children_; //!< The children of this render element
 		bool blend_changed_; //!< Was the blend of this render element changed since last frame?
 		bool alpha_changed_; //!< Was the alpha of this render element changed since last frame?
-		D3D11Texture* override_diffuse_; //!< An override texture to override the material texture
-		D3D11Texture* override_normal_; //!< An override texture to override the material texture
-		D3D11Texture* override_specular_; //!< An override texture to override the material texture
-		D3D11Texture* override_light_; //!< An override texture to override the material texture
-		D3D11Effect* override_effect_; //!< And override effect to override the material effect
+    MaterialGroup material_group_; //!< The material group of this render element
     D3D11ScrollArea* scroll_area_; //!< The scroll area parent of this render element
 
   public:

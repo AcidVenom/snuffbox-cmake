@@ -15,6 +15,49 @@
 namespace snuffbox
 {
   //-------------------------------------------------------------------------------------------
+  D3D11RenderElement::MaterialGroup::MaterialGroup() :
+    material(nullptr),
+    override_diffuse(nullptr),
+    override_normal(nullptr),
+    override_specular(nullptr),
+    override_light(nullptr),
+    override_effect(nullptr)
+  {
+
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderElement::MaterialGroup::Apply()
+  {
+    if (override_diffuse != nullptr && override_diffuse->is_valid() == false)
+    {
+      override_diffuse = nullptr;
+    }
+
+    if (override_normal != nullptr && override_normal->is_valid() == false)
+    {
+      override_diffuse = nullptr;
+    }
+
+    if (override_specular != nullptr && override_specular->is_valid() == false)
+    {
+      override_diffuse = nullptr;
+    }
+
+    if (override_light != nullptr && override_light->is_valid() == false)
+    {
+      override_diffuse = nullptr;
+    }
+
+    if (override_effect != nullptr && override_effect->is_valid() == false)
+    {
+      override_effect = nullptr;
+    }
+
+    material->Apply(override_diffuse, override_normal, override_specular, override_light);
+  }
+
+  //-------------------------------------------------------------------------------------------
 	D3D11RenderElement::D3D11RenderElement() :
 		translation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
 		rotation_(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f)),
@@ -23,7 +66,6 @@ namespace snuffbox
 		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
-    material_(D3D11RenderDevice::Instance()->default_material()),
     billboarding_(false),
 		technique_("Default"),
 		layer_type_(LayerType::kWorld),
@@ -33,15 +75,11 @@ namespace snuffbox
 		animation_(nullptr),
 		alpha_changed_(false),
 		blend_changed_(false),
-		override_diffuse_(nullptr),
-		override_normal_(nullptr),
-		override_specular_(nullptr),
-		override_light_(nullptr),
-		override_effect_(nullptr),
 		target_(nullptr),
     parent_(nullptr),
     scroll_area_(nullptr)
   {
+    material_group_.material = D3D11RenderDevice::Instance()->default_material();
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
   }
 
@@ -54,7 +92,6 @@ namespace snuffbox
 		size_(XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f)),
 		world_matrix_(XMMatrixIdentity()),
 		spawned_(false),
-		material_(D3D11RenderDevice::Instance()->default_material()),
 		billboarding_(false),
 		technique_("Default"),
 		layer_type_(LayerType::kWorld),
@@ -64,14 +101,10 @@ namespace snuffbox
 		animation_(nullptr),
 		alpha_changed_(false),
 		blend_changed_(false),
-		override_diffuse_(nullptr),
-		override_normal_(nullptr),
-		override_specular_(nullptr),
-		override_light_(nullptr),
-		override_effect_(nullptr),
 		target_(nullptr),
     scroll_area_(nullptr)
 	{
+    material_group_.material = D3D11RenderDevice::Instance()->default_material();
 		uniforms_ = AllocatedMemory::Instance().Construct<D3D11Uniforms>();
 
 		JSWrapper wrapper(args);
@@ -325,9 +358,9 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
-	D3D11Material* D3D11RenderElement::material()
+  D3D11RenderElement::MaterialGroup& D3D11RenderElement::material_group()
 	{
-		return material_;
+		return material_group_;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -385,60 +418,10 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Animation* D3D11RenderElement::animation()
-	{
-		return animation_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11Texture* D3D11RenderElement::override_diffuse()
-	{
-		if (override_diffuse_ != nullptr && override_diffuse_->is_valid() == false)
-		{
-			override_diffuse_ = nullptr;
-		}
-		return override_diffuse_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11Texture* D3D11RenderElement::override_normal()
-	{
-		if (override_normal_ != nullptr && override_normal_->is_valid() == false)
-		{
-			override_normal_ = nullptr;
-		}
-		return override_normal_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11Texture* D3D11RenderElement::override_specular()
-	{
-		if (override_specular_ != nullptr && override_specular_->is_valid() == false)
-		{
-			override_specular_ = nullptr;
-		}
-		return override_specular_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11Texture* D3D11RenderElement::override_light()
-	{
-		if (override_light_ != nullptr && override_light_->is_valid() == false)
-		{
-			override_light_ = nullptr;
-		}
-		return override_light_;
-	}
-
-	//-------------------------------------------------------------------------------------------
-	D3D11Effect* D3D11RenderElement::override_effect()
-	{
-		if (override_effect_ != nullptr && override_effect_->is_valid() == false)
-		{
-			override_effect_ = nullptr;
-		}
-		return override_effect_;
-	}
+  Animation* D3D11RenderElement::animation()
+  {
+    return animation_;
+  }
 
   //-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_translation(const float& x, const float& y, const float& z)
@@ -473,13 +456,13 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_material(const std::string& path)
 	{
-		material_ = ContentManager::Instance()->Get<D3D11Material>(path);
+		material_group_.material = ContentManager::Instance()->Get<D3D11Material>(path);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void D3D11RenderElement::set_material(D3D11Material* effect)
+	void D3D11RenderElement::set_material(D3D11Material* mat)
 	{
-		material_ = effect;
+    material_group_.material = mat;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -571,31 +554,31 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_override_diffuse(D3D11Texture* diffuse)
 	{
-		override_diffuse_ = diffuse;
+		material_group_.override_diffuse = diffuse;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_override_normal(D3D11Texture* normal)
 	{
-		override_normal_ = normal;
+    material_group_.override_normal = normal;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_override_specular(D3D11Texture* specular)
 	{
-		override_specular_ = specular;
+    material_group_.override_specular = specular;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_override_light(D3D11Texture* light)
 	{
-		override_light_ = light;
+    material_group_.override_light = light;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void D3D11RenderElement::set_override_effect(D3D11Effect* effect)
 	{
-		override_effect_ = effect;
+    material_group_.override_effect = effect;
 	}
 
   //-------------------------------------------------------------------------------------------

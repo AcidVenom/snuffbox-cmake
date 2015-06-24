@@ -58,12 +58,13 @@ namespace snuffbox
 		FBXData data;
 
 		FbxNode* node = fbx_scene_->GetRootNode()->GetChild(0);
-		if (node)
+		if (node != nullptr)
 		{
 			FbxMesh* mesh = node->GetMesh();
-			if (mesh)
+
+			if (mesh != nullptr)
 			{
-				GetMeshData(&data.vertices, &data.indices, mesh);
+				GetMeshData(&data, mesh);
 			}
 		}
 
@@ -102,7 +103,7 @@ namespace snuffbox
 	}
 
 	//----------------------------------------------------------------------------------------
-	void FBXLoader::GetMeshData(std::vector<Vertex>* verts, std::vector<int>* indices, FbxMesh* mesh)
+	void FBXLoader::GetMeshData(FBXData* data, FbxMesh* mesh)
 	{
 		FbxStringList uv_names;
 		mesh->GetUVSetNames(uv_names);
@@ -143,6 +144,8 @@ namespace snuffbox
 			Vertex vert;
 			FbxVector4 normal;
 			unsigned int control_point;
+      int old_material = -1;
+      int material_id = -1;
 
 			for (unsigned int polygon = 0; polygon < poly_count; ++polygon)
 			{
@@ -164,11 +167,28 @@ namespace snuffbox
 
           if (material_array != nullptr)
           {
-            vert.material_id = material_array->GetAt(polygon);
+            material_id = material_array->GetAt(polygon);
+
+            if (material_id != old_material)
+            {
+              if (data->materials.size() > 0)
+              {
+                data->materials.at(data->materials.size() - 1).end = static_cast<unsigned int>(data->indices.size());
+              }
+
+              old_material = material_id;
+              MaterialIndices indices;
+
+              indices.start = static_cast<unsigned int>(data->indices.size());
+              indices.material_id = material_id;
+              data->materials.push_back(indices);
+            }
+
+            vert.material_id = material_id;
           }
 
-					verts->push_back(vert);
-					indices->push_back(polygon * 3 + vertex);
+					data->vertices.push_back(vert);
+          data->indices.push_back(polygon * 3 + vertex);
 				}
 			}
 
@@ -188,7 +208,7 @@ namespace snuffbox
 						unsigned int uv_index = use_index ? uv_element->GetIndexArray().GetAt(control_point) : control_point;
 				
 						FbxVector2 uv = uv_element->GetDirectArray().GetAt(uv_index);
-						Vertex& vert = verts->at(count);
+            Vertex& vert = data->vertices.at(count);
 						
 						vert.tex_coords.x = static_cast<float>(uv.mData[0]);
 						vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
@@ -213,7 +233,7 @@ namespace snuffbox
 
 							FbxVector2 uv = uv_element->GetDirectArray().GetAt(uv_index);
 
-							Vertex& vert = verts->at(count);
+							Vertex& vert = data->vertices.at(count);
 
 							vert.tex_coords.x = static_cast<float>(uv.mData[0]);
 							vert.tex_coords.y = static_cast<float>(-uv.mData[1]);
@@ -226,7 +246,21 @@ namespace snuffbox
 			}
 		}
 
-		SNUFF_LOG_INFO("Vertices: " + std::to_string(verts->size()));
+    if (data->materials.size() == 0)
+    {
+      MaterialIndices indices;
+      indices.start = 0;
+      indices.end = static_cast<unsigned int>(data->indices.size());
+      indices.material_id = 0;
+
+      data->materials.push_back(indices);
+    }
+    else
+    {
+      data->materials.at(data->materials.size() - 1).end = static_cast<unsigned int>(data->indices.size());
+    }
+
+		SNUFF_LOG_INFO("Vertices: " + std::to_string(data->vertices.size()));
 	}
 
 	//----------------------------------------------------------------------------------------

@@ -100,7 +100,7 @@ Game.Initialise = function()
 
 	Game.cube = new Model("test.fbx");
 	Game.cube.spawn("G-Buffer");
-	Game.cube.setMaterial("test.material");
+	Game.cube.setMaterial(0, "test.material");
 }
 
 Game.Update = function(dt)

@@ -8,7 +8,9 @@
 #include "../d3d11/d3d11_render_target.h"
 #include "../d3d11/d3d11_uniforms.h"
 #include "../d3d11/elements/d3d11_text_element.h"
+#include "../d3d11/elements/d3d11_model_element.h"
 #include "../application/game.h"
+#include "../fbx/fbx_loader.h"
 
 #include <algorithm>
 
@@ -87,7 +89,8 @@ namespace snuffbox
 
     D3D11Material::Attributes attributes;
 
-    D3D11Material* material = element->material();
+    D3D11RenderElement::MaterialGroup& m_group = element->material_group();
+    D3D11Material* material = m_group.material;
 
     Animation* animation = element->animation();
 
@@ -117,38 +120,50 @@ namespace snuffbox
 
     if (material != nullptr && material->is_valid() == true)
     {
-      material->Apply(element->override_diffuse(), element->override_normal(), element->override_specular(), element->override_light());
-      D3D11Effect* effect = material->effect();
-      D3D11Effect* override_effect = element->override_effect();
-      if (override_effect != nullptr)
-      {
-        effect = override_effect;
-      }
+      D3D11Model* model = dynamic_cast<D3D11Model*>(element);
 
-      if (effect != nullptr && effect->is_valid() == true)
+      if (model != nullptr)
       {
-        unsigned int n_pass = effect->NumPasses(element->technique());
+        FBXModel* mesh = model->model();
 
-        if (n_pass > 0)
+        if (mesh == nullptr)
         {
-          for (unsigned int i = 0; i < n_pass; ++i)
-          {
-            effect->Apply(element->technique(), i);
-
-            buffer->Draw();
-          }
+          return;
         }
-        else
+
+        std::vector<MaterialIndices> indices = mesh->material_indices();
+        std::vector<D3D11RenderElement::MaterialGroup> groups = model->material_groups();
+        D3D11Material* mat = nullptr;
+
+        for (unsigned int i = 0; i < indices.size(); ++i)
         {
-          buffer->Draw();
+          MaterialIndices& index = indices.at(i);
+          D3D11RenderElement::MaterialGroup& group = groups.at(index.material_id);
+
+          mat = group.material;
+
+          if (mat != nullptr && material->is_valid() == true)
+          {
+            Render(group, buffer, element, index.start, index.end);
+          }
+          else
+          {
+            if (mat != nullptr)
+            {
+              group.material = nullptr;
+            }
+            else
+            {
+              group.material = D3D11RenderDevice::Instance()->default_material();
+            }
+
+            Render(group, buffer, element, index.start, index.end);
+          }
         }
       }
       else
       {
-        if (effect != nullptr)
-        {
-          material->set_effect(nullptr);
-        }
+        Render(m_group, buffer, element);
       }
     }
     else
@@ -220,6 +235,51 @@ namespace snuffbox
       else if (target_ != nullptr)
       {
         ui_.erase(ui_.begin() + i);
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void D3D11RenderQueue::Render(D3D11RenderElement::MaterialGroup& m_group, D3D11VertexBuffer* buffer, D3D11RenderElement* element, const int& start, const int& end)
+  {
+    int num = end == -1 ? -1 : end - start;
+
+    buffer->set_num_indices(num);
+
+    m_group.Apply();
+    D3D11Material* material = m_group.material;
+
+    D3D11Effect* effect = material->effect();
+    D3D11Effect* override_effect = m_group.override_effect;
+
+    if (override_effect != nullptr)
+    {
+      effect = override_effect;
+    }
+
+    if (effect != nullptr && effect->is_valid() == true)
+    {
+      unsigned int n_pass = effect->NumPasses(element->technique());
+
+      if (n_pass > 0)
+      {
+        for (unsigned int i = 0; i < n_pass; ++i)
+        {
+          effect->Apply(element->technique(), i);
+
+          buffer->Draw(start);
+        }
+      }
+      else
+      {
+        buffer->Draw(start);
+      }
+    }
+    else
+    {
+      if (effect != nullptr)
+      {
+        material->set_effect(nullptr);
       }
     }
   }

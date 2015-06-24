@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../d3d11/d3d11_render_device.h"
+#include "../d3d11/elements/d3d11_render_element.h"
 #include <vector>
 
 namespace snuffbox
 {
-  class D3D11RenderElement;
-
 	struct RenderSorterZ
 	{
 		bool operator()(D3D11RenderElement* a, D3D11RenderElement* b);
@@ -70,6 +69,16 @@ namespace snuffbox
     * @param[in] context (ID3D11DeviceContext*) The context to draw with
     */
     void Draw(ID3D11DeviceContext* context);
+
+    /**
+    * @brief Renders the buffer with the given materials and given offset
+    * @param[in] m_group (snuffbox::D3D11RenderElement::MaterialGroup&) The material group to render
+    * @param[in] buffer (snuffbox::D3D11VertexBuffer*) The vertex buffer to render
+    * @param[in] element (snuffbox::D3D11RenderElement*) The element currently being drawn
+    * @param[in] start (const int&) The start index
+    * @param[in] end (const int&) The end index
+    */
+    void Render(D3D11RenderElement::MaterialGroup& m_group, D3D11VertexBuffer* buffer, D3D11RenderElement* element, const int& start = 0, const int& end = -1);
 
     /// Clears the entire render queue
     void Clear();

@@ -10,6 +10,18 @@ namespace snuffbox
 {
 	struct Vertex;
 
+  /**
+  * @struct snuffbox::MaterialIndices
+  * @brief Holds information about material indices, where they start and where they end
+  * @author Daniël Konings
+  */
+  struct MaterialIndices
+  {
+    unsigned int start; //!< The start index of this material group
+    unsigned int end; //!< The end index of this material group
+    int material_id; //!< The material ID corresponding to these indices
+  };
+
 	/**
 	* @struct snuffbox::FBXData
 	* @brief Contains FBX data to create a vertex buffer with
@@ -17,8 +29,9 @@ namespace snuffbox
 	*/
 	struct FBXData
 	{
-		std::vector<Vertex> vertices;
-		std::vector<int> indices;
+		std::vector<Vertex> vertices; //!< All vertices of the mesh
+		std::vector<int> indices; //!< All indices of the mesh
+    std::vector<MaterialIndices> materials; //!< The materials of the mesh
 	};
 
 	/**
@@ -29,7 +42,6 @@ namespace snuffbox
 	class FBXLoader
 	{
 	public:
-
 		/**
 		* @class snuffbox::FBXLoader::VertexSorter
 		* @brief Sorts vertices by their ascending material IDs
@@ -68,11 +80,10 @@ namespace snuffbox
 
 		/**
 		* @brief Retrieves all mesh data necessary
-		* @param[out] verts (std::vector<Vertex>*) The vertex vector to fill with vertex information
-		* @param[out] indices (std::vector<Vertex>*) The vertex vector to fill with vertex information
+		* @param[out] data (snuffbox::FBXData*) The data structure to load the information in
 		* @param[in] mesh (FbxMesh*) The mesh to load the information from
 		*/
-		void GetMeshData(std::vector<Vertex>* verts, std::vector<int>* indices, FbxMesh* mesh);
+		void GetMeshData(FBXData* data, FbxMesh* mesh);
 
 		/// Default destructor
 		~FBXLoader();

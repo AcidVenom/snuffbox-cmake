@@ -106,8 +106,11 @@ namespace snuffbox
     /// Sets the vertex/index buffer
     void Set();
 
-    /// Draws the set vertex/index buffer
-    void Draw();
+    /** 
+    * @brief Draws the set vertex/index buffer
+    * @param[in] start (const int&) The index to start drawing from, default = 0
+    */
+    void Draw(const int& start = 0);
 
     /**
     * @brief Preforms a picking test with a given ray on the vertices of this vertex buffer

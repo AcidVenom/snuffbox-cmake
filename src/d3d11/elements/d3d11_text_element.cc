@@ -67,6 +67,8 @@ namespace snuffbox
 		material_->Validate();
 		material_->set_effect(D3D11RenderDevice::Instance()->default_effect());
 		set_technique("Text");
+
+    material_group().material = material_.get();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -167,7 +169,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void D3D11Text::DrawIcons()
 	{
-		material()->effect()->Apply("UI", 0);
+		material_group().material->effect()->Apply("UI", 0);
 		D3D11RenderDevice* render_device = D3D11RenderDevice::Instance();
 		for (D3D11Text::TextIcon& it : icon_buffer_)
 		{
@@ -469,10 +471,11 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	D3D11Material* D3D11Text::material()
+  D3D11RenderElement::MaterialGroup& D3D11Text::material_group()
 	{
-		material_->set_textures(FontManager::Instance()->atlas()->texture());
-		return material_.get();
+    MaterialGroup& m = material_group();
+		m.material->set_textures(FontManager::Instance()->atlas()->texture());
+    return m;
 	}
 
 	//-------------------------------------------------------------------------------------------

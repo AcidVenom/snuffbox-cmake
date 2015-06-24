@@ -197,8 +197,8 @@ namespace snuffbox
 		//// @see snuffbox::D3D11RenderElement::world_matrix
 		const XMMATRIX& world_matrix();
 
-		//// @see snuffbox::D3D11RenderElement::material
-		D3D11Material* material();
+		//// @see snuffbox::D3D11RenderElement::material_group
+    D3D11RenderElement::MaterialGroup& material_group();
 
 		/// Default destructor
 		virtual ~D3D11Text();
