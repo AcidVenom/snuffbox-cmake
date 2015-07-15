@@ -200,5 +200,6 @@ namespace snuffbox
     static void JSRemoveChild(JS_ARGS args);
     static void JSSetVisible(JS_ARGS args);
     static void JSVisible(JS_ARGS args);
+		static void JSSetParent(JS_ARGS args);
   };
 }

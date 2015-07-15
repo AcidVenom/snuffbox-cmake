@@ -229,6 +229,7 @@ namespace snuffbox
 
 		XMMATRIX									world_matrix_; //!< The world matrix of the text
 		SharedPtr<D3D11Material>  material_; //!< The material used for text
+		MaterialGroup							material_group_; //!< The material group used for text
 
 		float											highest_; //!< The biggest height found to adjust to newline
 	public:

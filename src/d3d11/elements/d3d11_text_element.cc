@@ -473,9 +473,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
   D3D11RenderElement::MaterialGroup& D3D11Text::material_group()
 	{
-    MaterialGroup& m = material_group();
-		m.material->set_textures(FontManager::Instance()->atlas()->texture());
-    return m;
+		material_group_.material = material_.get();
+		material_group_.material->set_textures(FontManager::Instance()->atlas()->texture());
+		return material_group_;
 	}
 
 	//-------------------------------------------------------------------------------------------
